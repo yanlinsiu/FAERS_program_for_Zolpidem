@@ -1,18 +1,17 @@
-import pandas as pd
 from pathlib import Path
 from config import RAW_ROOT
-from utils import read_faers_txt, build_file_path
+from utils import read_faers_txt, build_file_path, deduplicate_demo_records
 
 
 def process_demo(year, quarter, output_root):
     """
     处理 FAERS DEMO 数据（患者人口统计信息）
-    
+
     参数:
         year: 年份（如 2024）
         quarter: 季度（如 'Q1', 'Q2' 等）
         output_root: 输出文件根目录
-    
+
     处理步骤:
     1. 构建输入文件路径并检查文件是否存在
     2. 读取原始数据
@@ -44,40 +43,16 @@ def process_demo(year, quarter, output_root):
     print("列名:")
     print(list(df.columns))
 
-    # ========== 步骤 3: 数据清洗 - 类型转换 ==========
-    # 将 caseversion（病例版本号）转换为数值类型
-    # errors="coerce" 会将无法转换的值自动设为 NaN（空值）
-    # 这是 pandas 的经典用法：先转类型，再排序，最后去重
-    df["caseversion"] = pd.to_numeric(df["caseversion"], errors="coerce")
-
-    # ========== 步骤 4: 数据清洗 - 排序 ==========
-    # 先按 caseid（病例 ID）排序，再按 caseversion（版本号）升序排列
-    # 目的：让同一个病例的不同版本按从小到大有序排列，为去重做准备
-    df = df.sort_values(["caseid", "caseversion"])
-
-    # ========== 步骤 5: 数据清洗 - 去重 ==========
-    # 删除重复的 caseid，只保留每个病例的最新版本
-    # subset="caseid" 表示根据病例 ID 判断重复
-    # keep="last" 表示保留每组中的最后一条记录（即 caseversion 最大的）
-    df = df.drop_duplicates(subset="caseid", keep="last")
-
-    # 打印去重效果
-    print("去重后行数:", len(df))
-    # 验证是否还有重复的 caseid（应该为 0）
+    # ========== 步骤 3: 数据清洗与去重 ==========
+    df = deduplicate_demo_records(df)
+    print("按 DEMO 规则清洗并去重后行数:", len(df))
     print("去重后重复 caseid 数量:", df["caseid"].duplicated().sum())
 
-    # ========== 步骤 6: 保存处理后的数据 ==========
-    # 确保输出目录存在，如果不存在则创建
-    # parents=True 表示递归创建所有父目录
-    # exist_ok=True 表示如果目录已存在则不报错
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
-    # 构建输出文件路径，保存为 Parquet 格式
-    # Parquet 是高效的列式存储格式，读取速度快，文件体积小
     output_file = output_root / f"demo_{year}{quarter.lower()}.parquet"
-    
-    # 保存数据，index=False 表示不保存行索引
     df.to_parquet(output_file, index=False)
 
     print(f"已保存：{output_file}")
+    return df

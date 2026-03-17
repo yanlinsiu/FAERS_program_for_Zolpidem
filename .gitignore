@@ -1,10 +1,51 @@
-# Python-generated files
+# ------------ Python 官方标准忽略规则 ------------
+# Python 字节码/缓存文件
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 build/
+develop-eggs/
 dist/
-wheels/
-*.egg-info
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Virtual environments
-.venv
+# 虚拟环境
+.venv/
+.venv3/
+env/
+venv/
+ENV/
+
+# 开发工具/缓存
+.ruff_cache/
+.uv/
+.venv/
+*.pyc
+*.pyo
+*.pyd
+
+# ------------ 项目专属忽略规则 ------------
+# 1. 运行产出的输出数据（核心：忽略 OUTPUT 文件夹下所有内容）
+OUTPUT/
+
+# 2. 其他运行时生成的无关文件（根据你截图补充）
+# 锁定文件（如果是自动生成的也可忽略）
+uv.lock
+.python-version
+
+# 测试脚本（如果非必须提交，也可以忽略）
+test_*.py
+demo.py
+drug_name_cleaner.py

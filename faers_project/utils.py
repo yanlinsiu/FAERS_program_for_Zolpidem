@@ -6,12 +6,7 @@ def read_faers_txt(file_path):
     """
     读取 FAERS ASCII txt 文件
     """
-    df = pd.read_csv(
-        file_path,
-        sep="$",
-        encoding="latin1",
-        low_memory=False
-    )
+    df = pd.read_csv(file_path, sep="$", encoding="latin1", low_memory=False)
     df.columns = df.columns.str.strip().str.lower()
     return df
 
@@ -36,6 +31,38 @@ def build_file_path(raw_root, year, quarter, table_name):
     filename = f"{table_name}{year_short}{quarter}.txt"
 
     return Path(raw_root) / year / quarter / "ASCII" / filename
+
+
+def deduplicate_demo_records(df):
+    """
+    清洗并按 caseid 保留 DEMO 中每个病例的最新记录。
+    """
+    required_cols = ["caseid", "primaryid", "fda_dt", "caseversion"]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"DEMO 缺少必要字段: {missing_cols}")
+
+    deduped_df = df.copy()
+    deduped_df["caseid"] = (
+        deduped_df["caseid"]
+        .where(deduped_df["caseid"].notna(), "")
+        .astype(str)
+        .str.strip()
+    )
+    deduped_df = deduped_df[deduped_df["caseid"] != ""]
+    deduped_df["primaryid"] = pd.to_numeric(deduped_df["primaryid"], errors="coerce")
+    deduped_df["caseversion"] = pd.to_numeric(
+        deduped_df["caseversion"], errors="coerce"
+    )
+    deduped_df["fda_dt"] = pd.to_datetime(
+        deduped_df["fda_dt"], format="%Y%m%d", errors="coerce"
+    )
+
+    deduped_df = deduped_df.sort_values(
+        by=["caseid", "fda_dt", "caseversion", "primaryid"],
+        ascending=[True, True, True, True],
+    )
+    return deduped_df.drop_duplicates(subset="caseid", keep="last")
 
 
 def iter_quarters(start_year, start_quarter, end_year=None, end_quarter=None):

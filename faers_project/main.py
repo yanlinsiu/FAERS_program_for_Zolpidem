@@ -3,20 +3,6 @@ from config import DEFAULT_OUTPUT_ROOT
 from demo_processor import process_demo
 from drug_processor import process_drug
 from reac_processor import process_reac
-from utils import iter_quarters
-
-
-def process_one_period(year, quarter, table, output_root):
-    if table == "demo":
-        process_demo(year, quarter, output_root)
-    elif table == "drug":
-        process_drug(year, quarter, output_root)
-    elif table == "reac":
-        process_reac(year, quarter, output_root)
-    elif table == "all":
-        process_demo(year, quarter, output_root)
-        process_drug(year, quarter, output_root)
-        process_reac(year, quarter, output_root)
 
 
 def main():
@@ -66,19 +52,6 @@ def main():
         help="季度，例如 Q1"
     )
 
-    parser.add_argument(
-        "--end-year",
-        type=int,
-        help="结束年份；不传时默认等于 --year"
-    )
-
-    parser.add_argument(
-        "--end-quarter",
-        type=str,
-        choices=["Q1", "Q2", "Q3", "Q4", "q1", "q2", "q3", "q4"],
-        help="结束季度；不传时默认等于 --quarter"
-    )
-
     # ========== 添加必需参数：表名 ==========
     # 用户可以选择处理哪个表，或者选择 "all" 批量处理所有表
     parser.add_argument(
@@ -107,26 +80,34 @@ def main():
     # 从 args 对象中提取各个参数的值，方便后续使用
     year = args.year
     quarter = args.quarter.upper()  # 统一转为大写，如 'q1' → 'Q1'
-    end_year = args.end_year
-    end_quarter = args.end_quarter.upper() if args.end_quarter else None
     table = args.table.lower()      # 统一转为小写，确保匹配逻辑正确
     output_root = args.output
 
-    periods = list(iter_quarters(year, quarter, end_year, end_quarter))
-
-    if len(periods) > 1:
+    # ========== 根据表名调用相应的处理函数 ==========
+    if table == "demo":
+        # 处理 DEMO 表（患者人口统计信息）
+        process_demo(year, quarter, output_root)
+        
+    elif table == "drug":
+        # 处理 DRUG 表（药物信息）
+        process_drug(year, quarter, output_root)
+        
+    elif table == "reac":
+        # 处理 REAC 表（不良反应事件信息）
+        process_reac(year, quarter, output_root)
+        
+    elif table == "all":
+        # 批量处理所有三个表
         print("=" * 50)
-        print(f"开始批量处理 {len(periods)} 个季度...")
-        print(f"范围：{periods[0][0]} {periods[0][1]} -> {periods[-1][0]} {periods[-1][1]}")
+        print("开始批量处理所有 FAERS 数据表...")
         print("=" * 50)
-
-    for current_year, current_quarter in periods:
-        print(f"当前处理：{current_year} {current_quarter} | 表：{table}")
-        process_one_period(current_year, current_quarter, table, output_root)
-
-    if len(periods) > 1:
+        
+        process_demo(year, quarter, output_root)
+        process_drug(year, quarter, output_root)
+        process_reac(year, quarter, output_root)
+        
         print("=" * 50)
-        print("批量处理完成！")
+        print("所有数据处理完成！")
         print("=" * 50)
 
 
