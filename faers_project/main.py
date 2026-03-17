@@ -3,6 +3,7 @@ from config import DEFAULT_OUTPUT_ROOT
 from case_dataset_processor import process_case_dataset
 from demo_processor import process_demo
 from drug_processor import process_drug
+from drug_feature_processor import process_drug_feature
 from reac_processor import process_reac
 
 
@@ -24,6 +25,9 @@ def main():
 
     # 处理 REAC 表
     python main.py --year 2024 --quarter Q1 --table reac
+
+    # 处理病例级药物特征表
+    python main.py --year 2024 --quarter Q1 --table drug_feature
 
     # 构建病例级分析主表
     python main.py --year 2024 --quarter Q1 --table case
@@ -57,8 +61,12 @@ def main():
         "--table",
         required=True,
         type=str,
-        choices=["demo", "drug", "reac", "case", "all"],
-        help="要处理的表：demo(患者信息), drug(药物信息), reac(不良反应), case(病例级分析表), all(全部)",
+        choices=["demo", "drug", "drug_feature", "reac", "case", "all"],
+        help=(
+            "要处理的表：demo(患者信息), drug(药物信息), "
+            "drug_feature(病例级药物特征表), reac(不良反应), "
+            "case(病例级分析表), all(全部)"
+        ),
     )
 
     # ========== 添加可选参数：输出目录 ==========
@@ -95,8 +103,12 @@ def main():
         # 处理 REAC 表（不良反应事件信息）
         process_reac(year, quarter, output_root)
 
+    elif table == "drug_feature":
+        # 处理 DRUG 衍生的病例级药物特征表
+        process_drug_feature(year, quarter, output_root)
+
     elif table == "case":
-        # 构建病例级分析主表（DEMO + REAC）
+        # 构建病例级分析主表（DEMO + REAC + DRUG_FEATURE）
         process_case_dataset(year, quarter, output_root)
 
     elif table == "all":
@@ -107,6 +119,7 @@ def main():
 
         process_demo(year, quarter, output_root)
         process_drug(year, quarter, output_root)
+        process_drug_feature(year, quarter, output_root)
         process_reac(year, quarter, output_root)
         process_case_dataset(year, quarter, output_root)
 
