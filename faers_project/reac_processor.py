@@ -58,7 +58,9 @@ def process_reac(year, quarter, output_root):
     )
 
     # ========== 步骤 4: 与 DEMO 表关联过滤 ==========
-    retained_primaryids = load_retained_demo_primaryids(RAW_ROOT, year, quarter)
+    retained_primaryids = load_retained_demo_primaryids(
+        RAW_ROOT, year, quarter, output_root=output_root
+    )
     df = df[df["primaryid"].isin(retained_primaryids)]
     df = df[df["caseid"] != ""]
     print("DEMO 保留 primaryid 过滤后 REAC 事件行数:", len(df))

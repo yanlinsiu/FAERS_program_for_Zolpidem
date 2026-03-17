@@ -6,7 +6,7 @@ from drug_processor import process_drug
 
 
 # 病例级药物特征匹配词表。
-# 统一使用大写，后续在标准化后的 drugname/prod_ai 中做包含匹配。
+# 统一使用大写，后续在标准化后的 drugname/prod_ai 中做边界匹配。
 DRUG_FEATURE_TERMS = {
     "is_zolpidem": [
         "ZOLPIDEM",
@@ -64,7 +64,7 @@ DRUG_FEATURE_TERMS = {
 
 def _normalize_drug_text(series):
     """
-    统一标准化药物文本，便于后续做包含匹配和去重计数。
+    统一标准化药物文本，便于后续做边界匹配和去重计数。
 
     处理规则:
         1. 空值转为空字符串
@@ -81,14 +81,15 @@ def _normalize_drug_text(series):
     )
 
 
-def _build_contains_pattern(terms):
+def _build_boundary_pattern(terms):
     """
     根据匹配词列表构建正则模式。
 
     这里使用 re.escape 对词项转义，避免商品名中若存在特殊字符时影响匹配。
     """
-    escaped_terms = [re.escape(term) for term in terms]
-    return "|".join(escaped_terms)
+    escaped_terms = sorted({re.escape(term) for term in terms}, key=len, reverse=True)
+    alternation = "|".join(escaped_terms)
+    return rf"(?<![A-Z0-9])(?:{alternation})(?![A-Z0-9])"
 
 
 def process_drug_feature(year, quarter, output_root):
@@ -114,7 +115,7 @@ def process_drug_feature(year, quarter, output_root):
 
     处理规则:
         1. 若缺少前置的 DRUG parquet，则自动调用 process_drug 生成
-        2. 同时使用 drugname 和 prod_ai 做标准化后的包含匹配
+        2. 同时使用 drugname 和 prod_ai 做标准化后的边界匹配
         3. 不按 role_cod 过滤，保留病例中所有报告药物
         4. drug_n 的去重标识优先使用 prod_ai，若缺失则回退到 drugname
         5. 使用 caseid 聚合，布尔特征只要任一药物记录命中即记为 True
@@ -156,16 +157,15 @@ def process_drug_feature(year, quarter, output_root):
     df = df[df["caseid"] != ""]
     df = df[~((df["drugname"] == "") & (df["prod_ai"] == ""))]
 
-    # match_text 同时拼接商品名和活性成分，用于病例级药物类别识别。
-    df["match_text"] = (df["drugname"] + " " + df["prod_ai"]).str.strip()
-
     # resolved_drug_name 用于 drug_n 计数：优先 prod_ai，缺失时回退到 drugname。
     df["resolved_drug_name"] = df["prod_ai"].where(df["prod_ai"] != "", df["drugname"])
 
     # ========== 步骤 4: 构建药物类别标识 ==========
     for feature_name, terms in DRUG_FEATURE_TERMS.items():
-        pattern = _build_contains_pattern(terms)
-        df[feature_name] = df["match_text"].str.contains(pattern, regex=True, na=False)
+        pattern = _build_boundary_pattern(terms)
+        drugname_hit = df["drugname"].str.contains(pattern, regex=True, na=False)
+        prod_ai_hit = df["prod_ai"].str.contains(pattern, regex=True, na=False)
+        df[feature_name] = drugname_hit | prod_ai_hit
 
     # ========== 步骤 5: 计算病例级 drug_n 和 polypharmacy ==========
     # 先按病例 + 药物标识去重，再统计病例中不同药物的数量。

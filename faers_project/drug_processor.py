@@ -144,7 +144,9 @@ def process_drug(year, quarter, output_root):
     # ========== 步骤 4: 与 DEMO 表关联过滤 ==========
     # 加载 DEMO 表中保留的 primaryid 集合（去重后的最新版本病例）
     # 这样可以确保只处理有效病例的药物记录
-    retained_primaryids = load_retained_demo_primaryids(RAW_ROOT, year, quarter)
+    retained_primaryids = load_retained_demo_primaryids(
+        RAW_ROOT, year, quarter, output_root=output_root
+    )
     
     # 过滤 DRUG 数据，只保留在 DEMO 表中的 primaryid 对应的记录
     # 这一步确保了数据的一致性和完整性

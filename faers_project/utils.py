@@ -125,7 +125,69 @@ def deduplicate_demo_records(df):
     return deduped_df.drop_duplicates(subset="caseid", keep="last")
 
 
-def load_retained_demo_primaryids(raw_root, year, quarter):
+def apply_demo_demographic_criteria(df):
+    """
+    在 DEMO 去重后执行人口学标准化与纳排：
+    1. 标准化年龄字段 age_years（基于 age + age_cod）
+    2. 仅保留 65 <= age_years <= 120
+    3. 生成年龄分组 age_group：65-74, 75-84, >=85
+    4. 清洗性别 sex_clean：M/F/UNK（优先 sex，缺失则回退 gndr_cod）
+
+    支持年龄单位:
+        YR, MON, WK, DY, HR, DEC
+    其他单位视为缺失，后续会在年龄筛选中剔除。
+    """
+    required_age_cols = ["age", "age_cod"]
+    missing_age_cols = [col for col in required_age_cols if col not in df.columns]
+    if missing_age_cols:
+        raise ValueError(f"DEMO 缺少年龄标准化所需字段：{missing_age_cols}")
+
+    out_df = df.copy()
+
+    age_value = pd.to_numeric(out_df["age"], errors="coerce")
+    age_unit = (
+        out_df["age_cod"]
+        .where(out_df["age_cod"].notna(), "")
+        .astype(str)
+        .str.strip()
+        .str.upper()
+    )
+
+    age_years = pd.Series(float("nan"), index=out_df.index)
+    age_years.loc[age_unit == "YR"] = age_value.loc[age_unit == "YR"]
+    age_years.loc[age_unit == "MON"] = age_value.loc[age_unit == "MON"] / 12
+    age_years.loc[age_unit == "WK"] = age_value.loc[age_unit == "WK"] / 52
+    age_years.loc[age_unit == "DY"] = age_value.loc[age_unit == "DY"] / 365
+    age_years.loc[age_unit == "HR"] = age_value.loc[age_unit == "HR"] / (24 * 365)
+    age_years.loc[age_unit == "DEC"] = age_value.loc[age_unit == "DEC"] * 10
+    out_df["age_years"] = age_years
+
+    out_df = out_df[out_df["age_years"].between(65, 120, inclusive="both")].copy()
+
+    out_df["age_group"] = pd.cut(
+        out_df["age_years"],
+        bins=[65, 75, 85, float("inf")],
+        labels=["65-74", "75-84", ">=85"],
+        right=False,
+    ).astype(str)
+
+    sex_source_col = "sex" if "sex" in out_df.columns else "gndr_cod" if "gndr_cod" in out_df.columns else None
+    if sex_source_col is None:
+        out_df["sex_clean"] = "UNK"
+    else:
+        sex_raw = (
+            out_df[sex_source_col]
+            .where(out_df[sex_source_col].notna(), "")
+            .astype(str)
+            .str.strip()
+            .str.upper()
+        )
+        out_df["sex_clean"] = sex_raw.map({"M": "M", "F": "F"}).fillna("UNK")
+
+    return out_df
+
+
+def load_retained_demo_primaryids(raw_root, year, quarter, output_root=None):
     """
     读取指定年份和季度的 DEMO 数据，返回去重后保留的 primaryid 集合
     
@@ -143,18 +205,25 @@ def load_retained_demo_primaryids(raw_root, year, quarter):
     用途:
         用于获取有效的病例 ID 列表，以便在其他表（如 DRUG、REAC）中筛选出这些病例的记录
     """
-    # 构建 DEMO 文件的完整路径
+    if output_root is not None:
+        demo_parquet = Path(output_root) / f"demo_{year}{str(quarter).lower()}.parquet"
+        if demo_parquet.exists():
+            demo_df = pd.read_parquet(demo_parquet)
+            if "primaryid" not in demo_df.columns:
+                raise ValueError(f"DEMO 结果缺少必要字段：['primaryid']，文件：{demo_parquet}")
+            primaryid = pd.to_numeric(demo_df["primaryid"], errors="coerce")
+            return set(primaryid.dropna())
+
+    # 回退：若未找到 demo parquet，则从原始 DEMO 读取并应用同口径规则
     demo_file = build_file_path(raw_root, year, quarter, "DEMO")
-    # 检查文件是否存在
     if not demo_file.exists():
         raise FileNotFoundError(f"找不到文件：{demo_file}")
 
-    # 读取 DEMO 文件
     demo_df = read_faers_txt(demo_file)
-    # 对 DEMO 数据进行去重，保留每个病例的最新记录
     demo_df = deduplicate_demo_records(demo_df)
-    # 返回 primaryid 集合并去除空值
-    return set(demo_df["primaryid"].dropna())
+    demo_df = apply_demo_demographic_criteria(demo_df)
+    primaryid = pd.to_numeric(demo_df["primaryid"], errors="coerce")
+    return set(primaryid.dropna())
 
 
 def iter_quarters(start_year, start_quarter, end_year=None, end_quarter=None):

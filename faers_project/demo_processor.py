@@ -1,6 +1,11 @@
 from pathlib import Path
 from config import RAW_ROOT
-from utils import read_faers_txt, build_file_path, deduplicate_demo_records
+from utils import (
+    read_faers_txt,
+    build_file_path,
+    deduplicate_demo_records,
+    apply_demo_demographic_criteria,
+)
 
 
 def process_demo(year, quarter, output_root):
@@ -43,10 +48,21 @@ def process_demo(year, quarter, output_root):
     print("列名:")
     print(list(df.columns))
 
-    # ========== 步骤 3: 数据清洗与去重 ==========
+    # ========== 步骤 3: 数据清洗、去重与纳排标准处理 ==========
     df = deduplicate_demo_records(df)
     print("按 DEMO 规则清洗并去重后行数:", len(df))
     print("去重后重复 caseid 数量:", df["caseid"].duplicated().sum())
+
+    # 人口学标准化与纳排：年龄标准化、老年筛选、年龄分组、性别清洗
+    # 后续若增加 OUTC 严重结局字段，可在此阶段继续扩展（统一病例口径入口）
+    pre_filter_n = len(df)
+    df = apply_demo_demographic_criteria(df)
+    print("应用老年纳排标准后行数:", len(df))
+    print("纳排剔除行数:", pre_filter_n - len(df))
+    print("年龄分组分布:")
+    print(df["age_group"].value_counts(dropna=False))
+    print("性别清洗分布:")
+    print(df["sex_clean"].value_counts(dropna=False))
 
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)

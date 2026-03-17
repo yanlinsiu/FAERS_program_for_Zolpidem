@@ -147,6 +147,8 @@ def process_case_dataset(year, quarter, output_root):
     missing_drug_feature_cols = [
         col for col in required_drug_feature_cols if col not in drug_feature_df.columns
     ]
+    # [ 要什么  for  挨个取  in  列表  if  条件 ]
+    
     if missing_drug_feature_cols:
         raise ValueError(
             f"DRUG 病例级特征结果缺少必要字段：{missing_drug_feature_cols}"
