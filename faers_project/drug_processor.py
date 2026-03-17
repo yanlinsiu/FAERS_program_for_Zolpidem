@@ -105,13 +105,14 @@ def process_drug(year, quarter, output_root):
     # 1. 将 NaN 替换为空字符串
     # 2. 转换为字符串类型
     # 3. 去除首尾空格
-    df["caseid"] = df["caseid"].where(df["caseid"].notna(), "").astype(str).str.strip()
+    df["caseid"] = (
+        df["caseid"]
+        .where(df["caseid"]  # 1. NaN 变空字符串
+        .notna(), "")        
+        .astype(str)         # 2. 强制转为字符串
+        .str.strip()         # 3. 去除首尾空格
+    )
     
-    # 清洗 drugname（药物名称）字段：
-    # 1. 将 NaN 替换为空字符串
-    # 2. 转换为字符串类型
-    # 3. 去除首尾空格
-    # 4. 转换为大写，统一格式便于后续匹配和分析
     df["drugname"] = (
         df["drugname"]
         .where(df["drugname"].notna(), "")

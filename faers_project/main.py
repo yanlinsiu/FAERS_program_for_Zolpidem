@@ -1,5 +1,6 @@
 import argparse
 from config import DEFAULT_OUTPUT_ROOT
+from case_dataset_processor import process_case_dataset
 from demo_processor import process_demo
 from drug_processor import process_drug
 from reac_processor import process_reac
@@ -8,22 +9,25 @@ from reac_processor import process_reac
 def main():
     """
     FAERS 数据处理脚本的主入口函数
-    
+
     功能:
     - 接收命令行参数（年份、季度、表名、输出目录）
     - 根据用户选择调用相应的处理函数
     - 支持单个表处理或批量处理所有表
-    
+
     使用示例:
     # 处理 DEMO 表
     python main.py --year 2024 --quarter Q1 --table demo
-    
+
     # 处理 DRUG 表
     python main.py --year 2024 --quarter Q1 --table drug
-    
+
     # 处理 REAC 表
     python main.py --year 2024 --quarter Q1 --table reac
-    
+
+    # 构建病例级分析主表
+    python main.py --year 2024 --quarter Q1 --table case
+
     # 批量处理所有表
     python main.py --year 2024 --quarter Q1 --table all
     """
@@ -34,12 +38,7 @@ def main():
     # ========== 添加必需参数：年份 ==========
     # required=True 表示该参数必须提供
     # type=int 限制输入必须是整数
-    parser.add_argument(
-        "--year", 
-        required=True, 
-        type=int, 
-        help="年份，例如 2024"
-    )
+    parser.add_argument("--year", required=True, type=int, help="年份，例如 2024")
 
     # ========== 添加必需参数：季度 ==========
     # choices 参数限制了可选值，只能是 Q1-Q4 或 q1-q4
@@ -49,7 +48,7 @@ def main():
         required=True,
         type=str,
         choices=["Q1", "Q2", "Q3", "Q4", "q1", "q2", "q3", "q4"],
-        help="季度，例如 Q1"
+        help="季度，例如 Q1",
     )
 
     # ========== 添加必需参数：表名 ==========
@@ -58,8 +57,8 @@ def main():
         "--table",
         required=True,
         type=str,
-        choices=["demo", "drug", "reac", "all"],
-        help="要处理的表：demo(患者信息), drug(药物信息), reac(不良反应), all(全部)"
+        choices=["demo", "drug", "reac", "case", "all"],
+        help="要处理的表：demo(患者信息), drug(药物信息), reac(不良反应), case(病例级分析表), all(全部)",
     )
 
     # ========== 添加可选参数：输出目录 ==========
@@ -69,7 +68,7 @@ def main():
         "--output",
         default=DEFAULT_OUTPUT_ROOT,
         type=str,
-        help="输出目录（可选，默认使用配置文件中的路径）"
+        help="输出目录（可选，默认使用配置文件中的路径）",
     )
 
     # ========== 解析命令行参数 ==========
@@ -80,32 +79,37 @@ def main():
     # 从 args 对象中提取各个参数的值，方便后续使用
     year = args.year
     quarter = args.quarter.upper()  # 统一转为大写，如 'q1' → 'Q1'
-    table = args.table.lower()      # 统一转为小写，确保匹配逻辑正确
+    table = args.table.lower()  # 统一转为小写，确保匹配逻辑正确
     output_root = args.output
 
     # ========== 根据表名调用相应的处理函数 ==========
     if table == "demo":
         # 处理 DEMO 表（患者人口统计信息）
         process_demo(year, quarter, output_root)
-        
+
     elif table == "drug":
         # 处理 DRUG 表（药物信息）
         process_drug(year, quarter, output_root)
-        
+
     elif table == "reac":
         # 处理 REAC 表（不良反应事件信息）
         process_reac(year, quarter, output_root)
-        
+
+    elif table == "case":
+        # 构建病例级分析主表（DEMO + REAC）
+        process_case_dataset(year, quarter, output_root)
+
     elif table == "all":
-        # 批量处理所有三个表
+        # 批量处理所有表，并构建病例级分析主表
         print("=" * 50)
         print("开始批量处理所有 FAERS 数据表...")
         print("=" * 50)
-        
+
         process_demo(year, quarter, output_root)
         process_drug(year, quarter, output_root)
         process_reac(year, quarter, output_root)
-        
+        process_case_dataset(year, quarter, output_root)
+
         print("=" * 50)
         print("所有数据处理完成！")
         print("=" * 50)
