@@ -171,18 +171,28 @@ def apply_demo_demographic_criteria(df):
         right=False,
     ).astype(str)
 
-    sex_source_col = "sex" if "sex" in out_df.columns else "gndr_cod" if "gndr_cod" in out_df.columns else None
-    if sex_source_col is None:
-        out_df["sex_clean"] = "UNK"
-    else:
+    # 逐行优先 sex，当前行缺失/无效时回退 gndr_cod，最后置为 UNK
+    sex_raw = pd.Series("", index=out_df.index, dtype="object")
+    if "sex" in out_df.columns:
         sex_raw = (
-            out_df[sex_source_col]
-            .where(out_df[sex_source_col].notna(), "")
+            out_df["sex"]
+            .where(out_df["sex"].notna(), "")
             .astype(str)
             .str.strip()
             .str.upper()
         )
-        out_df["sex_clean"] = sex_raw.map({"M": "M", "F": "F"}).fillna("UNK")
+
+    if "gndr_cod" in out_df.columns:
+        gndr_raw = (
+            out_df["gndr_cod"]
+            .where(out_df["gndr_cod"].notna(), "")
+            .astype(str)
+            .str.strip()
+            .str.upper()
+        )
+        sex_raw = sex_raw.where(sex_raw.isin(["M", "F"]), gndr_raw)
+
+    out_df["sex_clean"] = sex_raw.map({"M": "M", "F": "F"}).fillna("UNK")
 
     return out_df
 
