@@ -1,5 +1,21 @@
-import pandas as pd
+﻿import pandas as pd
 from pathlib import Path
+
+OUTC_BOOL_COLS = [
+    "is_death",
+    "is_life_threatening",
+    "is_hospitalization",
+    "is_disability",
+    "is_congenital_anomaly",
+    "is_other_serious",
+    "is_serious_any",
+]
+
+DRUG_EXPOSURE_BOOL_COLS = [
+    "suspect_role_any",
+    "is_zolpidem_suspect",
+    "is_other_zdrug_suspect",
+]
 
 
 def process_case_dataset(year, quarter, output_root):
@@ -72,6 +88,10 @@ def process_case_dataset(year, quarter, output_root):
     drug_feature_file = (
         output_root / f"drug_feature_{year}{quarter.lower()}_case.parquet"
     )
+    drug_exposure_file = (
+        output_root / f"drug_exposure_{year}{quarter.lower()}_case.parquet"
+    )
+    outc_case_file = output_root / f"outc_{year}{quarter.lower()}_case.parquet"
 
     # 缺少前置产物时自动补跑，允许用户直接执行 case 流程。
     if not demo_file.exists():
@@ -103,6 +123,23 @@ def process_case_dataset(year, quarter, output_root):
 
     # ========== 步骤 2: 读取数据 ==========
     # 读取去重后的 DEMO 数据（Parquet 格式）
+    if not drug_exposure_file.exists():
+        print(f"未找到 DRUG 病例级暴露定义文件，正在自动生成：{drug_exposure_file}")
+        from drug_exposure_processor import process_drug_exposure
+
+        process_drug_exposure(year, quarter, output_root)
+
+    if not drug_exposure_file.exists():
+        raise FileNotFoundError(f"找不到 DRUG 病例级暴露定义文件：{drug_exposure_file}")
+
+    if not outc_case_file.exists():
+        print(f"未找到 OUTC 病例级文件，正在自动生成：{outc_case_file}")
+        from outc_processor import process_outc
+
+        process_outc(year, quarter, output_root)
+
+    if not outc_case_file.exists():
+        raise FileNotFoundError(f"找不到 OUTC 病例级文件：{outc_case_file}")
     demo_df = pd.read_parquet(demo_file)
 
     # 读取 REAC 衍生的病例级跌倒标识数据（Parquet 格式）
@@ -111,6 +148,9 @@ def process_case_dataset(year, quarter, output_root):
     # 读取 DRUG 衍生的病例级药物特征数据（Parquet 格式）
     drug_feature_df = pd.read_parquet(drug_feature_file)
 
+
+    drug_exposure_df = pd.read_parquet(drug_exposure_file)
+    outc_case_df = pd.read_parquet(outc_case_file)
     # ========== 步骤 3: 字段验证 ==========
     # 定义 DEMO 表必需的字段
     required_demo_cols = ["caseid"]
@@ -159,6 +199,25 @@ def process_case_dataset(year, quarter, output_root):
     # 1. 将 NaN 替换为空字符串
     # 2. 转换为字符串类型
     # 3. 去除首尾空格
+    required_drug_exposure_cols = [
+        "caseid",
+        "suspect_role_any",
+        "is_zolpidem_suspect",
+        "is_other_zdrug_suspect",
+        "target_drug_group",
+    ]
+    missing_drug_exposure_cols = [
+        col for col in required_drug_exposure_cols if col not in drug_exposure_df.columns
+    ]
+    if missing_drug_exposure_cols:
+        raise ValueError(
+            f"DRUG 病例级暴露定义结果缺少必要字段：{missing_drug_exposure_cols}"
+        )
+
+    required_outc_cols = ["caseid", *OUTC_BOOL_COLS]
+    missing_outc_cols = [col for col in required_outc_cols if col not in outc_case_df.columns]
+    if missing_outc_cols:
+        raise ValueError(f"OUTC 病例级结果缺少必要字段：{missing_outc_cols}")
     demo_df["caseid"] = (
         demo_df["caseid"].where(demo_df["caseid"].notna(), "").astype(str).str.strip()
     )
@@ -176,6 +235,15 @@ def process_case_dataset(year, quarter, output_root):
         .where(drug_feature_df["caseid"].notna(), "")
         .astype(str)
         .str.strip()
+    )
+    drug_exposure_df["caseid"] = (
+        drug_exposure_df["caseid"]
+        .where(drug_exposure_df["caseid"].notna(), "")
+        .astype(str)
+        .str.strip()
+    )
+    outc_case_df["caseid"] = (
+        outc_case_df["caseid"].where(outc_case_df["caseid"].notna(), "").astype(str).str.strip()
     )
 
     # 处理 is_fall 字段：
@@ -198,6 +266,19 @@ def process_case_dataset(year, quarter, output_root):
     for col in drug_bool_cols:
         drug_feature_df[col] = drug_feature_df[col].fillna(False).astype(bool)
 
+    for col in DRUG_EXPOSURE_BOOL_COLS:
+        drug_exposure_df[col] = drug_exposure_df[col].fillna(False).astype(bool)
+    drug_exposure_df["target_drug_group"] = (
+        drug_exposure_df["target_drug_group"].where(
+            drug_exposure_df["target_drug_group"].notna(), "no_suspect_drug"
+        )
+        .astype(str)
+        .str.strip()
+    )
+
+    for col in OUTC_BOOL_COLS:
+        outc_case_df[col] = outc_case_df[col].fillna(False).astype(bool)
+
     drug_feature_df["drug_n"] = (
         pd.to_numeric(drug_feature_df["drug_n"], errors="coerce").fillna(0).astype(int)
     )
@@ -210,6 +291,8 @@ def process_case_dataset(year, quarter, output_root):
 
     # 过滤掉 caseid 为空的 DRUG 特征记录
     drug_feature_df = drug_feature_df[drug_feature_df["caseid"] != ""]
+    drug_exposure_df = drug_exposure_df[drug_exposure_df["caseid"] != ""]
+    outc_case_df = outc_case_df[outc_case_df["caseid"] != ""]
 
     # 合并前校验病例级结果是否保持一病例一行，避免左连接时静默扩增主表行数。
     if reac_case_df["caseid"].duplicated().any():
@@ -229,6 +312,24 @@ def process_case_dataset(year, quarter, output_root):
             f"{duplicated_caseids[:10].tolist()}"
         )
 
+    if drug_exposure_df["caseid"].duplicated().any():
+        duplicated_caseids = drug_exposure_df.loc[
+            drug_exposure_df["caseid"].duplicated(), "caseid"
+        ].unique()
+        raise ValueError(
+            "DRUG 病例级暴露定义结果存在重复 caseid，无法合并："
+            f"{duplicated_caseids[:10].tolist()}"
+        )
+
+    if outc_case_df["caseid"].duplicated().any():
+        duplicated_caseids = outc_case_df.loc[
+            outc_case_df["caseid"].duplicated(), "caseid"
+        ].unique()
+        raise ValueError(
+            "OUTC 病例级结果存在重复 caseid，无法合并："
+            f"{duplicated_caseids[:10].tolist()}"
+        )
+
     # ========== 步骤 5: 数据合并 ==========
     # 使用左连接（left join）合并 DEMO 和 REAC 数据
     # - 保留 DEMO 表中的所有有效病例
@@ -236,12 +337,26 @@ def process_case_dataset(year, quarter, output_root):
     # - 未在 REAC 中命中的病例，is_fall 为 NaN
     case_df = demo_df.merge(reac_case_df, on="caseid", how="left")
     case_df = case_df.merge(drug_feature_df, on="caseid", how="left")
+    case_df = case_df.merge(drug_exposure_df, on="caseid", how="left")
+    case_df = case_df.merge(outc_case_df, on="caseid", how="left")
 
     # 将合并后 is_fall 为 NaN 的记录填充为 False
     # 这些病例在 REAC 中没有跌倒相关术语记录
     case_df["is_fall"] = case_df["is_fall"].fillna(False).astype(bool)
 
     for col in drug_bool_cols:
+        case_df[col] = case_df[col].fillna(False).astype(bool)
+
+    for col in DRUG_EXPOSURE_BOOL_COLS:
+        case_df[col] = case_df[col].fillna(False).astype(bool)
+    case_df["target_drug_group"] = (
+        case_df["target_drug_group"]
+        .where(case_df["target_drug_group"].notna(), "no_suspect_drug")
+        .astype(str)
+        .str.strip()
+    )
+
+    for col in OUTC_BOOL_COLS:
         case_df[col] = case_df[col].fillna(False).astype(bool)
 
     case_df["drug_n"] = (
