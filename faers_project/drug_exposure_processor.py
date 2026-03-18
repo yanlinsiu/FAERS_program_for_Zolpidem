@@ -25,6 +25,7 @@ OTHER_ZDRUG_TERMS = [
 ]
 
 SUSPECT_ROLES = {"PS", "SS"}
+PS_ONLY_ROLES = {"PS"}
 
 
 def _normalize_drug_text(series):
@@ -171,6 +172,8 @@ def process_drug_exposure(year, quarter, output_root):
 
     # 标记是否为可疑角色药物（PS=主要怀疑，SS=次要怀疑）
     df["is_suspect_role"] = df["role_cod"].isin(SUSPECT_ROLES)
+    # PS-only 口径，用于敏感性分析
+    df["is_ps_role"] = df["role_cod"].isin(PS_ONLY_ROLES)
 
     # 构建唑吡坦和其他 Z-drug 的正则匹配模式
     zolpidem_pattern = _build_boundary_pattern(ZOLPIDEM_TERMS)
@@ -186,52 +189,67 @@ def process_drug_exposure(year, quarter, output_root):
         | df["prod_ai"].str.contains(other_zdrug_pattern, regex=True, na=False)
     )
 
-    # 标记可疑角色中的唑吡坦和其他 Z-drug 记录
+    # 标记可疑角色中的唑吡坦和其他 Z-drug 记录（PS+SS 主口径）
     df["is_zolpidem_suspect_row"] = df["is_suspect_role"] & df["is_zolpidem_hit"]
     df["is_other_zdrug_suspect_row"] = df["is_suspect_role"] & df["is_other_zdrug_hit"]
+    # 标记可疑角色中的唑吡坦和其他 Z-drug 记录（PS-only 口径）
+    df["is_zolpidem_suspect_row_ps"] = df["is_ps_role"] & df["is_zolpidem_hit"]
+    df["is_other_zdrug_suspect_row_ps"] = df["is_ps_role"] & df["is_other_zdrug_hit"]
 
     # 按 caseid 聚合，生成病例级别的暴露标志
     grouped = df.groupby("caseid", as_index=False).agg(
         suspect_role_any=("is_suspect_role", "max"),
+        suspect_role_any_ps=("is_ps_role", "max"),
         is_zolpidem_suspect=("is_zolpidem_suspect_row", "max"),
+        is_zolpidem_suspect_ps=("is_zolpidem_suspect_row_ps", "max"),
         is_other_zdrug_suspect=("is_other_zdrug_suspect_row", "max"),
+        is_other_zdrug_suspect_ps=("is_other_zdrug_suspect_row_ps", "max"),
     )
 
     # 填充空值并确保布尔类型正确
-    grouped["is_zolpidem_suspect"] = grouped["is_zolpidem_suspect"].fillna(False).astype(
-        bool
-    )
-    grouped["is_other_zdrug_suspect"] = grouped["is_other_zdrug_suspect"].fillna(
-        False
-    ).astype(bool)
-    grouped["suspect_role_any"] = grouped["suspect_role_any"].fillna(False).astype(bool)
+    bool_cols = [
+        "suspect_role_any",
+        "suspect_role_any_ps",
+        "is_zolpidem_suspect",
+        "is_zolpidem_suspect_ps",
+        "is_other_zdrug_suspect",
+        "is_other_zdrug_suspect_ps",
+    ]
+    for col in bool_cols:
+        grouped[col] = grouped[col].fillna(False).astype(bool)
 
-    # 初始化目标药物分组为"无可疑药物"
-    grouped["target_drug_group"] = "no_suspect_drug"
-    
-    # 如果有可疑角色药物，更新为"无目标 Z-drug 可疑"
-    grouped.loc[
-        grouped["suspect_role_any"],
-        "target_drug_group",
-    ] = "no_target_zdrug_suspect"
-    
-    # 如果有其他 Z-drug 可疑，更新分组
-    grouped.loc[
-        grouped["is_other_zdrug_suspect"],
-        "target_drug_group",
-    ] = "other_zdrug_only"
-    
-    # 如果有唑吡坦可疑，更新分组
-    grouped.loc[
-        grouped["is_zolpidem_suspect"],
-        "target_drug_group",
-    ] = "zolpidem_only"
-    
-    # 如果两者皆有，覆盖为最高优先级分组
-    grouped.loc[
-        grouped["is_zolpidem_suspect"] & grouped["is_other_zdrug_suspect"],
-        "target_drug_group",
-    ] = "both_zolpidem_and_other_zdrug"
+    def _assign_target_group(
+        input_df: pd.DataFrame,
+        suspect_col: str,
+        zolpidem_col: str,
+        other_zdrug_col: str,
+        output_col: str,
+    ) -> None:
+        input_df[output_col] = "no_suspect_drug"
+        input_df.loc[input_df[suspect_col], output_col] = "no_target_zdrug_suspect"
+        input_df.loc[input_df[other_zdrug_col], output_col] = "other_zdrug_only"
+        input_df.loc[input_df[zolpidem_col], output_col] = "zolpidem_only"
+        input_df.loc[
+            input_df[zolpidem_col] & input_df[other_zdrug_col],
+            output_col,
+        ] = "both_zolpidem_and_other_zdrug"
+
+    # 主口径：PS+SS
+    _assign_target_group(
+        grouped,
+        suspect_col="suspect_role_any",
+        zolpidem_col="is_zolpidem_suspect",
+        other_zdrug_col="is_other_zdrug_suspect",
+        output_col="target_drug_group",
+    )
+    # 敏感性口径：PS-only
+    _assign_target_group(
+        grouped,
+        suspect_col="suspect_role_any_ps",
+        zolpidem_col="is_zolpidem_suspect_ps",
+        other_zdrug_col="is_other_zdrug_suspect_ps",
+        output_col="target_drug_group_ps",
+    )
 
     # 构建输出文件路径并保存
     output_file = output_root / f"drug_exposure_{year}{quarter.lower()}_case.parquet"
@@ -241,6 +259,11 @@ def process_drug_exposure(year, quarter, output_root):
     print("病例级研究暴露定义表行数:", len(grouped))
     print("唑吡坦 suspect 病例数:", int(grouped["is_zolpidem_suspect"].sum()))
     print("其他 Z-drug suspect 病例数:", int(grouped["is_other_zdrug_suspect"].sum()))
+    print("唑吡坦 suspect 病例数 (PS-only):", int(grouped["is_zolpidem_suspect_ps"].sum()))
+    print(
+        "其他 Z-drug suspect 病例数 (PS-only):",
+        int(grouped["is_other_zdrug_suspect_ps"].sum()),
+    )
     print(f"已保存：{output_file}")
 
     return grouped

@@ -5,6 +5,7 @@ OUTC_BOOL_COLS = [
     "is_death",
     "is_life_threatening",
     "is_hospitalization",
+    "is_required_intervention",
     "is_disability",
     "is_congenital_anomaly",
     "is_other_serious",
@@ -13,8 +14,11 @@ OUTC_BOOL_COLS = [
 
 DRUG_EXPOSURE_BOOL_COLS = [
     "suspect_role_any",
+    "suspect_role_any_ps",
     "is_zolpidem_suspect",
+    "is_zolpidem_suspect_ps",
     "is_other_zdrug_suspect",
+    "is_other_zdrug_suspect_ps",
 ]
 
 
@@ -55,7 +59,7 @@ def process_case_dataset(year, quarter, output_root):
         - is_fall: 跌倒结局标识（True/False）
         - is_zolpidem 等药物类别标识
         - drug_n: 病例内去重后的药物数
-        - polypharmacy: 是否满足多药并用（drug_n >= 5）
+        - polypharmacy_5: 是否满足多药并用（distinct_drug_n >= 5）
 
     数据处理规则:
         - 使用左连接（left join）保留 DEMO 表中的所有有效病例
@@ -182,7 +186,7 @@ def process_case_dataset(year, quarter, output_root):
         "is_opioid",
         "is_antiepileptic",
         "drug_n",
-        "polypharmacy",
+        "distinct_drug_n",
     ]
     missing_drug_feature_cols = [
         col for col in required_drug_feature_cols if col not in drug_feature_df.columns
@@ -193,18 +197,39 @@ def process_case_dataset(year, quarter, output_root):
         raise ValueError(
             f"DRUG 病例级特征结果缺少必要字段：{missing_drug_feature_cols}"
         )
+    if "polypharmacy_5" not in drug_feature_df.columns and "polypharmacy" not in drug_feature_df.columns:
+        raise ValueError("DRUG 病例级特征结果缺少必要字段：['polypharmacy_5']")
 
     # ========== 步骤 4: 数据清洗 ==========
     # 清洗 DEMO 表的 caseid 字段：
     # 1. 将 NaN 替换为空字符串
     # 2. 转换为字符串类型
     # 3. 去除首尾空格
+    if "suspect_role_any_ps" not in drug_exposure_df.columns and "suspect_role_any" in drug_exposure_df.columns:
+        drug_exposure_df["suspect_role_any_ps"] = drug_exposure_df["suspect_role_any"]
+    if (
+        "is_zolpidem_suspect_ps" not in drug_exposure_df.columns
+        and "is_zolpidem_suspect" in drug_exposure_df.columns
+    ):
+        drug_exposure_df["is_zolpidem_suspect_ps"] = drug_exposure_df["is_zolpidem_suspect"]
+    if (
+        "is_other_zdrug_suspect_ps" not in drug_exposure_df.columns
+        and "is_other_zdrug_suspect" in drug_exposure_df.columns
+    ):
+        drug_exposure_df["is_other_zdrug_suspect_ps"] = drug_exposure_df["is_other_zdrug_suspect"]
+    if "target_drug_group_ps" not in drug_exposure_df.columns and "target_drug_group" in drug_exposure_df.columns:
+        drug_exposure_df["target_drug_group_ps"] = drug_exposure_df["target_drug_group"]
+
     required_drug_exposure_cols = [
         "caseid",
         "suspect_role_any",
+        "suspect_role_any_ps",
         "is_zolpidem_suspect",
+        "is_zolpidem_suspect_ps",
         "is_other_zdrug_suspect",
+        "is_other_zdrug_suspect_ps",
         "target_drug_group",
+        "target_drug_group_ps",
     ]
     missing_drug_exposure_cols = [
         col for col in required_drug_exposure_cols if col not in drug_exposure_df.columns
@@ -251,6 +276,12 @@ def process_case_dataset(year, quarter, output_root):
     # 2. 转换为布尔类型
     reac_case_df["is_fall"] = reac_case_df["is_fall"].fillna(False).astype(bool)
 
+    if "polypharmacy_5" not in drug_feature_df.columns and "polypharmacy" in drug_feature_df.columns:
+        drug_feature_df["polypharmacy_5"] = drug_feature_df["polypharmacy"]
+    if "polypharmacy" not in drug_feature_df.columns and "polypharmacy_5" in drug_feature_df.columns:
+        # Keep legacy alias for downstream compatibility.
+        drug_feature_df["polypharmacy"] = drug_feature_df["polypharmacy_5"]
+
     drug_bool_cols = [
         "is_zolpidem",
         "is_zaleplon",
@@ -261,6 +292,7 @@ def process_case_dataset(year, quarter, output_root):
         "is_antipsychotic",
         "is_opioid",
         "is_antiepileptic",
+        "polypharmacy_5",
         "polypharmacy",
     ]
     for col in drug_bool_cols:
@@ -275,12 +307,24 @@ def process_case_dataset(year, quarter, output_root):
         .astype(str)
         .str.strip()
     )
+    drug_exposure_df["target_drug_group_ps"] = (
+        drug_exposure_df["target_drug_group_ps"].where(
+            drug_exposure_df["target_drug_group_ps"].notna(), "no_suspect_drug"
+        )
+        .astype(str)
+        .str.strip()
+    )
 
     for col in OUTC_BOOL_COLS:
         outc_case_df[col] = outc_case_df[col].fillna(False).astype(bool)
 
     drug_feature_df["drug_n"] = (
         pd.to_numeric(drug_feature_df["drug_n"], errors="coerce").fillna(0).astype(int)
+    )
+    drug_feature_df["distinct_drug_n"] = (
+        pd.to_numeric(drug_feature_df["distinct_drug_n"], errors="coerce")
+        .fillna(0)
+        .astype(int)
     )
 
     # 过滤掉 caseid 为空的 DEMO 记录
@@ -355,12 +399,21 @@ def process_case_dataset(year, quarter, output_root):
         .astype(str)
         .str.strip()
     )
+    case_df["target_drug_group_ps"] = (
+        case_df["target_drug_group_ps"]
+        .where(case_df["target_drug_group_ps"].notna(), "no_suspect_drug")
+        .astype(str)
+        .str.strip()
+    )
 
     for col in OUTC_BOOL_COLS:
         case_df[col] = case_df[col].fillna(False).astype(bool)
 
     case_df["drug_n"] = (
         pd.to_numeric(case_df["drug_n"], errors="coerce").fillna(0).astype(int)
+    )
+    case_df["distinct_drug_n"] = (
+        pd.to_numeric(case_df["distinct_drug_n"], errors="coerce").fillna(0).astype(int)
     )
 
     # ========== 步骤 6: 保存结果 ==========
@@ -375,7 +428,7 @@ def process_case_dataset(year, quarter, output_root):
     # 打印统计信息
     print("病例级分析数据行数:", len(case_df))
     print("跌倒病例数:", int(case_df["is_fall"].sum()))
-    print("多药并用病例数:", int(case_df["polypharmacy"].sum()))
+    print("多药并用病例数(polypharmacy_5):", int(case_df["polypharmacy_5"].sum()))
     print(f"已保存：{output_file}")
 
     # 返回合并后的 DataFrame，供后续分析使用

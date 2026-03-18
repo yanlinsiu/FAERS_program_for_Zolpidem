@@ -7,6 +7,7 @@ from drug_processor import process_drug
 from drug_feature_processor import process_drug_feature
 from outc_processor import process_outc
 from reac_processor import process_reac
+from signal_dataset_processor import process_signal_dataset
 
 
 def main():
@@ -42,12 +43,12 @@ def main():
     """
     # ========== 创建命令行参数解析器 ==========
     # argparse �?Python 标准库，用于解析命令行参�?
-    parser = argparse.ArgumentParser(description="FAERS 数据处理脚本")
+    parser = argparse.ArgumentParser(description="FAERS data processing script")
 
     # ========== 添加必需参数：年�?==========
     # required=True 表示该参数必须提�?
     # type=int 限制输入必须是整�?
-    parser.add_argument("--year", required=True, type=int, help="年份，例�?2024")
+    parser.add_argument("--year", required=True, type=int, help="Year, e.g. 2024")
 
     # ========== 添加必需参数：季�?==========
     # choices 参数限制了可选值，只能�?Q1-Q4 �?q1-q4
@@ -57,7 +58,7 @@ def main():
         required=True,
         type=str,
         choices=["Q1", "Q2", "Q3", "Q4", "q1", "q2", "q3", "q4"],
-        help="季度，例�?Q1",
+        help="Quarter, e.g. Q1",
     )
 
     # ========== 添加必需参数：表�?==========
@@ -74,13 +75,12 @@ def main():
             "reac",
             "outc",
             "case",
+            "signal",
             "all",
         ],
         help=(
-            "要处理的表：demo(患者信�?, drug(药物信息), "
-            "drug_feature(病例级药物特征表), drug_exposure(病例级研究暴露定义表), "
-            "reac(不良反应), outc(严重结局), "
-            "case(病例级分析表), all(全部)"
+            "Table to process: demo, drug, drug_feature, drug_exposure, "
+            "reac, outc, case, signal, or all"
         ),
     )
 
@@ -91,7 +91,7 @@ def main():
         "--output",
         default=DEFAULT_OUTPUT_ROOT,
         type=str,
-        help="输出目录（可选，默认使用配置文件中的路径）",
+        help="Output directory (optional, defaults to config value)",
     )
 
     # ========== 解析命令行参�?==========
@@ -131,10 +131,14 @@ def main():
         # 构建病例级分析主表（DEMO + REAC + DRUG_FEATURE�?
         process_case_dataset(year, quarter, output_root)
 
+    elif table == "signal":
+        # 构建信号挖掘分析表（case_base + REAC case + drug_exposure case）
+        process_signal_dataset(year, quarter, output_root)
+
     elif table == "all":
         # 批量处理所有表，并构建病例级分析主�?
         print("=" * 50)
-        print("开始批量处理所�?FAERS 数据�?..")
+        print("Starting batch processing for all FAERS tables...")
         print("=" * 50)
 
         process_demo(year, quarter, output_root)
@@ -144,9 +148,10 @@ def main():
         process_reac(year, quarter, output_root)
         process_outc(year, quarter, output_root)
         process_case_dataset(year, quarter, output_root)
+        process_signal_dataset(year, quarter, output_root)
 
         print("=" * 50)
-        print("所有数据处理完成！")
+        print("All data processing completed.")
         print("=" * 50)
 
 

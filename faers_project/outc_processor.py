@@ -11,6 +11,7 @@ OUTC_CODE_TO_FLAG = {
     "DE": "is_death",
     "LT": "is_life_threatening",
     "HO": "is_hospitalization",
+    "RI": "is_required_intervention",
     "DS": "is_disability",
     "CA": "is_congenital_anomaly",
     "OT": "is_other_serious",

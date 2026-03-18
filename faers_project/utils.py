@@ -5,7 +5,15 @@ import pandas as pd
 
 def read_faers_txt(file_path):
     """Read FAERS ASCII file with standard settings."""
-    df = pd.read_csv(file_path, sep="$", encoding="latin1", low_memory=False)
+    # Read raw FAERS columns as strings first so large identifier-like fields
+    # (for example lot numbers / NDA numbers) are not inferred as oversized ints.
+    df = pd.read_csv(
+        file_path,
+        sep="$",
+        encoding="latin1",
+        low_memory=False,
+        dtype=str,
+    )
     df.columns = df.columns.str.strip().str.lower()
     return df
 

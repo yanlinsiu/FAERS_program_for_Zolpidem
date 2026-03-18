@@ -140,7 +140,9 @@ def process_drug_feature(year, quarter, output_root):
     case_feature_df["distinct_drug_n"] = (
         case_feature_df["distinct_drug_n"].fillna(0).astype(int)
     )
-    case_feature_df["polypharmacy"] = case_feature_df["distinct_drug_n"] >= 5
+    case_feature_df["polypharmacy_5"] = case_feature_df["distinct_drug_n"] >= 5
+    # Keep legacy name for backward compatibility with existing downstream code.
+    case_feature_df["polypharmacy"] = case_feature_df["polypharmacy_5"]
 
     output_root.mkdir(parents=True, exist_ok=True)
 
@@ -154,7 +156,7 @@ def process_drug_feature(year, quarter, output_root):
     case_feature_df.to_parquet(legacy_output_file, index=False)
 
     print("drug_feature_dataset rows:", len(case_feature_df))
-    print("polypharmacy cases:", int(case_feature_df["polypharmacy"].sum()))
+    print("polypharmacy_5 cases:", int(case_feature_df["polypharmacy_5"].sum()))
     print(f"saved: {output_file}")
     print(f"saved (legacy): {legacy_output_file}")
     return case_feature_df
