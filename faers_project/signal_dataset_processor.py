@@ -84,6 +84,7 @@ def process_signal_dataset(year, quarter, output_root):
     case_base_file = output_root / f"case_base_dataset_{year}{quarter_lower}.parquet"
     reac_case_file = output_root / f"reac_{year}{quarter_lower}_case.parquet"
     drug_exposure_file = output_root / f"drug_exposure_{year}{quarter_lower}_case.parquet"
+    outc_case_file = output_root / f"outc_{year}{quarter_lower}_case.parquet"
 
     if not case_base_file.exists():
         print(f"case_base dataset not found, building automatically: {case_base_file}")
@@ -106,16 +107,25 @@ def process_signal_dataset(year, quarter, output_root):
 
         process_drug_exposure(year, quarter, output_root)
 
+    if not outc_case_file.exists():
+        print(f"OUTC case dataset not found, building automatically: {outc_case_file}")
+        from outc_processor import process_outc
+
+        process_outc(year, quarter, output_root)
+
     if not case_base_file.exists():
         raise FileNotFoundError(f"file not found: {case_base_file}")
     if not reac_case_file.exists():
         raise FileNotFoundError(f"file not found: {reac_case_file}")
     if not drug_exposure_file.exists():
         raise FileNotFoundError(f"file not found: {drug_exposure_file}")
+    if not outc_case_file.exists():
+        raise FileNotFoundError(f"file not found: {outc_case_file}")
 
     case_base_df = pd.read_parquet(case_base_file)
     reac_case_df = pd.read_parquet(reac_case_file)
     drug_exposure_df = pd.read_parquet(drug_exposure_file)
+    outc_case_df = pd.read_parquet(outc_case_file)
 
     if "suspect_role_any_ps" not in drug_exposure_df.columns and "suspect_role_any" in drug_exposure_df.columns:
         drug_exposure_df["suspect_role_any_ps"] = drug_exposure_df["suspect_role_any"]
@@ -137,6 +147,7 @@ def process_signal_dataset(year, quarter, output_root):
     _assert_has_columns(
         drug_exposure_df, REQUIRED_DRUG_EXPOSURE_COLS, "drug_exposure_case"
     )
+    _assert_has_columns(outc_case_df, ["caseid", "is_serious_any"], "outc_case")
 
     case_base_keep_cols = REQUIRED_CASE_BASE_COLS.copy()
     if "serious" in case_base_df.columns:
@@ -149,13 +160,20 @@ def process_signal_dataset(year, quarter, output_root):
     case_base_df = _normalize_caseid(case_base_df[case_base_keep_cols])
     reac_case_df = _normalize_caseid(reac_case_df[reac_keep_cols])
     drug_exposure_df = _normalize_caseid(drug_exposure_df[REQUIRED_DRUG_EXPOSURE_COLS])
+    outc_case_df = _normalize_caseid(outc_case_df[["caseid", "is_serious_any"]])
 
     _assert_caseid_unique(case_base_df, "case_base_dataset")
     _assert_caseid_unique(reac_case_df, "reac_case")
     _assert_caseid_unique(drug_exposure_df, "drug_exposure_case")
+    _assert_caseid_unique(outc_case_df, "outc_case")
 
     signal_df = case_base_df.merge(reac_case_df, on="caseid", how="left")
     signal_df = signal_df.merge(drug_exposure_df, on="caseid", how="left")
+    signal_df = signal_df.merge(
+        outc_case_df.rename(columns={"is_serious_any": "serious_outc"}),
+        on="caseid",
+        how="left",
+    )
 
     for col in BOOL_COLS:
         signal_df[col] = signal_df[col].fillna(False).astype(bool)
@@ -164,6 +182,12 @@ def process_signal_dataset(year, quarter, output_root):
         signal_df["has_fall_related_broad"] = (
             signal_df["has_fall_related_broad"].fillna(False).astype(bool)
         )
+
+    if "serious_outc" in signal_df.columns:
+        signal_df["serious"] = signal_df["serious_outc"].fillna(False).astype(bool)
+        signal_df = signal_df.drop(columns=["serious_outc"])
+    elif "serious" in signal_df.columns:
+        signal_df["serious"] = signal_df["serious"].fillna(False).astype(bool)
 
     signal_df["age_group"] = (
         signal_df["age_group"].where(signal_df["age_group"].notna(), "unknown")

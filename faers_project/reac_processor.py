@@ -1,7 +1,13 @@
 import pandas as pd
 from pathlib import Path
 
-from utils import build_file_path, load_retained_demo_primaryids, read_faers_txt
+from utils import (
+    attach_caseid_from_demo,
+    build_file_path,
+    ensure_required_columns,
+    load_retained_demo_primaryids,
+    read_faers_txt,
+)
 from config import RAW_ROOT
 
 
@@ -13,12 +19,9 @@ def process_reac(year, quarter, output_root):
     if not file_path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
 
-    df = read_faers_txt(file_path)
-
-    required_cols = ["primaryid", "caseid"]
-    missing_cols = [col for col in required_cols if col not in df.columns]
-    if missing_cols:
-        raise ValueError(f"REAC missing required columns: {missing_cols}")
+    df = read_faers_txt(file_path, dataset_name="REAC")
+    df = attach_caseid_from_demo(df, RAW_ROOT, year, quarter, output_root=output_root)
+    ensure_required_columns(df, ["primaryid", "caseid"], "REAC")
 
     if "pt" in df.columns:
         reaction_term_col = "pt"

@@ -7,7 +7,8 @@ from utils import (
     apply_demo_demographic_criteria,
     build_file_path,
     deduplicate_demo_records,
-    read_faers_txt,
+    exclude_deleted_caseids,
+    load_standardized_demo,
 )
 
 
@@ -65,8 +66,21 @@ def process_demo(year, quarter, output_root):
     if not file_path.exists():
         raise FileNotFoundError(f"file not found: {file_path}")
 
-    df = read_faers_txt(file_path)
+    df = load_standardized_demo(RAW_ROOT, year, quarter)
     print("raw rows:", len(df))
+
+    pre_deleted_rows = len(df)
+    df, removed_rows, removed_caseids = exclude_deleted_caseids(df, RAW_ROOT, year, quarter)
+    if removed_rows:
+        print(
+            "rows removed by deleted reports:",
+            removed_rows,
+            f"(unique caseid: {removed_caseids})",
+        )
+    else:
+        print("rows removed by deleted reports: 0")
+    print("rows after deleted reports filter:", len(df))
+    print("rows changed by deleted filter:", pre_deleted_rows - len(df))
 
     df = deduplicate_demo_records(df)
     print("rows after DEMO dedup:", len(df))

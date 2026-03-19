@@ -9,6 +9,29 @@ import pandas as pd
 DEFAULT_SIGNAL_ROOT = Path(r"D:\program_FAERS\OUTPUT")
 DEFAULT_ANALYSIS_ROOT = Path(r"D:\program_FAERS\OUTPUT\analysis")
 
+OUTCOME_SPECS = [
+    {
+        "outcome_name": "strict_fall",
+        "outcome_col": "is_fall",
+        "outcome_label": "Strict fall definition (PT=FALL/FALLS)",
+    },
+    {
+        "outcome_name": "broad_fall",
+        "outcome_col": "has_fall_related_broad",
+        "outcome_label": "Broad fall-related definition",
+    },
+]
+
+STRATUM_SPECS = [
+    ("age_group", "65-74", "Age 65-74"),
+    ("age_group", "75-84", "Age 75-84"),
+    ("age_group", ">=85", "Age >=85"),
+    ("sex_clean", "F", "Female"),
+    ("sex_clean", "M", "Male"),
+    ("serious", True, "Serious outcome"),
+    ("polypharmacy_5", True, "Polypharmacy >=5"),
+]
+
 
 def ensure_output_dir(output_dir: str | Path | None = None) -> Path:
     path = Path(output_dir) if output_dir else DEFAULT_ANALYSIS_ROOT
@@ -50,6 +73,10 @@ def load_signal_dataset(signal_root: str | Path | None = None) -> pd.DataFrame:
     combined = pd.concat(frames, ignore_index=True)
     combined["caseid"] = combined["caseid"].astype(str).str.strip()
     combined = combined[combined["caseid"] != ""].copy()
+    if "has_fall_related_broad" not in combined.columns and "is_fall" in combined.columns:
+        combined["has_fall_related_broad"] = combined["is_fall"].fillna(False).astype(bool)
+    if "serious" in combined.columns:
+        combined["serious"] = combined["serious"].fillna(False).astype(bool)
     return combined
 
 
@@ -88,6 +115,8 @@ def merge_signal_and_feature(signal_root: str | Path | None = None) -> pd.DataFr
         "is_antiepileptic",
         "polypharmacy_5",
         "polypharmacy",
+        "serious",
+        "has_fall_related_broad",
     ]
     for col in feature_bool_cols:
         if col in merged.columns:
@@ -98,6 +127,12 @@ def merge_signal_and_feature(signal_root: str | Path | None = None) -> pd.DataFr
             merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0).astype(int)
 
     return merged
+
+
+def feature_mask(df: pd.DataFrame, column: str, value) -> pd.Series:
+    if isinstance(value, bool):
+        return df[column].fillna(False).astype(bool).eq(value)
+    return df[column].astype(str).str.strip().eq(str(value))
 
 
 def summarize_missing(df: pd.DataFrame, columns: Iterable[str]) -> dict[str, int]:
@@ -176,9 +211,59 @@ def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int
     return result
 
 
+def describe_signal(metrics: dict[str, float | int | None]) -> str:
+    if metrics["signal_flag_ror"] or metrics["signal_flag_mhra"]:
+        return "存在不成比例性信号"
+    return "未见明确不成比例性信号"
+
+
+def format_metric(value) -> str:
+    if value is None or pd.isna(value):
+        return "NA"
+    return f"{float(value):.4f}"
+
+
+def build_stratified_rows(
+    df: pd.DataFrame,
+    analysis_name: str,
+    exposure_col: str,
+    outcome_col: str,
+    outcome_name: str,
+    outcome_label: str,
+    stratum_specs: list[tuple[str, object, str]] | None = None,
+) -> pd.DataFrame:
+    rows = []
+    specs = STRATUM_SPECS if stratum_specs is None else stratum_specs
+    for column, value, label in specs:
+        if column not in df.columns:
+            continue
+        mask = feature_mask(df, column, value)
+        subset = df[mask].copy()
+        if subset.empty:
+            continue
+        counts = two_by_two_counts(subset[exposure_col], subset[outcome_col])
+        metrics = ror_prr_from_counts(**counts)
+        rows.append(
+            {
+                "analysis": analysis_name,
+                "outcome_name": outcome_name,
+                "outcome_label": outcome_label,
+                "stratum_col": column,
+                "stratum_value": value,
+                "stratum_label": label,
+                "n_in_stratum": int(len(subset)),
+                "n_outcome": int(subset[outcome_col].fillna(False).astype(bool).sum()),
+                "conclusion": describe_signal(metrics),
+                **metrics,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def make_overall_qc(df: pd.DataFrame, label: str, exposure_col: str, outcome_col: str) -> pd.DataFrame:
     qc = {
         "analysis": label,
+        "outcome_col": outcome_col,
         "n_total": int(len(df)),
         "n_exposed": int(df[exposure_col].fillna(False).astype(bool).sum()),
         "n_unexposed": int((~df[exposure_col].fillna(False).astype(bool)).sum()),

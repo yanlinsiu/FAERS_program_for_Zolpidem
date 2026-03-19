@@ -4,7 +4,13 @@ from pathlib import Path
 # 从配置文件导入原始数据根目录配置
 from config import RAW_ROOT
 # 从 utils 模块导入工具函数：路径构建、加载保留的 primaryid、读取 FAERS 文件
-from utils import build_file_path, load_retained_demo_primaryids, read_faers_txt
+from utils import (
+    attach_caseid_from_demo,
+    build_file_path,
+    ensure_required_columns,
+    load_retained_demo_primaryids,
+    read_faers_txt,
+)
 
 
 def process_drug(year, quarter, output_root):
@@ -80,15 +86,11 @@ def process_drug(year, quarter, output_root):
     # - 分隔符 ($)：FAERS 标准格式
     # - 编码 (latin1)：兼容特殊字符
     # - 列名转小写：统一命名规范
-    df = read_faers_txt(file)
+    df = read_faers_txt(file, dataset_name="DRUG")
 
     # ========== 步骤 3: 数据验证和清洗 ==========
     # 定义 DRUG 表必需的字段
     required_cols = ["primaryid", "caseid", "drugname", "prod_ai", "role_cod"]
-    # 检查是否有缺失的必需列
-    missing_cols = [col for col in required_cols if col not in df.columns]
-    if missing_cols:
-        raise ValueError(f"DRUG 缺少必要字段：{missing_cols}")
 
     # 打印数据行数，了解数据规模
     print("DRUG 行数:", len(df))
@@ -96,6 +98,9 @@ def process_drug(year, quarter, output_root):
     # 打印所有列名，查看可用的药物信息字段
     print("DRUG 列名:")
     print(list(df.columns))
+
+    df = attach_caseid_from_demo(df, RAW_ROOT, year, quarter, output_root=output_root)
+    ensure_required_columns(df, ["primaryid", "caseid", "drugname", "prod_ai", "role_cod"], "DRUG")
 
     # 将 primaryid 转换为数值类型，无法转换的值设为 NaN
     # primaryid 用于与 DEMO 表关联，必须是有效的数字 ID
