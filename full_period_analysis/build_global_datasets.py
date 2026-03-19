@@ -170,7 +170,7 @@ def write_outputs(
     con: duckdb.DuckDBPyConnection,
     start_year: int,
     end_year: int,
-) -> tuple[Path, Path, Path, Path]:
+) -> tuple[Path, Path, Path, Path, Path]:
     GLOBAL_DATASET_DIR.mkdir(parents=True, exist_ok=True)
     GLOBAL_QC_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -179,6 +179,7 @@ def write_outputs(
     signal_file = GLOBAL_DATASET_DIR / f"signal_dataset_{period_token}.parquet"
     feature_file = GLOBAL_DATASET_DIR / f"drug_feature_{period_token}_case.parquet"
     qc_file = GLOBAL_QC_DIR / f"global_dataset_qc_{period_token}.csv"
+    qc_summary_file = GLOBAL_QC_DIR / f"global_signal_summary_{period_token}.csv"
 
     con.execute(f"COPY global_case_index TO '{_sql_quoted(case_index_file)}' (FORMAT PARQUET)")
     con.execute(f"COPY signal_global TO '{_sql_quoted(signal_file)}' (FORMAT PARQUET)")
@@ -198,7 +199,61 @@ def write_outputs(
         """
     ).df()
     qc_df.to_csv(qc_file, index=False, encoding="utf-8-sig")
-    return case_index_file, signal_file, feature_file, qc_file
+
+    signal_summary_df = con.execute(
+        """
+        WITH metrics AS (
+            SELECT 'global_total_cases' AS metric, COUNT(*)::BIGINT AS value FROM global_case_index
+            UNION ALL
+            SELECT 'signal_dataset_cases', COUNT(*)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'feature_dataset_cases', COUNT(*)::BIGINT FROM feature_global
+            UNION ALL
+            SELECT 'strict_fall_cases', SUM(CASE WHEN is_fall THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'broad_fall_cases', SUM(CASE WHEN has_fall_related_broad THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'suspect_any_cases_ps_ss', SUM(CASE WHEN suspect_role_any THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'suspect_any_cases_ps_only', SUM(CASE WHEN suspect_role_any_ps THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'zolpidem_any_cases', SUM(CASE WHEN is_zolpidem_any THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'zolpidem_suspect_cases_ps_ss', SUM(CASE WHEN is_zolpidem_suspect THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'zolpidem_suspect_cases_ps_only', SUM(CASE WHEN is_zolpidem_suspect_ps THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'other_zdrug_suspect_cases_ps_ss', SUM(CASE WHEN is_other_zdrug_suspect THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'other_zdrug_suspect_cases_ps_only', SUM(CASE WHEN is_other_zdrug_suspect_ps THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_ss_no_suspect_drug', SUM(CASE WHEN target_drug_group = 'no_suspect_drug' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_ss_no_target_zdrug_suspect', SUM(CASE WHEN target_drug_group = 'no_target_zdrug_suspect' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_ss_other_zdrug_only', SUM(CASE WHEN target_drug_group = 'other_zdrug_only' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_ss_zolpidem_only', SUM(CASE WHEN target_drug_group = 'zolpidem_only' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_ss_both_zolpidem_and_other_zdrug', SUM(CASE WHEN target_drug_group = 'both_zolpidem_and_other_zdrug' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_only_no_suspect_drug', SUM(CASE WHEN target_drug_group_ps = 'no_suspect_drug' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_only_no_target_zdrug_suspect', SUM(CASE WHEN target_drug_group_ps = 'no_target_zdrug_suspect' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_only_other_zdrug_only', SUM(CASE WHEN target_drug_group_ps = 'other_zdrug_only' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_only_zolpidem_only', SUM(CASE WHEN target_drug_group_ps = 'zolpidem_only' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            UNION ALL
+            SELECT 'group_ps_only_both_zolpidem_and_other_zdrug', SUM(CASE WHEN target_drug_group_ps = 'both_zolpidem_and_other_zdrug' THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+        )
+        SELECT metric, value
+        FROM metrics
+        ORDER BY metric
+        """
+    ).df()
+    signal_summary_df.to_csv(qc_summary_file, index=False, encoding="utf-8-sig")
+    return case_index_file, signal_file, feature_file, qc_file, qc_summary_file
 
 
 def main() -> None:
@@ -228,7 +283,7 @@ def main() -> None:
         create_global_case_index(con, case_files, start_year, end_year)
         create_global_signal_dataset(con, signal_files, start_year, end_year)
         create_global_feature_dataset(con, feature_files)
-        case_file, signal_file, feature_file, qc_file = write_outputs(con, start_year, end_year)
+        case_file, signal_file, feature_file, qc_file, qc_summary_file = write_outputs(con, start_year, end_year)
     finally:
         con.close()
 
@@ -238,6 +293,7 @@ def main() -> None:
     print(f"Signal dataset: {signal_file}")
     print(f"Feature dataset: {feature_file}")
     print(f"QC summary: {qc_file}")
+    print(f"Signal summary: {qc_summary_file}")
 
 
 if __name__ == "__main__":
