@@ -39,13 +39,33 @@ def ensure_output_dir(output_dir: str | Path | None = None) -> Path:
     return path
 
 
-def list_signal_files(signal_root: str | Path | None = None) -> list[Path]:
-    root = Path(signal_root) if signal_root else DEFAULT_SIGNAL_ROOT
+def _normalize_input_path(path_value: str | Path | None, default_path: Path) -> Path:
+    return Path(path_value) if path_value else default_path
+
+
+def list_signal_files(
+    signal_root: str | Path | None = None,
+    signal_file: str | Path | None = None,
+) -> list[Path]:
+    if signal_file:
+        return [Path(signal_file)]
+
+    root = _normalize_input_path(signal_root, DEFAULT_SIGNAL_ROOT)
+    if root.is_file():
+        return [root]
     return sorted(root.glob("signal_dataset_*.parquet"))
 
 
-def list_feature_files(signal_root: str | Path | None = None) -> list[Path]:
-    root = Path(signal_root) if signal_root else DEFAULT_SIGNAL_ROOT
+def list_feature_files(
+    signal_root: str | Path | None = None,
+    feature_file: str | Path | None = None,
+) -> list[Path]:
+    if feature_file:
+        return [Path(feature_file)]
+
+    root = _normalize_input_path(signal_root, DEFAULT_SIGNAL_ROOT)
+    if root.is_file():
+        return [root]
     return sorted(root.glob("drug_feature_*_case.parquet"))
 
 
@@ -58,8 +78,11 @@ def _extract_period_from_name(path: Path) -> str:
     return stem
 
 
-def load_signal_dataset(signal_root: str | Path | None = None) -> pd.DataFrame:
-    files = list_signal_files(signal_root)
+def load_signal_dataset(
+    signal_root: str | Path | None = None,
+    signal_file: str | Path | None = None,
+) -> pd.DataFrame:
+    files = list_signal_files(signal_root=signal_root, signal_file=signal_file)
     if not files:
         raise FileNotFoundError("No signal_dataset_*.parquet files found.")
 
@@ -80,8 +103,11 @@ def load_signal_dataset(signal_root: str | Path | None = None) -> pd.DataFrame:
     return combined
 
 
-def load_feature_dataset(signal_root: str | Path | None = None) -> pd.DataFrame:
-    files = list_feature_files(signal_root)
+def load_feature_dataset(
+    signal_root: str | Path | None = None,
+    feature_file: str | Path | None = None,
+) -> pd.DataFrame:
+    files = list_feature_files(signal_root=signal_root, feature_file=feature_file)
     if not files:
         raise FileNotFoundError("No drug_feature_*_case.parquet files found.")
 
@@ -98,13 +124,18 @@ def load_feature_dataset(signal_root: str | Path | None = None) -> pd.DataFrame:
     return combined
 
 
-def merge_signal_and_feature(signal_root: str | Path | None = None) -> pd.DataFrame:
-    signal_df = load_signal_dataset(signal_root)
-    feature_df = load_feature_dataset(signal_root)
+def merge_signal_and_feature(
+    signal_root: str | Path | None = None,
+    signal_file: str | Path | None = None,
+    feature_file: str | Path | None = None,
+) -> pd.DataFrame:
+    signal_df = load_signal_dataset(signal_root=signal_root, signal_file=signal_file)
+    feature_df = load_feature_dataset(signal_root=signal_root, feature_file=feature_file)
     merged = signal_df.merge(feature_df, on=["caseid", "dataset_period"], how="left")
 
     feature_bool_cols = [
         "is_zolpidem",
+        "is_zolpidem_any",
         "is_zaleplon",
         "is_zopiclone",
         "is_eszopiclone",
@@ -173,13 +204,23 @@ def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int
     result["reporting_rate_exposed"] = a / (a + b) if (a + b) else None
     result["reporting_rate_unexposed"] = c / (c + d) if (c + d) else None
 
-    if all(x > 0 for x in [a, b, c, d]):
-        ror = (a * d) / (b * c)
-        se_log_ror = math.sqrt((1 / a) + (1 / b) + (1 / c) + (1 / d))
+    if n > 0:
+        # Apply Haldane-Anscombe continuity correction when any cell is zero.
+        # This avoids dropping otherwise informative signals (e.g., b=0 or c=0).
+        use_continuity_correction = any(x == 0 for x in [a, b, c, d])
+        correction = 0.5 if use_continuity_correction else 0.0
+        a_eff = a + correction
+        b_eff = b + correction
+        c_eff = c + correction
+        d_eff = d + correction
+
+        ror = (a_eff * d_eff) / (b_eff * c_eff)
+        se_log_ror = math.sqrt((1 / a_eff) + (1 / b_eff) + (1 / c_eff) + (1 / d_eff))
         ror_ci_low, ror_ci_high = _wald_ci_from_log_estimate(math.log(ror), se_log_ror)
-        prr = (a / (a + b)) / (c / (c + d)) if (a + b) and (c + d) and c > 0 else None
-        se_log_prr = math.sqrt((1 / a) - (1 / (a + b)) + (1 / c) - (1 / (c + d)))
-        prr_ci_low, prr_ci_high = _wald_ci_from_log_estimate(math.log(prr), se_log_prr) if prr else (None, None)
+
+        prr = (a_eff / (a_eff + b_eff)) / (c_eff / (c_eff + d_eff))
+        se_log_prr = math.sqrt((1 / a_eff) - (1 / (a_eff + b_eff)) + (1 / c_eff) - (1 / (c_eff + d_eff)))
+        prr_ci_low, prr_ci_high = _wald_ci_from_log_estimate(math.log(prr), se_log_prr)
     else:
         ror = None
         ror_ci_low = None
@@ -213,8 +254,8 @@ def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int
 
 def describe_signal(metrics: dict[str, float | int | None]) -> str:
     if metrics["signal_flag_ror"] or metrics["signal_flag_mhra"]:
-        return "存在不成比例性信号"
-    return "未见明确不成比例性信号"
+        return "signal_detected"
+    return "no_clear_signal"
 
 
 def format_metric(value) -> str:

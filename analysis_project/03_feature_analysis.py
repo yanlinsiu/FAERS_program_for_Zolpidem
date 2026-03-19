@@ -69,8 +69,17 @@ def _build_feature_rows(
     return pd.DataFrame(rows)
 
 
-def build_feature_analysis(signal_root: str | Path | None = None, output_dir: str | Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
-    merged_df = merge_signal_and_feature(signal_root)
+def build_feature_analysis(
+    signal_root: str | Path | None = None,
+    output_dir: str | Path | None = None,
+    signal_file: str | Path | None = None,
+    feature_file: str | Path | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    merged_df = merge_signal_and_feature(
+        signal_root=signal_root,
+        signal_file=signal_file,
+        feature_file=feature_file,
+    )
 
     result_frames = []
     qc_rows = []

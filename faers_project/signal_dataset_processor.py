@@ -30,6 +30,7 @@ REQUIRED_DRUG_EXPOSURE_COLS = [
 
 BOOL_COLS = [
     "is_fall",
+    "is_zolpidem_any",
     "suspect_role_any",
     "suspect_role_any_ps",
     "is_zolpidem_suspect",
@@ -41,6 +42,11 @@ BOOL_COLS = [
 OPTIONAL_FALL_COLS = [
     "has_fall_related_broad",
     "fall_pt_list",
+]
+
+OPTIONAL_DRUG_FEATURE_COLS = [
+    "is_zolpidem_any",
+    "is_zolpidem",
 ]
 
 
@@ -84,6 +90,7 @@ def process_signal_dataset(year, quarter, output_root):
     case_base_file = output_root / f"case_base_dataset_{year}{quarter_lower}.parquet"
     reac_case_file = output_root / f"reac_{year}{quarter_lower}_case.parquet"
     drug_exposure_file = output_root / f"drug_exposure_{year}{quarter_lower}_case.parquet"
+    drug_feature_file = output_root / f"drug_feature_{year}{quarter_lower}_case.parquet"
     outc_case_file = output_root / f"outc_{year}{quarter_lower}_case.parquet"
 
     if not case_base_file.exists():
@@ -113,18 +120,30 @@ def process_signal_dataset(year, quarter, output_root):
 
         process_outc(year, quarter, output_root)
 
+    if not drug_feature_file.exists():
+        print(
+            "drug_feature case dataset not found, building automatically: "
+            f"{drug_feature_file}"
+        )
+        from drug_feature_processor import process_drug_feature
+
+        process_drug_feature(year, quarter, output_root)
+
     if not case_base_file.exists():
         raise FileNotFoundError(f"file not found: {case_base_file}")
     if not reac_case_file.exists():
         raise FileNotFoundError(f"file not found: {reac_case_file}")
     if not drug_exposure_file.exists():
         raise FileNotFoundError(f"file not found: {drug_exposure_file}")
+    if not drug_feature_file.exists():
+        raise FileNotFoundError(f"file not found: {drug_feature_file}")
     if not outc_case_file.exists():
         raise FileNotFoundError(f"file not found: {outc_case_file}")
 
     case_base_df = pd.read_parquet(case_base_file)
     reac_case_df = pd.read_parquet(reac_case_file)
     drug_exposure_df = pd.read_parquet(drug_exposure_file)
+    drug_feature_df = pd.read_parquet(drug_feature_file)
     outc_case_df = pd.read_parquet(outc_case_file)
 
     if "suspect_role_any_ps" not in drug_exposure_df.columns and "suspect_role_any" in drug_exposure_df.columns:
@@ -141,12 +160,15 @@ def process_signal_dataset(year, quarter, output_root):
         drug_exposure_df["is_other_zdrug_suspect_ps"] = drug_exposure_df["is_other_zdrug_suspect"]
     if "target_drug_group_ps" not in drug_exposure_df.columns and "target_drug_group" in drug_exposure_df.columns:
         drug_exposure_df["target_drug_group_ps"] = drug_exposure_df["target_drug_group"]
+    if "is_zolpidem_any" not in drug_feature_df.columns and "is_zolpidem" in drug_feature_df.columns:
+        drug_feature_df["is_zolpidem_any"] = drug_feature_df["is_zolpidem"]
 
     _assert_has_columns(case_base_df, REQUIRED_CASE_BASE_COLS, "case_base_dataset")
     _assert_has_columns(reac_case_df, REQUIRED_REAC_COLS, "reac_case")
     _assert_has_columns(
         drug_exposure_df, REQUIRED_DRUG_EXPOSURE_COLS, "drug_exposure_case"
     )
+    _assert_has_columns(drug_feature_df, ["caseid", "is_zolpidem_any"], "drug_feature_case")
     _assert_has_columns(outc_case_df, ["caseid", "is_serious_any"], "outc_case")
 
     case_base_keep_cols = REQUIRED_CASE_BASE_COLS.copy()
@@ -160,15 +182,21 @@ def process_signal_dataset(year, quarter, output_root):
     case_base_df = _normalize_caseid(case_base_df[case_base_keep_cols])
     reac_case_df = _normalize_caseid(reac_case_df[reac_keep_cols])
     drug_exposure_df = _normalize_caseid(drug_exposure_df[REQUIRED_DRUG_EXPOSURE_COLS])
+    drug_feature_keep_cols = ["caseid"] + [
+        col for col in OPTIONAL_DRUG_FEATURE_COLS if col in drug_feature_df.columns
+    ]
+    drug_feature_df = _normalize_caseid(drug_feature_df[drug_feature_keep_cols])
     outc_case_df = _normalize_caseid(outc_case_df[["caseid", "is_serious_any"]])
 
     _assert_caseid_unique(case_base_df, "case_base_dataset")
     _assert_caseid_unique(reac_case_df, "reac_case")
     _assert_caseid_unique(drug_exposure_df, "drug_exposure_case")
+    _assert_caseid_unique(drug_feature_df, "drug_feature_case")
     _assert_caseid_unique(outc_case_df, "outc_case")
 
     signal_df = case_base_df.merge(reac_case_df, on="caseid", how="left")
     signal_df = signal_df.merge(drug_exposure_df, on="caseid", how="left")
+    signal_df = signal_df.merge(drug_feature_df, on="caseid", how="left")
     signal_df = signal_df.merge(
         outc_case_df.rename(columns={"is_serious_any": "serious_outc"}),
         on="caseid",
@@ -238,6 +266,7 @@ def process_signal_dataset(year, quarter, output_root):
     final_cols = [
         "caseid",
         "is_fall",
+        "is_zolpidem_any",
         "is_zolpidem_suspect",
         "is_zolpidem_suspect_ps",
         "is_other_zdrug_suspect",
@@ -268,6 +297,7 @@ def process_signal_dataset(year, quarter, output_root):
 
     print("signal_dataset rows:", len(signal_df))
     print("fall cases (strict):", int(signal_df["is_fall"].sum()))
+    print("zolpidem any-exposure cases:", int(signal_df["is_zolpidem_any"].sum()))
     print("zolpidem suspect cases:", int(signal_df["is_zolpidem_suspect"].sum()))
     print("other z-drug suspect cases:", int(signal_df["is_other_zdrug_suspect"].sum()))
     print(f"saved: {output_file}")

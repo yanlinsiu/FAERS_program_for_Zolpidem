@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ANALYSIS_ROOT = PROJECT_ROOT / "analysis_projiect"
+ANALYSIS_ROOT = PROJECT_ROOT / "analysis_project"
 if str(ANALYSIS_ROOT) not in sys.path:
     sys.path.insert(0, str(ANALYSIS_ROOT))
 
@@ -90,10 +90,40 @@ def _is_year_completed(year_root: Path) -> bool:
     return all(path.exists() for path in [summary_file, signal_file, comparative_file, feature_file])
 
 
+def _looks_like_parquet(file_path: Path) -> bool:
+    if not file_path.exists() or not file_path.is_file():
+        return False
+
+    try:
+        with file_path.open("rb") as handle:
+            header = handle.read(4)
+            if len(header) < 4:
+                return False
+            handle.seek(-4, 2)
+            footer = handle.read(4)
+    except OSError:
+        return False
+
+    return header == b"PAR1" and footer == b"PAR1"
+
+
 def _concat_parquet_files(files: list[Path], output_file: Path) -> int:
     frames: list[pd.DataFrame] = []
     for file_path in files:
-        df = pd.read_parquet(file_path)
+        if not _looks_like_parquet(file_path):
+            size = file_path.stat().st_size if file_path.exists() else "missing"
+            raise ValueError(
+                f"Invalid parquet file detected before annual combine: {file_path} "
+                f"(size={size})"
+            )
+        try:
+            df = pd.read_parquet(file_path)
+        except Exception as exc:
+            size = file_path.stat().st_size if file_path.exists() else "missing"
+            raise RuntimeError(
+                f"Failed to read parquet during annual combine: {file_path} "
+                f"(size={size})"
+            ) from exc
         frames.append(df)
 
     combined = pd.concat(frames, ignore_index=True)
@@ -328,6 +358,9 @@ def process_year(
                 "quarter": quarter,
                 "n_cases": int(len(signal_df)),
                 "n_fall": int(signal_df["is_fall"].fillna(False).astype(bool).sum()),
+                "n_zolpidem_any": int(
+                    signal_df["is_zolpidem_any"].fillna(False).astype(bool).sum()
+                ) if "is_zolpidem_any" in signal_df.columns else None,
                 "n_zolpidem_suspect": int(
                     signal_df["is_zolpidem_suspect"].fillna(False).astype(bool).sum()
                 ),
@@ -339,6 +372,7 @@ def process_year(
         print(
             f"{year} {quarter}: cases={quarter_summary_rows[-1]['n_cases']}, "
             f"fall={quarter_summary_rows[-1]['n_fall']}, "
+            f"zolpidem_any={quarter_summary_rows[-1]['n_zolpidem_any']}, "
             f"zolpidem_suspect={quarter_summary_rows[-1]['n_zolpidem_suspect']}"
         )
 

@@ -5,13 +5,11 @@ import re
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 
-from config import GLOBAL_DATASET_DIR, GLOBAL_QC_DIR, OUTPUT_ROOT, RAW_ROOT
+from config import GLOBAL_DATASET_DIR, GLOBAL_QC_DIR, OUTPUT_ROOT
 
 
 YEAR_Q_PATTERN = re.compile(r"(\d{4})q([1-4])", re.IGNORECASE)
-PATH_YEAR_Q_PATTERN = re.compile(r"[\\/](20\d{2})[\\/]Q([1-4])[\\/]", re.IGNORECASE)
 
 
 def discover_quarterly_files(pattern: str) -> list[Path]:
@@ -24,35 +22,6 @@ def discover_quarterly_files(pattern: str) -> list[Path]:
             continue
         files.extend(sorted(quarterly_dir.glob(pattern)))
     return files
-
-
-def load_deleted_case_map(start_year: int, end_year: int) -> pd.DataFrame:
-    records: list[dict[str, object]] = []
-    for year in range(max(start_year, 2019), end_year + 1):
-        for quarter in ("Q1", "Q2", "Q3", "Q4"):
-            quarter_dir = RAW_ROOT / str(year) / quarter
-            if not quarter_dir.exists():
-                continue
-            deleted_dirs = [d for d in quarter_dir.iterdir() if d.is_dir() and "DELETE" in d.name.upper()]
-            for deleted_dir in deleted_dirs:
-                for file_path in sorted(deleted_dir.glob("*.txt")):
-                    with file_path.open("r", encoding="latin1", errors="ignore") as handle:
-                        for line in handle:
-                            token = line.strip().split("$", 1)[0].strip()
-                            if token.isdigit():
-                                records.append({"year": year, "quarter": quarter, "caseid": token})
-
-    if not records:
-        return pd.DataFrame(columns=["year", "quarter", "caseid"])
-
-    deleted_df = pd.DataFrame(records).drop_duplicates()
-    deleted_df["year"] = pd.to_numeric(deleted_df["year"], errors="coerce").astype("Int64")
-    deleted_df["quarter"] = deleted_df["quarter"].astype(str).str.upper().str.strip()
-    deleted_df["caseid"] = deleted_df["caseid"].astype(str).str.strip()
-    deleted_df = deleted_df.dropna(subset=["year"])
-    deleted_df = deleted_df[deleted_df["caseid"] != ""].copy()
-    deleted_df["year"] = deleted_df["year"].astype(int)
-    return deleted_df
 
 
 def period_from_feature_path(path: Path) -> str:
@@ -69,12 +38,10 @@ def _sql_quoted(path: Path) -> str:
 def create_global_case_index(
     con: duckdb.DuckDBPyConnection,
     case_files: list[Path],
-    deleted_df: pd.DataFrame,
     start_year: int,
     end_year: int,
 ) -> None:
     case_file_list = [file_path.as_posix() for file_path in case_files]
-    con.register("deleted_case_map", deleted_df)
     con.execute(
         """
         CREATE OR REPLACE TEMP TABLE case_base_all AS
@@ -93,14 +60,9 @@ def create_global_case_index(
     con.execute(
         """
         CREATE OR REPLACE TEMP TABLE case_base_filtered AS
-        SELECT c.*
-        FROM case_base_all c
-        LEFT JOIN deleted_case_map d
-            ON c.year = d.year
-           AND c.quarter = d.quarter
-           AND c.caseid = d.caseid
-        WHERE c.caseid <> ''
-          AND d.caseid IS NULL
+        SELECT *
+        FROM case_base_all
+        WHERE caseid <> ''
         """
     )
 
@@ -224,6 +186,10 @@ def write_outputs(
 
     qc_df = con.execute(
         """
+        SELECT 'case_base_all' AS dataset, COUNT(*) AS n_rows FROM case_base_all
+        UNION ALL
+        SELECT 'case_base_filtered' AS dataset, COUNT(*) AS n_rows FROM case_base_filtered
+        UNION ALL
         SELECT 'global_case_index' AS dataset, COUNT(*) AS n_rows FROM global_case_index
         UNION ALL
         SELECT 'signal_global' AS dataset, COUNT(*) AS n_rows FROM signal_global
@@ -257,11 +223,9 @@ def main() -> None:
     if not signal_files:
         raise FileNotFoundError("No quarterly signal_dataset parquet files found in OUTPUT/*/quarterly.")
 
-    deleted_df = load_deleted_case_map(start_year, end_year)
-
     con = duckdb.connect()
     try:
-        create_global_case_index(con, case_files, deleted_df, start_year, end_year)
+        create_global_case_index(con, case_files, start_year, end_year)
         create_global_signal_dataset(con, signal_files, start_year, end_year)
         create_global_feature_dataset(con, feature_files)
         case_file, signal_file, feature_file, qc_file = write_outputs(con, start_year, end_year)
@@ -269,7 +233,7 @@ def main() -> None:
         con.close()
 
     print("Global datasets built successfully.")
-    print(f"Deleted-case map rows: {len(deleted_df)}")
+    print("Global build reused cleaned quarterly datasets only.")
     print(f"Case index: {case_file}")
     print(f"Signal dataset: {signal_file}")
     print(f"Feature dataset: {feature_file}")

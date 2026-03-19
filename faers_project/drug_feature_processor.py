@@ -140,6 +140,9 @@ def process_drug_feature(year, quarter, output_root):
     case_feature_df["distinct_drug_n"] = (
         case_feature_df["distinct_drug_n"].fillna(0).astype(int)
     )
+    case_feature_df["is_zolpidem_any"] = (
+        case_feature_df["is_zolpidem"].fillna(False).astype(bool)
+    )
     case_feature_df["polypharmacy_5"] = case_feature_df["distinct_drug_n"] >= 5
     # Keep legacy name for backward compatibility with existing downstream code.
     case_feature_df["polypharmacy"] = case_feature_df["polypharmacy_5"]

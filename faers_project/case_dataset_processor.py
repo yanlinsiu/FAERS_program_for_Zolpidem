@@ -177,6 +177,7 @@ def process_case_dataset(year, quarter, output_root):
     required_drug_feature_cols = [
         "caseid",
         "is_zolpidem",
+        "is_zolpidem_any",
         "is_zaleplon",
         "is_zopiclone",
         "is_eszopiclone",
@@ -188,6 +189,9 @@ def process_case_dataset(year, quarter, output_root):
         "drug_n",
         "distinct_drug_n",
     ]
+    if "is_zolpidem_any" not in drug_feature_df.columns and "is_zolpidem" in drug_feature_df.columns:
+        drug_feature_df["is_zolpidem_any"] = drug_feature_df["is_zolpidem"]
+
     missing_drug_feature_cols = [
         col for col in required_drug_feature_cols if col not in drug_feature_df.columns
     ]
@@ -284,6 +288,7 @@ def process_case_dataset(year, quarter, output_root):
 
     drug_bool_cols = [
         "is_zolpidem",
+        "is_zolpidem_any",
         "is_zaleplon",
         "is_zopiclone",
         "is_eszopiclone",

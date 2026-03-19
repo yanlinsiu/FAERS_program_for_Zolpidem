@@ -4,8 +4,8 @@ This folder is isolated from the existing yearly pipeline.
 
 ## What this workflow does
 
-1. Build a global case index across `2004-2025` using quarterly outputs in `OUTPUT/*/quarterly`.
-2. Remove deleted reports (`2019+`) by `CASEID`.
+1. Reuse the already cleaned quarterly outputs in `OUTPUT/*/quarterly`.
+2. Build a global case index across `2004-2025`.
 3. Keep one latest record per `CASEID` using:
    - latest `FDA_DT`
    - if tied, larger `PRIMARYID`
@@ -13,6 +13,8 @@ This folder is isolated from the existing yearly pipeline.
    - `global_case_index_2004_2025.parquet`
    - `signal_dataset_2004_2025.parquet`
    - `drug_feature_2004_2025_case.parquet`
+
+The global step does not reread raw `DELETE` files. Any quarter-level deletion/nullification handling is expected to have been completed upstream during quarterly cleaning.
 
 ## Run
 
@@ -26,4 +28,3 @@ This folder is isolated from the existing yearly pipeline.
 - `OUTPUT_GLOBAL/datasets`: global parquet datasets
 - `OUTPUT_GLOBAL/qc`: row-count and QC summary
 - `OUTPUT_GLOBAL/analysis`: analysis csv outputs
-

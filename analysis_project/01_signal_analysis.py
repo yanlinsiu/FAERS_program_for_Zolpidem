@@ -22,8 +22,12 @@ PRIMARY_EXPOSURE = "is_zolpidem_suspect"
 SENSITIVITY_EXPOSURE = "is_zolpidem_suspect_ps"
 
 
-def build_signal_analysis(signal_root: str | Path | None = None, output_dir: str | Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
-    signal_df = load_signal_dataset(signal_root)
+def build_signal_analysis(
+    signal_root: str | Path | None = None,
+    output_dir: str | Path | None = None,
+    signal_file: str | Path | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    signal_df = load_signal_dataset(signal_root=signal_root, signal_file=signal_file)
 
     result_rows = []
     qc_frames = []
