@@ -1,13 +1,10 @@
-# ------------ Python 官方标准忽略规则 ------------
-# Python 字节码/缓存文件
+# Python cache and build artifacts
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
@@ -17,43 +14,55 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# 虚拟环境
+# Virtual environments
 .venv/
 .venv3/
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
 
-# 开发工具/缓存
+# Tool and test caches
 .ruff_cache/
-.uv/
-.venv/
-*.pyc
-*.pyo
-*.pyd
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.cache/
 
-# ------------ 项目专属忽略规则 ------------
-# 1. 运行产出的输出数据（核心：忽略 OUTPUT 文件夹下所有内容）
+# Environment/config files
+.env
+.envrc
+.python-version
+uv.lock
+.pdm-python
+.pdm-build/
+.pixi/
+
+# Runtime outputs
 OUTPUT/
 OUTPUT_GLOBAL/
 package/
 
-# 2. 其他运行时生成的无关文件（根据你截图补充）
-# 锁定文件（如果是自动生成的也可忽略）
-uv.lock
-.python-version
+# Optional local scripts
+# test_*.py
+# demo.py
+# drug_name_cleaner.py
 
-# 测试脚本（如果非必须提交，也可以忽略）
-test_*.py
-demo.py
-drug_name_cleaner.py
-
-# ------------ 新增忽略规则 ------------
-# 忽略 2024 年份文件夹及其所有内容
+# Ignore yearly raw folders
 2004/
 2005/
 2006/
