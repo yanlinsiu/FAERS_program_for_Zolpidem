@@ -353,6 +353,7 @@ def apply_demo_demographic_criteria(df):
         sex_raw = sex_raw.where(sex_raw.isin(["M", "F"]), gndr_raw)
 
     out_df["sex_clean"] = sex_raw.map({"M": "M", "F": "F"}).fillna("UNK")
+    out_df = out_df[out_df["sex_clean"].isin(["M", "F"])].copy()
     return out_df
 
 

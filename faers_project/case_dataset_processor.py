@@ -56,17 +56,18 @@ def process_case_dataset(year, quarter, output_root):
     输出数据结构:
         - caseid: 病例 ID（主键）
         - DEMO 表的所有字段（如 primaryid, fda_dt, caseversion 等）
-        - is_fall: 跌倒结局标识（True/False）
+        - is_fall_narrow: 狭义跌倒结局标识（True/False）
+        - is_fall_broad: 广义跌倒相关结局标识（True/False）
         - is_zolpidem 等药物类别标识
         - drug_n: 病例内去重后的药物数
         - polypharmacy_5: 是否满足多药并用（distinct_drug_n >= 5）
 
     数据处理规则:
         - 使用左连接（left join）保留 DEMO 表中的所有有效病例
-        - 未在 REAC 中命中跌倒术语的病例，is_fall 标记为 False
+        - 未在 REAC 中命中跌倒术语的病例，跌倒结局字段标记为 False
         - 未在 DRUG 中出现的病例，药物类别标记为 False，drug_n 记为 0
         - 过滤掉 caseid 为空的记录
-        - is_fall 和药物类别字段统一转换为布尔类型
+        - 跌倒结局和药物类别字段统一转换为布尔类型
 
     异常:
         FileNotFoundError: 当 DEMO 文件或 REAC 病例级文件不存在时抛出
@@ -166,7 +167,7 @@ def process_case_dataset(year, quarter, output_root):
         raise ValueError(f"DEMO 缺少必要字段：{missing_demo_cols}")
 
     # 定义 REAC 病例级数据必需的字段
-    required_reac_cols = ["caseid", "is_fall"]
+    required_reac_cols = ["caseid", "is_fall_narrow"]
     # 检查 REAC 数据是否有缺失的必需列
     missing_reac_cols = [
         col for col in required_reac_cols if col not in reac_case_df.columns
@@ -275,10 +276,26 @@ def process_case_dataset(year, quarter, output_root):
         outc_case_df["caseid"].where(outc_case_df["caseid"].notna(), "").astype(str).str.strip()
     )
 
-    # 处理 is_fall 字段：
+    # 处理跌倒结局字段：
     # 1. 将 NaN 值填充为 False（未报告跌倒）
     # 2. 转换为布尔类型
-    reac_case_df["is_fall"] = reac_case_df["is_fall"].fillna(False).astype(bool)
+    reac_bool_cols = [
+        "is_fall_narrow",
+        "is_fall_broad",
+    ]
+    for col in reac_bool_cols:
+        if col in reac_case_df.columns:
+            reac_case_df[col] = reac_case_df[col].fillna(False).astype(bool)
+    if "fall_narrow_pt_count" in reac_case_df.columns:
+        reac_case_df["fall_narrow_pt_count"] = (
+            pd.to_numeric(reac_case_df["fall_narrow_pt_count"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
+    if "fall_pt_list" in reac_case_df.columns:
+        reac_case_df["fall_pt_list"] = (
+            reac_case_df["fall_pt_list"].where(reac_case_df["fall_pt_list"].notna(), "")
+        )
 
     if "polypharmacy_5" not in drug_feature_df.columns and "polypharmacy" in drug_feature_df.columns:
         drug_feature_df["polypharmacy_5"] = drug_feature_df["polypharmacy"]
@@ -383,15 +400,27 @@ def process_case_dataset(year, quarter, output_root):
     # 使用左连接（left join）合并 DEMO 和 REAC 数据
     # - 保留 DEMO 表中的所有有效病例
     # - 通过 caseid 进行关联
-    # - 未在 REAC 中命中的病例，is_fall 为 NaN
+    # - 未在 REAC 中命中的病例，跌倒结局字段为 NaN
     case_df = demo_df.merge(reac_case_df, on="caseid", how="left")
     case_df = case_df.merge(drug_feature_df, on="caseid", how="left")
     case_df = case_df.merge(drug_exposure_df, on="caseid", how="left")
     case_df = case_df.merge(outc_case_df, on="caseid", how="left")
 
-    # 将合并后 is_fall 为 NaN 的记录填充为 False
+    # 将合并后跌倒结局字段为 NaN 的记录填充为 False
     # 这些病例在 REAC 中没有跌倒相关术语记录
-    case_df["is_fall"] = case_df["is_fall"].fillna(False).astype(bool)
+    for col in reac_bool_cols:
+        if col in case_df.columns:
+            case_df[col] = case_df[col].fillna(False).astype(bool)
+    if "fall_narrow_pt_count" in case_df.columns:
+        case_df["fall_narrow_pt_count"] = (
+            pd.to_numeric(case_df["fall_narrow_pt_count"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
+    if "fall_pt_list" in case_df.columns:
+        case_df["fall_pt_list"] = (
+            case_df["fall_pt_list"].where(case_df["fall_pt_list"].notna(), "")
+        )
 
     for col in drug_bool_cols:
         case_df[col] = case_df[col].fillna(False).astype(bool)
@@ -432,7 +461,9 @@ def process_case_dataset(year, quarter, output_root):
 
     # 打印统计信息
     print("病例级分析数据行数:", len(case_df))
-    print("跌倒病例数:", int(case_df["is_fall"].sum()))
+    print("狭义跌倒病例数:", int(case_df["is_fall_narrow"].sum()))
+    if "is_fall_broad" in case_df.columns:
+        print("广义跌倒相关病例数:", int(case_df["is_fall_broad"].sum()))
     print("多药并用病例数(polypharmacy_5):", int(case_df["polypharmacy_5"].sum()))
     print(f"已保存：{output_file}")
 
