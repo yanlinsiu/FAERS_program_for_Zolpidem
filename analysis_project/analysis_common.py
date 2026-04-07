@@ -12,12 +12,12 @@ DEFAULT_ANALYSIS_ROOT = Path(r"D:\program_FAERS\OUTPUT\analysis")
 OUTCOME_SPECS = [
     {
         "outcome_name": "strict_fall",
-        "outcome_col": "is_fall",
-        "outcome_label": "Strict fall definition (PT=FALL/FALLS)",
+        "outcome_col": "is_fall_narrow",
+        "outcome_label": "Narrow fall definition",
     },
     {
         "outcome_name": "broad_fall",
-        "outcome_col": "has_fall_related_broad",
+        "outcome_col": "is_fall_broad",
         "outcome_label": "Broad fall-related definition",
     },
 ]
@@ -96,8 +96,10 @@ def load_signal_dataset(
     combined = pd.concat(frames, ignore_index=True)
     combined["caseid"] = combined["caseid"].astype(str).str.strip()
     combined = combined[combined["caseid"] != ""].copy()
-    if "has_fall_related_broad" not in combined.columns and "is_fall" in combined.columns:
-        combined["has_fall_related_broad"] = combined["is_fall"].fillna(False).astype(bool)
+    if "is_fall_narrow" not in combined.columns and "is_fall" in combined.columns:
+        combined["is_fall_narrow"] = combined["is_fall"].fillna(False).astype(bool)
+    if "is_fall_broad" not in combined.columns and "is_fall_narrow" in combined.columns:
+        combined["is_fall_broad"] = combined["is_fall_narrow"].fillna(False).astype(bool)
     if "serious" in combined.columns:
         combined["serious"] = combined["serious"].fillna(False).astype(bool)
     return combined
@@ -147,7 +149,8 @@ def merge_signal_and_feature(
         "polypharmacy_5",
         "polypharmacy",
         "serious",
-        "has_fall_related_broad",
+        "is_fall_narrow",
+        "is_fall_broad",
     ]
     for col in feature_bool_cols:
         if col in merged.columns:
