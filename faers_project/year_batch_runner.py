@@ -190,10 +190,12 @@ def _write_year_summary(
     for row in signal_results.to_dict(orient="records"):
         ror_text = "NA" if pd.isna(row["ror"]) else f"{row['ror']:.4f}"
         prr_text = "NA" if pd.isna(row["prr"]) else f"{row['prr']:.4f}"
+        ic_text = "NA" if pd.isna(row.get("ic")) else f"{row['ic']:.4f}"
+        ebgm_text = "NA" if pd.isna(row.get("ebgm")) else f"{row['ebgm']:.4f}"
         lines.append(
             f"- {row['analysis']} | {row['outcome_name']} | {row['conclusion']}: "
             f"a={row['a']}, b={row['b']}, c={row['c']}, d={row['d']}, "
-            f"ROR={ror_text}, PRR={prr_text}"
+            f"ROR={ror_text}, PRR={prr_text}, IC={ic_text}, EBGM={ebgm_text}"
         )
 
     lines.extend(
@@ -205,10 +207,12 @@ def _write_year_summary(
     for row in comparative_results.to_dict(orient="records"):
         ror_text = "NA" if pd.isna(row["ror"]) else f"{row['ror']:.4f}"
         prr_text = "NA" if pd.isna(row["prr"]) else f"{row['prr']:.4f}"
+        ic_text = "NA" if pd.isna(row.get("ic")) else f"{row['ic']:.4f}"
+        ebgm_text = "NA" if pd.isna(row.get("ebgm")) else f"{row['ebgm']:.4f}"
         lines.append(
             f"- {row['analysis']} | {row['outcome_name']} | {row['conclusion']}: "
             f"a={row['a']}, b={row['b']}, c={row['c']}, d={row['d']}, "
-            f"ROR={ror_text}, PRR={prr_text}"
+            f"ROR={ror_text}, PRR={prr_text}, IC={ic_text}, EBGM={ebgm_text}"
         )
 
     lines.extend(
@@ -251,6 +255,19 @@ def _build_year_trend_row(year: int, analysis_root: Path) -> pd.DataFrame:
                 False: "未见明确不成比例性信号",
             }
         )
+    required_defaults = {
+        "ic": None,
+        "ic025": None,
+        "ic975": None,
+        "ebgm": None,
+        "eb05": None,
+        "eb95": None,
+        "signal_flag_ic": False,
+        "signal_flag_ebgm": False,
+    }
+    for column, default_value in required_defaults.items():
+        if column not in df.columns:
+            df[column] = default_value
     return df[
         [
             "year",
@@ -269,10 +286,18 @@ def _build_year_trend_row(year: int, analysis_root: Path) -> pd.DataFrame:
             "prr",
             "prr_ci_low",
             "prr_ci_high",
+            "ic",
+            "ic025",
+            "ic975",
+            "ebgm",
+            "eb05",
+            "eb95",
             "chi_square_yates",
             "expected_a",
             "signal_flag_mhra",
             "signal_flag_ror",
+            "signal_flag_ic",
+            "signal_flag_ebgm",
         ]
     ].copy()
 

@@ -1,0 +1,10 @@
+﻿指标,数值
+数据文件,D:\program_FAERS\OUTPUT\2025\case_dataset_2025.parquet
+总病例数,359303
+唯一 caseid 数,329593
+唯一 primaryid 数,359249
+变量数,45
+覆盖年份,2025
+覆盖季度,"Q1, Q2, Q3, Q4"
+最早 FDA_DT,2025-01-01
+最晚 FDA_DT,2025-12-31

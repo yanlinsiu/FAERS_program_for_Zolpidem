@@ -19,7 +19,6 @@ CASE_BASE_COLUMNS = [
     "age_years",
     "age_group",
     "sex_clean",
-    "serious",
     "year",
     "quarter",
     "year_quarter",
@@ -44,16 +43,18 @@ def _build_case_base_dataset(df: pd.DataFrame, year: int, quarter: str) -> pd.Da
         df["sex_clean"].where(df["sex_clean"].notna(), "").astype(str).str.strip()
     )
 
-    if "serious" in df.columns:
+    if "serious" in df.columns and df["serious"].notna().any():
         case_base_df["serious"] = df["serious"]
-    else:
-        case_base_df["serious"] = pd.NA
 
     case_base_df["year"] = year_int
     case_base_df["quarter"] = quarter_upper
     case_base_df["year_quarter"] = f"{year_int}{quarter_upper}"
 
-    case_base_df = case_base_df[CASE_BASE_COLUMNS]
+    case_base_columns = CASE_BASE_COLUMNS.copy()
+    if "serious" in case_base_df.columns:
+        case_base_columns.insert(6, "serious")
+
+    case_base_df = case_base_df[case_base_columns]
     case_base_df = case_base_df[case_base_df["caseid"] != ""].copy()
     case_base_df = case_base_df.drop_duplicates(subset="caseid", keep="last")
 

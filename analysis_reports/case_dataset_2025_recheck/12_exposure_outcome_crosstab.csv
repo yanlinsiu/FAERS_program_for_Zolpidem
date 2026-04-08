@@ -1,0 +1,13 @@
+﻿暴露变量,结局变量,暴露状态,病例数,结局例数,结局报告率
+is_zolpidem,is_fall_narrow,暴露组,2226,244,0.109614
+is_zolpidem,is_fall_narrow,非暴露组,357077,11736,0.032867
+is_zolpidem,is_fall_broad,暴露组,2226,383,0.172058
+is_zolpidem,is_fall_broad,非暴露组,357077,25346,0.070982
+is_zolpidem_suspect,is_fall_narrow,暴露组,631,105,0.166403
+is_zolpidem_suspect,is_fall_narrow,非暴露组,358672,11875,0.033108
+is_zolpidem_suspect,is_fall_broad,暴露组,631,144,0.228209
+is_zolpidem_suspect,is_fall_broad,非暴露组,358672,25585,0.071333
+is_zolpidem_suspect_ps,is_fall_narrow,暴露组,308,30,0.097403
+is_zolpidem_suspect_ps,is_fall_narrow,非暴露组,358995,11950,0.033287
+is_zolpidem_suspect_ps,is_fall_broad,暴露组,308,50,0.162338
+is_zolpidem_suspect_ps,is_fall_broad,非暴露组,358995,25679,0.07153

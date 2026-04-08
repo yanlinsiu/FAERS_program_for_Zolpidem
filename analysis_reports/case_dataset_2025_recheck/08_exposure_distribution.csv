@@ -1,0 +1,9 @@
+﻿变量,阳性定义,例数,占总体百分比
+is_zolpidem,是,2226,0.62
+is_zolpidem_any,是,2226,0.62
+is_zolpidem_suspect,是,631,0.18
+is_zolpidem_suspect_ps,是,308,0.09
+is_other_zdrug_suspect,是,538,0.15
+is_other_zdrug_suspect_ps,是,13,0.0
+suspect_role_any,是,359303,100.0
+suspect_role_any_ps,是,359303,100.0

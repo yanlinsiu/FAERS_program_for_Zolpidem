@@ -1,0 +1,8 @@
+﻿变量,水平,例数,占总体百分比
+target_drug_group,no_target_zdrug_suspect,358248,99.71
+target_drug_group,zolpidem_only,517,0.14
+target_drug_group,other_zdrug_only,424,0.12
+target_drug_group,both_zolpidem_and_other_zdrug,114,0.03
+target_drug_group_ps,no_target_zdrug_suspect,358982,99.91
+target_drug_group_ps,zolpidem_only,308,0.09
+target_drug_group_ps,other_zdrug_only,13,0.0

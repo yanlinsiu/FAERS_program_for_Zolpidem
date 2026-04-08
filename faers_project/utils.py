@@ -40,7 +40,7 @@ COLUMN_ALIASES = {
 }
 
 OPTIONAL_DEFAULT_COLUMNS = {
-    "demo": ["caseversion", "fda_dt", "age", "age_cod", "sex", "gndr_cod", "serious"],
+    "demo": ["caseversion", "fda_dt", "age", "age_cod", "sex", "gndr_cod"],
     "drug": ["primaryid", "caseid", "prod_ai", "role_cod"],
     "outc": ["primaryid", "caseid", "outc_cod"],
     "reac": ["primaryid", "caseid", "pt", "reac_pt"],

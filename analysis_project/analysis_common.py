@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Iterable
 
 import pandas as pd
+from scipy.special import digamma
+from scipy.stats import gamma
 
 DEFAULT_SIGNAL_ROOT = Path(r"D:\program_FAERS\OUTPUT")
 DEFAULT_ANALYSIS_ROOT = Path(r"D:\program_FAERS\OUTPUT\analysis")
@@ -200,12 +202,102 @@ def _wald_ci_from_log_estimate(log_estimate: float, se: float) -> tuple[float | 
     return (lower, upper)
 
 
+def _safe_log2(value: float | None) -> float | None:
+    if value is None or value <= 0 or math.isnan(value):
+        return None
+    return math.log(value, 2)
+
+
+def _gamma_quantile_scores(
+    shape: float,
+    rate: float,
+    lower_prob: float,
+    upper_prob: float,
+) -> tuple[float | None, float | None]:
+    if shape <= 0 or rate <= 0:
+        return (None, None)
+    scale = 1.0 / rate
+    lower = float(gamma.ppf(lower_prob, a=shape, scale=scale))
+    upper = float(gamma.ppf(upper_prob, a=shape, scale=scale))
+    if math.isnan(lower) or math.isnan(upper):
+        return (None, None)
+    return (lower, upper)
+
+
+def _ic_from_observed_expected(
+    observed: int,
+    expected: float,
+    shrinkage: float = 0.5,
+    credibility_level: float = 0.95,
+) -> dict[str, float | None]:
+    alpha = 1.0 - credibility_level
+    lower_prob = alpha / 2.0
+    upper_prob = 1.0 - (alpha / 2.0)
+
+    shape = float(observed) + float(shrinkage)
+    rate = float(expected) + float(shrinkage)
+    if shape <= 0 or rate <= 0:
+        return {
+            "ic": None,
+            "ic025": None,
+            "ic975": None,
+        }
+
+    ic = _safe_log2(shape / rate)
+    posterior_low, posterior_high = _gamma_quantile_scores(
+        shape=shape,
+        rate=rate,
+        lower_prob=lower_prob,
+        upper_prob=upper_prob,
+    )
+    return {
+        "ic": ic,
+        "ic025": _safe_log2(posterior_low),
+        "ic975": _safe_log2(posterior_high),
+    }
+
+
+def _ebgm_from_observed_expected(
+    observed: int,
+    expected: float,
+    prior_shape: float = 1.0,
+    prior_rate: float = 1.0,
+    credibility_level: float = 0.90,
+) -> dict[str, float | None]:
+    alpha = 1.0 - credibility_level
+    lower_prob = alpha / 2.0
+    upper_prob = 1.0 - (alpha / 2.0)
+
+    shape = float(observed) + float(prior_shape)
+    rate = float(expected) + float(prior_rate)
+    if shape <= 0 or rate <= 0:
+        return {
+            "ebgm": None,
+            "eb05": None,
+            "eb95": None,
+        }
+
+    ebgm = math.exp(float(digamma(shape))) / rate
+    eb05, eb95 = _gamma_quantile_scores(
+        shape=shape,
+        rate=rate,
+        lower_prob=lower_prob,
+        upper_prob=upper_prob,
+    )
+    return {
+        "ebgm": ebgm,
+        "eb05": eb05,
+        "eb95": eb95,
+    }
+
+
 def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int | None]:
     n = a + b + c + d
     result: dict[str, float | int | None] = {"a": a, "b": b, "c": c, "d": d, "n": n}
 
     result["reporting_rate_exposed"] = a / (a + b) if (a + b) else None
     result["reporting_rate_unexposed"] = c / (c + d) if (c + d) else None
+    expected = ((a + b) * (a + c) / n) if n else 0.0
 
     if n > 0:
         # Apply Haldane-Anscombe continuity correction when any cell is zero.
@@ -232,11 +324,13 @@ def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int
         prr_ci_low = None
         prr_ci_high = None
 
-    expected = ((a + b) * (a + c) / n) if n else 0.0
     chi_square_yates = 0.0
     if (a + b) and (c + d) and (a + c) and (b + d):
         numerator = abs((a * d) - (b * c)) - (n / 2)
         chi_square_yates = n * max(numerator, 0) ** 2 / ((a + b) * (c + d) * (a + c) * (b + d))
+
+    ic_metrics = _ic_from_observed_expected(observed=a, expected=expected)
+    ebgm_metrics = _ebgm_from_observed_expected(observed=a, expected=expected)
 
     result.update(
         {
@@ -248,15 +342,24 @@ def ror_prr_from_counts(a: int, b: int, c: int, d: int) -> dict[str, float | int
             "prr_ci_high": prr_ci_high,
             "chi_square_yates": chi_square_yates,
             "expected_a": expected,
+            **ic_metrics,
+            **ebgm_metrics,
             "signal_flag_mhra": bool(a >= 3 and prr is not None and prr >= 2 and chi_square_yates >= 4),
             "signal_flag_ror": bool(ror_ci_low is not None and ror_ci_low > 1),
+            "signal_flag_ic": bool(ic_metrics["ic025"] is not None and ic_metrics["ic025"] > 0),
+            "signal_flag_ebgm": bool(a >= 3 and ebgm_metrics["eb05"] is not None and ebgm_metrics["eb05"] >= 2),
         }
     )
     return result
 
 
 def describe_signal(metrics: dict[str, float | int | None]) -> str:
-    if metrics["signal_flag_ror"] or metrics["signal_flag_mhra"]:
+    if (
+        metrics["signal_flag_ror"]
+        or metrics["signal_flag_mhra"]
+        or metrics.get("signal_flag_ic", False)
+        or metrics.get("signal_flag_ebgm", False)
+    ):
         return "signal_detected"
     return "no_clear_signal"
 

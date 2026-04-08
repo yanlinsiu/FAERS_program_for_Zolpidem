@@ -31,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GLOBAL_DATASET_DIR = PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets"
 OUTPUT_ML_ROOT = PROJECT_ROOT / "OUTPUT_ML"
 
-TARGET_OPTIONS = {"is_fall", "has_fall_related_broad", "serious"}
+TARGET_OPTIONS = {"is_fall_narrow", "is_fall_broad", "serious"}
 
 BOOL_FEATURES = [
     "is_zolpidem",

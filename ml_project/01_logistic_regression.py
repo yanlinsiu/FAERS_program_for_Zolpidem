@@ -55,8 +55,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--target-col",
-        default="is_fall",
-        help="Target column: is_fall, has_fall_related_broad, or serious.",
+        default="is_fall_narrow",
+        help="Target column: is_fall_narrow, is_fall_broad, or serious.",
     )
     parser.add_argument(
         "--train-end-year", type=int, default=2023, help="Train on years <= this value."

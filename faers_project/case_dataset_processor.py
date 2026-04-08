@@ -443,6 +443,12 @@ def process_case_dataset(year, quarter, output_root):
     for col in OUTC_BOOL_COLS:
         case_df[col] = case_df[col].fillna(False).astype(bool)
 
+    # Newer FAERS DEMO files no longer expose a raw `serious` field.
+    # Keep a compatibility alias sourced from OUTC-derived seriousness.
+    if "is_serious_any" in case_df.columns:
+        if "serious" not in case_df.columns or int(case_df["serious"].notna().sum()) == 0:
+            case_df["serious"] = case_df["is_serious_any"].astype(bool)
+
     case_df["drug_n"] = (
         pd.to_numeric(case_df["drug_n"], errors="coerce").fillna(0).astype(int)
     )
