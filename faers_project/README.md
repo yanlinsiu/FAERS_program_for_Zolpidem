@@ -1,48 +1,49 @@
-# FAERS 数据处理说明
+# FAERS 项目说明
 
-这个目录是一套面向 FAERS 原始季度数据的处理脚本，作用是把分表文本数据整理成病例级分析数据，并进一步生成药物警戒信号分析所需的数据集和年度汇总结果。
+这个目录是一套面向 FAERS 原始季度数据的处理脚本。它的目标是把分表文本数据整理成病例级分析数据集，并进一步生成用于信号分析和年度汇总分析的结果文件。
 
-这套代码当前围绕以下研究目标展开：
+当前代码围绕以下研究目标展开：
 
 - 识别老年病例
-- 识别 zolpidem 与其他 Z-drug 暴露
+- 识别 `zolpidem` 及其他 `Z-drug` 暴露
 - 构建跌倒相关结局
 - 构建病例级主分析表
 - 构建信号分析表
-- 生成年度汇总与年度分析结果
+- 生成年度汇总与跨年度趋势结果
 
 ## 项目结构
 
-这份代码默认自己位于整个项目仓库中的一个子目录里。按照当前代码的写法，建议目录结构如下：
+建议配套目录结构如下：
 
 ```text
 program_FAERS/
-├─ data/
-│  ├─ 2024/
-│  │  ├─ Q1/
-│  │  │  └─ ASCII/
-│  │  │     ├─ DEMO24Q1.txt
-│  │  │     ├─ DRUG24Q1.txt
-│  │  │     ├─ REAC24Q1.txt
-│  │  │     └─ OUTC24Q1.txt
-├─ OUTPUT/
-├─ analysis_project/
-│  ├─ 01_signal_analysis.py
-│  ├─ 02_comparative_analysis.py
-│  └─ 03_feature_analysis.py
-└─ faers_project/
-   ├─ main.py
-   ├─ year_batch_runner.py
-   └─ README.md
+|-- data/
+|   |-- 2024/
+|   |   |-- Q1/
+|   |   |   |-- ASCII/
+|   |   |   |   |-- DEMO24Q1.txt
+|   |   |   |   |-- DRUG24Q1.txt
+|   |   |   |   |-- REAC24Q1.txt
+|   |   |   |   `-- OUTC24Q1.txt
+|-- OUTPUT/
+|-- analysis_project/
+|   |-- 01_signal_analysis.py
+|   |-- 02_comparative_analysis.py
+|   `-- 03_feature_analysis.py
+`-- faers_project/
+    |-- main.py
+    |-- year_batch_runner.py
+    `-- README.md
 ```
 
-代码中的默认路径规则如下：
+当前代码中的默认路径规则：
 
-- 原始数据目录：`D:\program_FAERS\data`
-- 输出目录：`D:\program_FAERS\OUTPUT`
-- 年度分析脚本目录：`D:\program_FAERS\analysis_project`
+- 原始数据根目录：优先读取环境变量 `FAERS_RAW_ROOT`
+- 如果未设置环境变量，则优先尝试项目根目录下的 `data/`
+- 默认输出目录：项目根目录下的 `OUTPUT/`
+- 年度分析脚本目录：项目根目录下的 `analysis_project/`
 
-如果原始数据不在默认位置，可以设置环境变量：
+如需显式指定原始数据目录，可以在 PowerShell 中设置：
 
 ```powershell
 $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
@@ -50,88 +51,97 @@ $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
 
 ## 原始数据要求
 
-代码假定原始数据按“年份 / 季度”组织，并在季度目录中递归查找 `.txt` 文件。
+脚本假定 FAERS 原始数据按“年份/季度”组织，并在季度目录下递归查找对应文本文件。
 
-目前主要处理以下表：
+当前主要处理以下表：
 
 - `DEMO`
 - `DRUG`
 - `REAC`
 - `OUTC`
 
-代码里已经对一些历史差异做了兼容，包括：
+代码里已经兼容了一些历史差异，包括：
 
 - `ASCII` / `ascii` 目录名差异
 - 文件名大小写差异
-- 早期季度部分表缺少 `caseid` 时，从 `DEMO` 回填
+- 某些早期季度 `REAC` 或 `OUTC` 缺少 `caseid` 时，自动从 `DEMO` 回填
 - 删除病例目录存在时，自动剔除对应 `caseid`
-- 某些文本分隔异常时，使用 `utils.py` 中的备用解析逻辑
+- 文本分隔或列名存在历史差异时，由 `utils.py` 中的读取逻辑处理
 
 ## 整体处理流程
 
 主入口是 [main.py](D:/program_FAERS/faers_project/main.py)。
 
-整个处理链路大致如下：
+季度级处理链路大致如下：
 
 1. `demo_processor.py`
    - 读取 `DEMO`
-   - 去除 deleted case
-   - 以 `caseid` 去重，保留最新版本
+   - 剔除 deleted reports
+   - 按 `caseid` 去重，仅保留最新版本病例
    - 标准化年龄和性别
-   - 只保留 `65-120` 岁且性别为 `M/F` 的病例
+   - 默认仅保留 `65-120` 岁、性别为 `M/F` 的病例
+   - 生成 `case_base_dataset_YYYYqN.parquet`
+
 2. `drug_processor.py`
    - 读取 `DRUG`
-   - 只保留保留后的 DEMO 病例对应记录
+   - 仅保留 DEMO 保留病例对应记录
    - 清洗 `drugname`、`prod_ai`、`role_cod`
+   - 生成 `drug_YYYYqN.parquet`
+
 3. `drug_feature_processor.py`
-   - 在病例级识别 `zolpidem`、其他 `Z-drug`、苯二氮卓、抗抑郁药、抗精神病药、阿片类等
+   - 在病例级识别 `zolpidem`、其他 `Z-drug`、苯二氮卓、抗抑郁药、抗精神病药、阿片类、抗癫痫药
    - 生成 `drug_n`、`distinct_drug_n`、`polypharmacy_5`
+   - 生成 `drug_feature_dataset_YYYYqN.parquet`
+
 4. `drug_exposure_processor.py`
-   - 根据 `role_cod` 定义研究暴露
+   - 基于 `role_cod` 定义研究暴露
    - 主分析口径：`PS + SS`
-     - PS = Primary Suspect，主要怀疑药物
-     - SS = Secondary Suspect，次要怀疑药物
    - 敏感性分析口径：`PS only`
-     - 只有主要怀疑药物才算进暴露，SS 不算
+   - 输出 `target_drug_group` 与 `target_drug_group_ps`
+   - 生成 `drug_exposure_YYYYqN_case.parquet`
+
 5. `reac_processor.py`
-   - 从 `REAC` 生成病例级跌倒结局
-   - 包括狭义跌倒和广义跌倒相关定义
+   - 从 `REAC` 构建病例级跌倒结局
+   - 包含狭义跌倒和广义跌倒相关定义
+   - 生成 `reac_YYYYqN_case.parquet`
+
 6. `outc_processor.py`
-   - 从 `OUTC` 生成死亡、住院、危及生命等严重结局标记
+   - 从 `OUTC` 构建死亡、住院、危及生命等严重结局标记
+   - 生成 `outcome_dataset_YYYYqN.parquet`
+   - 同时保留兼容文件名 `outc_YYYYqN_case.parquet`
+
 7. `case_dataset_processor.py`
-   - 合并 DEMO、REAC、DRUG 特征、DRUG 暴露、OUTC
+   - 合并 `DEMO`、`REAC`、`DRUG feature`、`DRUG exposure`、`OUTC`
    - 形成病例级主分析表
+   - 生成 `case_dataset_YYYYqN.parquet`
+
 8. `signal_dataset_processor.py`
-   - 形成后续 ROR / PRR 分析使用的病例级信号数据集
+   - 提取信号分析所需字段
+   - 形成用于后续 ROR / PRR / 2x2 计算的病例级数据集
+   - 生成 `signal_dataset_YYYYqN.parquet`
+
+说明：
+
+- `case` 和 `signal` 两个步骤支持自动补跑前置依赖
+- `year_batch_runner.py` 会按年顺序执行季度处理，并调用 `analysis_project` 中的年度分析脚本
 
 ## 主要产物
 
-按季度运行时，主要会生成这些文件：
+按季度运行时，常见输出包括：
 
 - `case_base_dataset_YYYYqN.parquet`
-  - DEMO 处理后的病例主表
 - `demo_YYYYqN.parquet`
-  - 旧命名保留文件，内容与病例主表兼容
 - `drug_YYYYqN.parquet`
-  - 清洗后的 DRUG 明细表
 - `drug_feature_dataset_YYYYqN.parquet`
-  - 病例级药物特征表
 - `drug_feature_YYYYqN_case.parquet`
-  - 旧命名保留文件
 - `drug_exposure_YYYYqN_case.parquet`
-  - 病例级研究暴露定义表
 - `reac_YYYYqN_case.parquet`
-  - 病例级跌倒结局表
 - `outcome_dataset_YYYYqN.parquet`
-  - 病例级严重结局表
 - `outc_YYYYqN_case.parquet`
-  - 旧命名保留文件
 - `case_dataset_YYYYqN.parquet`
-  - 病例级主分析表
 - `signal_dataset_YYYYqN.parquet`
-  - 信号分析表
 
-按年度运行时，还会生成：
+按年运行时，还会额外生成：
 
 - 年度合并后的 `parquet`
 - `analysis/01_signal_analysis_results.csv`
@@ -142,18 +152,22 @@ $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
 - `analysis/03_feature_analysis_qc.csv`
 - `analysis/quarter_summary_YYYY.csv`
 - `analysis/summary_YYYY.txt`
-- 跨年份运行时的 `trend_START_END.csv`
+- 跨年份趋势文件 `trend_START_END.csv`
 
-## 安装依赖
+## 环境依赖
 
-上层 [pyproject.toml](D:/program_FAERS/pyproject.toml) 里当前声明了以下依赖：
+上层 [pyproject.toml](D:/program_FAERS/pyproject.toml) 当前声明的依赖为：
 
+- `duckdb`
 - `pandas`
 - `pyarrow`
 - `scipy`
-- `duckdb`
 - `scikit-learn`
 - `xgboost`
+
+Python 版本要求：
+
+- `Python >= 3.11`
 
 如果使用 `uv`：
 
@@ -162,15 +176,15 @@ cd D:\program_FAERS
 uv sync
 ```
 
-如果使用 `pip`，至少建议安装：
+如果使用 `pip`，最少建议先安装：
 
 ```powershell
-pip install pandas pyarrow scipy
+pip install pandas pyarrow scipy duckdb scikit-learn xgboost
 ```
 
-## 运行方法
+## 使用方法
 
-### 处理单张表
+### 1. 处理单张表
 
 ```powershell
 cd D:\program_FAERS\faers_project
@@ -180,13 +194,25 @@ python main.py --year 2024 --quarter Q1 --table reac
 python main.py --year 2024 --quarter Q1 --table outc
 ```
 
-### 处理单个季度的完整流程
+支持的 `--table` 取值：
+
+- `demo`
+- `drug`
+- `drug_feature`
+- `drug_exposure`
+- `reac`
+- `outc`
+- `case`
+- `signal`
+- `all`
+
+### 2. 处理单个季度的完整流程
 
 ```powershell
 python main.py --year 2024 --quarter Q1 --table all
 ```
 
-这个命令会顺序执行：
+这个命令会依次执行：
 
 - `demo`
 - `drug`
@@ -197,23 +223,29 @@ python main.py --year 2024 --quarter Q1 --table all
 - `case`
 - `signal`
 
-### 只构建病例级主分析表
+### 3. 只构建病例级主分析表
 
 ```powershell
 python main.py --year 2024 --quarter Q1 --table case
 ```
 
-如果依赖文件不存在，脚本会自动补跑前置步骤。
+如果依赖文件缺失，脚本会自动补跑前置步骤。
 
-### 只构建信号分析表
+### 4. 只构建信号分析表
 
 ```powershell
 python main.py --year 2024 --quarter Q1 --table signal
 ```
 
-如果依赖文件不存在，也会自动补跑前置步骤。
+如果依赖文件缺失，脚本也会自动补跑前置步骤。
 
-### 按年批处理
+### 5. 自定义输出目录
+
+```powershell
+python main.py --year 2024 --quarter Q1 --table all --output D:\program_FAERS\OUTPUT
+```
+
+## 按年批处理
 
 处理单年：
 
@@ -229,83 +261,94 @@ python year_batch_runner.py --start-year 2019 --end-year 2024
 
 常用参数：
 
-- `--verbose`：显示每一步详细输出
-- `--force`：即使已有年度结果也强制重建
-- `--output-root`：指定输出根目录
+- `--verbose`：显示季度内每一步的详细日志
+- `--force`：即使年度结果已存在，也强制重建
+- `--output-root`：指定年度输出根目录
+
+年度批处理会做三件事：
+
+1. 自动识别该年可用季度
+2. 为每个季度跑完整处理流程
+3. 汇总季度结果，并调用 `analysis_project` 中的年度分析脚本
 
 ## 年度分析内容
 
-[year_batch_runner.py](D:/program_FAERS/faers_project/year_batch_runner.py) 在季度级产物完成后，会继续调用 [analysis_project](D:/program_FAERS/analysis_project) 中的分析脚本：
+[year_batch_runner.py](D:/program_FAERS/faers_project/year_batch_runner.py) 会在季度产物完成后继续调用 [analysis_project](D:/program_FAERS/analysis_project) 中的分析脚本：
 
 - [01_signal_analysis.py](D:/program_FAERS/analysis_project/01_signal_analysis.py)
-  - 比较 `zolpidem suspect` 与其他 suspect drug 的不成比例信号
+  - 比较 `zolpidem suspect` 与其他病例之间的信号强度
 - [02_comparative_analysis.py](D:/program_FAERS/analysis_project/02_comparative_analysis.py)
   - 比较 `zolpidem_only` 与 `other_zdrug_only`
 - [03_feature_analysis.py](D:/program_FAERS/analysis_project/03_feature_analysis.py)
-  - 在 `zolpidem` 暴露人群内部做分层特征分析
+  - 在 `zolpidem` 暴露病例内部做分层特征分析
 
-当前主要分析的结局包括：
+当前代码里，信号分析结果会写出 ROR、PRR，以及部分 IC / EBGM 相关字段。
 
-- `strict_fall`：狭义跌倒定义
-- `broad_fall`：广义跌倒相关定义
+## 关键研究设定
+
+当前版本里比较重要的默认设定如下：
+
+- 研究对象默认仅保留 `65-120` 岁病例
+- 性别默认仅保留 `M` 和 `F`
+- 主分析暴露口径为 `PS + SS`
+- 敏感性分析暴露口径为 `PS only`
+- 多药并用定义为 `distinct_drug_n >= 5`
+- `REAC` 中同时构建 `is_fall_narrow` 和 `is_fall_broad`
+- `signal_dataset` 中保留年龄组、性别、严重结局和暴露分组字段
+
+这些设定都属于研究口径的一部分，后续如果改代码，建议优先同步更新文档。
 
 ## 辅助脚本
 
 - [structure_scan.py](D:/program_FAERS/faers_project/structure_scan.py)
-  - 扫描原始 FAERS 文件结构、字段变化和分隔符情况
+  - 扫描原始 FAERS 文件结构、字段变化和分隔情况
 - [explore_zolpidem_pt.py](D:/program_FAERS/faers_project/explore_zolpidem_pt.py)
-  - 统计 `zolpidem` 病例中的 PT 词频
+  - 统计 `zolpidem` 病例中的 PT 分布
+- [descriptive_total_report.py](D:/program_FAERS/faers_project/descriptive_total_report.py)
+  - 生成描述性汇总报告
 - [check.py](D:/program_FAERS/faers_project/check.py)
-  - 对某个固定输出文件做快速人工检查
-
-## 关键默认假设
-
-这套代码目前有几个很重要的研究设定，后续回看时最好优先确认：
-
-- 研究对象默认只保留 `65-120` 岁病例
-- 性别只保留 `M` 和 `F`
-- `zolpidem` 主分析暴露口径为 `PS + SS`
-- 敏感性分析暴露口径为 `PS only`
-- 多药并用定义为 `distinct_drug_n >= 5`
-- 同时命中 `zolpidem` 和其他 `Z-drug` 的病例，在部分比较分析里会被排除
+  - 做快速人工检查或结果抽查
 
 ## 常见问题
 
 ### 1. 找不到原始文件
 
-先确认目录结构是否符合：
+先确认目录结构是否满足：
 
 ```text
-data/年份/Q季度/.../*.txt
+data/年份/季度/.../*.txt
 ```
 
 如果不在默认目录，请设置 `FAERS_RAW_ROOT`。
 
-### 2. 处理时提示缺字段
+### 2. 某些季度缺少字段或 `caseid`
 
-不同年份的 FAERS 表头可能不完全一致。代码已经在 [utils.py](D:/program_FAERS/faers_project/utils.py) 中兼容了一部分历史字段名。如果遇到更老或更特殊的季度，建议先运行 [structure_scan.py](D:/program_FAERS/faers_project/structure_scan.py) 查看原始结构。
+FAERS 历史文件结构并不完全一致。这个项目已经在 [utils.py](D:/program_FAERS/faers_project/utils.py) 中兼容了一部分历史差异，但遇到更老或更特殊的季度时，建议先运行 [structure_scan.py](D:/program_FAERS/faers_project/structure_scan.py) 检查实际结构。
 
 ### 3. 年度批处理跑不起来
 
-先确认以下目录存在：
+请确认以下目录都存在且内容完整：
 
 - `D:\program_FAERS\data`
 - `D:\program_FAERS\OUTPUT`
 - `D:\program_FAERS\analysis_project`
 
-`year_batch_runner.py` 依赖 `analysis_project` 中的年度分析脚本，不能只拷贝 `faers_project` 单独运行。
+尤其是 `year_batch_runner.py` 依赖 `analysis_project` 中的 3 个年度分析脚本，不能只复制 `faers_project` 单独运行。
 
-## 建议的回顾顺序
+## 建议阅读顺序
 
-如果之后很久不看代码，建议按下面顺序快速找回上下文：
+如果后面需要快速重新理解这套代码，推荐按这个顺序看：
 
-1. 先看 [main.py](D:/program_FAERS/faers_project/main.py)
-2. 再看 [utils.py](D:/program_FAERS/faers_project/utils.py)
-3. 再看 `demo_processor.py`
-4. 再看 `drug_processor.py`
-5. 再看 `drug_feature_processor.py`
-6. 再看 `drug_exposure_processor.py`
-7. 再看 `reac_processor.py` 和 `outc_processor.py`
-8. 最后看 [case_dataset_processor.py](D:/program_FAERS/faers_project/case_dataset_processor.py) 和 [signal_dataset_processor.py](D:/program_FAERS/faers_project/signal_dataset_processor.py)
+1. [main.py](D:/program_FAERS/faers_project/main.py)
+2. [config.py](D:/program_FAERS/faers_project/config.py)
+3. [utils.py](D:/program_FAERS/faers_project/utils.py)
+4. [demo_processor.py](D:/program_FAERS/faers_project/demo_processor.py)
+5. [drug_processor.py](D:/program_FAERS/faers_project/drug_processor.py)
+6. [drug_feature_processor.py](D:/program_FAERS/faers_project/drug_feature_processor.py)
+7. [drug_exposure_processor.py](D:/program_FAERS/faers_project/drug_exposure_processor.py)
+8. [reac_processor.py](D:/program_FAERS/faers_project/reac_processor.py) 和 [outc_processor.py](D:/program_FAERS/faers_project/outc_processor.py)
+9. [case_dataset_processor.py](D:/program_FAERS/faers_project/case_dataset_processor.py)
+10. [signal_dataset_processor.py](D:/program_FAERS/faers_project/signal_dataset_processor.py)
+11. [year_batch_runner.py](D:/program_FAERS/faers_project/year_batch_runner.py)
 
-这样最快能重新理解这条数据处理链路。
+这样基本能最快把数据处理链路和分析入口重新串起来。
