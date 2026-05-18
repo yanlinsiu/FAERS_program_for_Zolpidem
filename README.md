@@ -314,3 +314,27 @@ FAERS 历史文本结构并不完全统一。项目已在 [faers_project/utils.p
 6. [analysis_project/analysis_common.py](/D:/program_FAERS/analysis_project/analysis_common.py)
 7. [full_period_analysis/build_global_datasets.py](/D:/program_FAERS/full_period_analysis/build_global_datasets.py)
 8. `ml_project/*.py`
+
+## Machine Learning Enhancement
+
+`ml_project/` 现在作为独立的离线机器学习层存在，定位是：
+
+- 在现有 FAERS 清洗、信号检测和分层分析之外，增加一层病例级风险排序和模型对比
+- 不替代 `ROR / PRR / 分层分析`
+- 不输出因果结论
+
+当前采用“一个模型一个文件 + 一个共享核心模块”的结构：
+
+- `ml_project/01_logistic_regression.py`
+- `ml_project/02_random_forest.py`
+- `ml_project/03_xgboost.py`
+- `ml_project/ml_common.py`
+
+默认时间切分为：
+
+- 训练集：`year <= 2023`
+- 验证集：`year = 2024`
+- 测试集：`year = 2025`
+
+默认建模特征是低维结构化变量，所以当前优先使用可解释模型，不引入深度学习。
+更详细的机器学习模块说明见 [ml_project/README.md](/D:/program_FAERS/ml_project/README.md)。
