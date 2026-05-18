@@ -26,8 +26,7 @@ SEARCH_SPEC = SearchSpec(
     param_space_by_mode={
         "fast": [
             {
-                "model__C": [0.1, 0.3, 1.0, 3.0],
-                "model__l1_ratio": [0.0, 0.25, 0.5, 1.0],
+                "model__C": [0.03, 0.1, 0.3, 1.0, 3.0, 10.0],
                 "model__class_weight": [None],
             },
         ],

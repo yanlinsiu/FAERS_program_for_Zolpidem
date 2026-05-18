@@ -36,12 +36,14 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GLOBAL_DATASET_DIR = PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets"
 OUTPUT_ML_ROOT = PROJECT_ROOT / "OUTPUT_ML"
+FEATURE_V2_DATASET_DIR = OUTPUT_ML_ROOT / "features_v2" / "datasets"
 
 TARGET_OPTIONS = ("is_fall_narrow", "is_fall_broad", "serious")
 SEARCH_MODES = ("none", "fast", "full")
 COHORT_OPTIONS = ("all", "zolpidem", "zdrug")
+FEATURE_VERSION_OPTIONS = ("v1", "v2")
 
-BOOL_FEATURES = [
+V1_BOOL_FEATURES = [
     "is_zolpidem",
     "is_zaleplon",
     "is_zopiclone",
@@ -59,7 +61,7 @@ BOOL_FEATURES = [
     "very_high_drug_burden_20",
 ]
 
-NUMERIC_FEATURES = [
+V1_NUMERIC_FEATURES = [
     "year",
     "drug_n",
     "distinct_drug_n",
@@ -69,7 +71,7 @@ NUMERIC_FEATURES = [
     "cns_coprescription_count",
 ]
 
-CATEGORICAL_FEATURES = [
+V1_CATEGORICAL_FEATURES = [
     "age_group",
     "sex_clean",
     "quarter",
@@ -78,6 +80,49 @@ CATEGORICAL_FEATURES = [
     "cns_coprescription_bucket",
 ]
 
+V2_BASE_BOOL_FEATURES = [
+    "event_date_known",
+    "has_ps_drug",
+    "has_ss_drug",
+    "zolpidem_as_ps",
+    "zolpidem_as_suspect",
+    "other_zdrug_as_suspect",
+    "indi_insomnia",
+    "indi_anxiety",
+    "indi_depression",
+    "indi_pain",
+    "indi_epilepsy",
+    "indi_dizziness_vertigo",
+    "has_rpsr",
+    "has_start_dt",
+    "has_end_dt",
+    "duration_known",
+]
+
+V2_BASE_NUMERIC_FEATURES = [
+    "age_years",
+    "ps_drug_n",
+    "ss_drug_n",
+    "concomitant_drug_n",
+    "interacting_drug_n",
+    "indi_n",
+    "distinct_indi_n",
+    "indi_mapped_n",
+    "indi_unmapped_n",
+    "therapy_record_n",
+]
+
+V2_BASE_CATEGORICAL_FEATURES = [
+    "rept_cod",
+    "e_sub",
+    "reporter_country",
+    "occr_country",
+    "rpsr_cod",
+]
+
+BOOL_FEATURES = V1_BOOL_FEATURES.copy()
+NUMERIC_FEATURES = V1_NUMERIC_FEATURES.copy()
+CATEGORICAL_FEATURES = V1_CATEGORICAL_FEATURES.copy()
 MODEL_FEATURES = CATEGORICAL_FEATURES + NUMERIC_FEATURES + BOOL_FEATURES
 
 SEARCH_SCORING = {
@@ -103,11 +148,13 @@ class DatasetBundle:
     period_token: str
     signal_file: Path
     feature_file: Path
+    feature_version: str = "v1"
 
 
 @dataclass(frozen=True)
 class ExperimentConfig:
     period_token: str | None
+    feature_version: str
     target_col: str
     cohort: str
     train_end_year: int
@@ -174,6 +221,12 @@ def add_common_arguments(
         help="Target column to predict.",
     )
     parser.add_argument(
+        "--feature-version",
+        default="v1",
+        choices=FEATURE_VERSION_OPTIONS,
+        help="Feature table version. v1 uses current global datasets; v2 uses OUTPUT_ML/features_v2/datasets.",
+    )
+    parser.add_argument(
         "--cohort",
         default="all",
         choices=COHORT_OPTIONS,
@@ -235,6 +288,7 @@ def add_common_arguments(
 def config_from_args(args: Any) -> ExperimentConfig:
     return ExperimentConfig(
         period_token=args.period_token,
+        feature_version=args.feature_version,
         target_col=args.target_col,
         cohort=args.cohort,
         train_end_year=args.train_end_year,
@@ -272,7 +326,31 @@ def _token_sort_key(token: str) -> tuple[int, int, int, str]:
 def resolve_dataset_bundle(
     dataset_dir: Path = GLOBAL_DATASET_DIR,
     period_token: str | None = None,
+    feature_version: str = "v1",
 ) -> DatasetBundle:
+    if feature_version == "v2":
+        feature_files = sorted(FEATURE_V2_DATASET_DIR.glob("ml_feature_v2_*.parquet"))
+        if not feature_files:
+            raise FileNotFoundError(
+                f"No ML-v2 feature dataset found in {FEATURE_V2_DATASET_DIR}. "
+                "Run ml_project/features_v2/07_build_ml_feature_v2.py first."
+            )
+        feature_by_token = {
+            _extract_token(path, "ml_feature_v2_"): path for path in feature_files
+        }
+        selected_token = period_token or max(feature_by_token, key=_token_sort_key)
+        if selected_token not in feature_by_token:
+            raise FileNotFoundError(
+                f"ML-v2 period token not found in {FEATURE_V2_DATASET_DIR}: {selected_token}"
+            )
+        selected_file = feature_by_token[selected_token]
+        return DatasetBundle(
+            period_token=selected_token,
+            signal_file=selected_file,
+            feature_file=selected_file,
+            feature_version="v2",
+        )
+
     signal_files = sorted(dataset_dir.glob("signal_dataset_*.parquet"))
     feature_files = sorted(dataset_dir.glob("drug_feature_*_case.parquet"))
 
@@ -301,6 +379,7 @@ def resolve_dataset_bundle(
         period_token=selected_token,
         signal_file=signal_by_token[selected_token],
         feature_file=feature_by_token[selected_token],
+        feature_version="v1",
     )
 
 
@@ -328,9 +407,43 @@ def apply_cohort_filter(df: pd.DataFrame, cohort: str) -> pd.DataFrame:
     return filtered
 
 
+def configure_feature_schema(feature_version: str, available_columns: list[str] | None = None) -> None:
+    global BOOL_FEATURES, NUMERIC_FEATURES, CATEGORICAL_FEATURES, MODEL_FEATURES
+
+    if feature_version == "v1":
+        BOOL_FEATURES = V1_BOOL_FEATURES.copy()
+        NUMERIC_FEATURES = V1_NUMERIC_FEATURES.copy()
+        CATEGORICAL_FEATURES = V1_CATEGORICAL_FEATURES.copy()
+    elif feature_version == "v2":
+        available = set(available_columns or [])
+        dynamic_soc_features = sorted(
+            column for column in available if column.startswith("indi_soc_")
+        )
+        BOOL_FEATURES = (
+            V1_BOOL_FEATURES
+            + [column for column in V2_BASE_BOOL_FEATURES if column in available]
+            + dynamic_soc_features
+        )
+        NUMERIC_FEATURES = V1_NUMERIC_FEATURES + [
+            column for column in V2_BASE_NUMERIC_FEATURES if column in available
+        ]
+        CATEGORICAL_FEATURES = V1_CATEGORICAL_FEATURES + [
+            column for column in V2_BASE_CATEGORICAL_FEATURES if column in available
+        ]
+    else:
+        raise ValueError(f"Unsupported feature version: {feature_version}")
+
+    MODEL_FEATURES = CATEGORICAL_FEATURES + NUMERIC_FEATURES + BOOL_FEATURES
+
+
 def load_modeling_frame(bundle: DatasetBundle, target_col: str, cohort: str) -> pd.DataFrame:
     if target_col not in TARGET_OPTIONS:
         raise ValueError(f"Unsupported target column: {target_col}")
+
+    if bundle.feature_version == "v2":
+        return load_modeling_frame_v2(bundle, target_col=target_col, cohort=cohort)
+
+    configure_feature_schema("v1")
 
     raw_bool_features = [
         "is_zolpidem",
@@ -387,6 +500,80 @@ def load_modeling_frame(bundle: DatasetBundle, target_col: str, cohort: str) -> 
     final_df = merged[["caseid", target_col, *MODEL_FEATURES]].copy()
     final_df = apply_cohort_filter(final_df, cohort=cohort)
     log_step(f"Modeling frame ready with {len(final_df):,} rows")
+    return final_df
+
+
+def load_modeling_frame_v2(bundle: DatasetBundle, target_col: str, cohort: str) -> pd.DataFrame:
+    log_step(f"Loading ML-v2 feature dataset: {bundle.feature_file.name}")
+    df = pd.read_parquet(bundle.feature_file)
+    if target_col not in df.columns:
+        raise ValueError(f"ML-v2 feature dataset missing target column: {target_col}")
+
+    leakage_cols = {"fall_pt_list", "fall_narrow_pt_count"}
+    present_leakage = sorted(leakage_cols & set(df.columns))
+    if present_leakage:
+        raise ValueError(f"ML-v2 feature dataset contains leakage columns: {present_leakage}")
+
+    df["caseid"] = df["caseid"].astype(str).str.strip()
+    df = df[df["caseid"] != ""].drop_duplicates(subset=["caseid"]).copy()
+
+    base_required = [
+        "is_zolpidem",
+        "is_zaleplon",
+        "is_zopiclone",
+        "is_eszopiclone",
+        "is_benzo",
+        "is_antidepressant",
+        "is_antipsychotic",
+        "is_opioid",
+        "is_antiepileptic",
+        "polypharmacy_5",
+        "drug_n",
+        "distinct_drug_n",
+        "age_group",
+        "sex_clean",
+        "quarter",
+        "year",
+    ]
+    missing = [column for column in base_required if column not in df.columns]
+    if missing:
+        raise ValueError(f"ML-v2 feature dataset missing required base columns: {missing}")
+
+    for col in V1_BOOL_FEATURES:
+        if col in df.columns:
+            df[col] = df[col].fillna(False).astype(bool)
+    for col in [target_col]:
+        df[col] = df[col].fillna(False).astype(bool)
+    for col in ["year", "drug_n", "distinct_drug_n"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+    df = add_derived_features(df)
+    configure_feature_schema("v2", available_columns=list(df.columns))
+
+    for col in BOOL_FEATURES:
+        if col not in df.columns:
+            df[col] = False
+        df[col] = df[col].fillna(False).astype(bool)
+    for col in NUMERIC_FEATURES:
+        if col not in df.columns:
+            df[col] = 0
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    for col in CATEGORICAL_FEATURES:
+        if col not in df.columns:
+            df[col] = "unknown"
+        df[col] = (
+            df[col]
+            .where(df[col].notna(), "unknown")
+            .astype(str)
+            .str.strip()
+            .replace("", "unknown")
+        )
+
+    final_df = df[["caseid", target_col, *MODEL_FEATURES]].copy()
+    final_df = apply_cohort_filter(final_df, cohort=cohort)
+    log_step(
+        f"ML-v2 modeling frame ready with {len(final_df):,} rows and {len(MODEL_FEATURES):,} features"
+    )
     return final_df
 
 
@@ -551,6 +738,24 @@ def _safe_brier_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
     return float(brier_score_loss(y_true, y_score))
 
 
+def _top_risk_metrics(y_true_arr: np.ndarray, y_score_arr: np.ndarray) -> dict[str, Any]:
+    rows: dict[str, Any] = {}
+    if len(y_true_arr) == 0:
+        return rows
+    order = np.argsort(-y_score_arr)
+    baseline = float(y_true_arr.mean()) if len(y_true_arr) else 0.0
+    for pct in [0.05, 0.10]:
+        n_top = max(1, int(np.ceil(len(y_true_arr) * pct)))
+        top_labels = y_true_arr[order[:n_top]]
+        rate = float(top_labels.mean()) if n_top else 0.0
+        label = f"top_{int(pct * 100)}pct"
+        rows[f"{label}_n"] = int(n_top)
+        rows[f"{label}_positive_cases"] = int(top_labels.sum())
+        rows[f"{label}_positive_rate"] = rate
+        rows[f"{label}_lift"] = rate / baseline if baseline > 0 else None
+    return rows
+
+
 def evaluate_predictions(
     y_true: pd.Series | np.ndarray,
     y_score: pd.Series | np.ndarray,
@@ -563,7 +768,7 @@ def evaluate_predictions(
     tn, fp, fn, tp = confusion_matrix(y_true_arr, y_pred, labels=[0, 1]).ravel()
     specificity = tn / (tn + fp) if (tn + fp) else 0.0
 
-    return {
+    metrics = {
         "n_rows": int(len(y_true_arr)),
         "positive_cases": int(y_true_arr.sum()),
         "positive_rate": float(y_true_arr.mean()),
@@ -581,6 +786,8 @@ def evaluate_predictions(
         "fn": int(fn),
         "tp": int(tp),
     }
+    metrics.update(_top_risk_metrics(y_true_arr, y_score_arr))
+    return metrics
 
 
 def build_roc_table(
@@ -932,12 +1139,14 @@ def make_run_dir(
     target_col: str,
     period_token: str,
     cohort: str,
+    feature_version: str,
 ) -> Path:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    version_suffix = "" if feature_version == "v1" else f"_{feature_version}"
     run_dir = (
         OUTPUT_ML_ROOT
         / model_name
-        / f"{target_col}_{cohort}_{period_token}_{timestamp}"
+        / f"{target_col}_{cohort}_{period_token}{version_suffix}_{timestamp}"
     )
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
@@ -1044,6 +1253,7 @@ def _build_metrics_payload(
     return {
         "model": model_name,
         "display_name": display_name,
+        "feature_version": result.config.feature_version,
         "target_col": result.config.target_col,
         "cohort": result.config.cohort,
         "period_token": result.bundle.period_token,
@@ -1057,6 +1267,9 @@ def _build_metrics_payload(
         "cv_folds_requested": result.config.cv_folds,
         "bootstrap_iterations": result.config.bootstrap_iterations,
         "model_features": MODEL_FEATURES,
+        "categorical_features": CATEGORICAL_FEATURES,
+        "numeric_features": NUMERIC_FEATURES,
+        "bool_features": BOOL_FEATURES,
         "search_summary": result.search_summary,
         "cross_validation_summary": result.cv_summary,
         "threshold_selection": result.threshold_selection,
@@ -1076,8 +1289,14 @@ def run_model_experiment(
     estimator_factory: Callable[[pd.DataFrame, ExperimentConfig], BaseEstimator],
     search_spec: SearchSpec,
 ) -> ExperimentResult:
-    log_step(f"Resolving dataset bundle for period token: {config.period_token or 'latest'}")
-    bundle = resolve_dataset_bundle(period_token=config.period_token)
+    log_step(
+        "Resolving dataset bundle for "
+        f"period token: {config.period_token or 'latest'}, feature_version={config.feature_version}"
+    )
+    bundle = resolve_dataset_bundle(
+        period_token=config.period_token,
+        feature_version=config.feature_version,
+    )
     modeling_df = load_modeling_frame(
         bundle=bundle,
         target_col=config.target_col,
@@ -1154,6 +1373,7 @@ def run_model_experiment(
         target_col=config.target_col,
         period_token=bundle.period_token,
         cohort=config.cohort,
+        feature_version=bundle.feature_version,
     )
     log_step(f"Writing outputs to {run_dir}")
 
