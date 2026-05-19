@@ -1,44 +1,83 @@
+from __future__ import annotations
+
+import argparse
 from pathlib import Path
 
 import pandas as pd
 
+from config import DEFAULT_OUTPUT_ROOT_PATH
 
-file = Path(r"D:\program_FAERS\OUTPUT\case_dataset_2024q1.parquet")
-df = pd.read_parquet(file)
 
-print("数据行数:", len(df))
-print("列名:")
-print(df.columns.tolist())
-
-print("\n前5行数据:")
-print(df.head())
-
-narrow_fall_n = int(df["is_fall_narrow"].fillna(False).astype(bool).sum())
-broad_fall_n = (
-    int(df["is_fall_broad"].fillna(False).astype(bool).sum())
-    if "is_fall_broad" in df.columns
-    else 0
-)
-polypharmacy_n = int(df["polypharmacy"].fillna(False).astype(bool).sum())
-
-if "is_zolpidem_suspect" in df.columns:
-    zolpidem_n = int(df["is_zolpidem_suspect"].fillna(False).astype(bool).sum())
-    zolpidem_scope = "suspect口径(is_zolpidem_suspect)"
-else:
-    zolpidem_n = int(df["is_zolpidem"].fillna(False).astype(bool).sum())
-    zolpidem_scope = "泛暴露口径(is_zolpidem)"
-
-print("\n狭义跌倒人数:", narrow_fall_n)
-print("广义跌倒相关人数:", broad_fall_n)
-print(f"唑吡坦人数[{zolpidem_scope}]:", zolpidem_n)
-if "is_zolpidem" in df.columns:
-    print(
-        "唑吡坦人数[泛暴露口径(is_zolpidem)]:",
-        int(df["is_zolpidem"].fillna(False).astype(bool).sum()),
+def _default_case_file() -> Path:
+    candidates = sorted(
+        DEFAULT_OUTPUT_ROOT_PATH.glob("**/case_dataset_*.parquet"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
     )
-if "is_zolpidem_suspect" in df.columns:
-    print(
-        "唑吡坦人数[suspect口径(is_zolpidem_suspect)]:",
-        int(df["is_zolpidem_suspect"].fillna(False).astype(bool).sum()),
+    if not candidates:
+        raise FileNotFoundError(
+            f"No case_dataset_*.parquet file found under {DEFAULT_OUTPUT_ROOT_PATH}"
+        )
+    return candidates[0]
+
+
+def _bool_count(df: pd.DataFrame, column: str) -> int | None:
+    if column not in df.columns:
+        return None
+    return int(df[column].fillna(False).astype(bool).sum())
+
+
+def inspect_case_dataset(case_file: Path, head: int = 5) -> dict[str, object]:
+    df = pd.read_parquet(case_file)
+    metrics = {
+        "file": case_file,
+        "rows": int(len(df)),
+        "columns": list(df.columns),
+        "head": df.head(int(head)),
+        "n_fall_narrow": _bool_count(df, "is_fall_narrow"),
+        "n_fall_broad": _bool_count(df, "is_fall_broad"),
+        "n_zolpidem_any": _bool_count(df, "is_zolpidem"),
+        "n_zolpidem_suspect": _bool_count(df, "is_zolpidem_suspect"),
+        "n_polypharmacy": _bool_count(df, "polypharmacy"),
+    }
+    return metrics
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Quickly inspect a FAERS case dataset parquet file.")
+    parser.add_argument(
+        "--case-file",
+        type=Path,
+        default=None,
+        help="Path to case_dataset parquet. Defaults to the newest one under OUTPUT.",
     )
-print("多药并用人数:", polypharmacy_n)
+    parser.add_argument("--head", type=int, default=5, help="Number of preview rows to print.")
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    case_file = args.case_file or _default_case_file()
+    metrics = inspect_case_dataset(case_file=case_file, head=args.head)
+
+    print(f"File: {metrics['file']}")
+    print(f"Rows: {metrics['rows']}")
+    print("Columns:")
+    print(metrics["columns"])
+    print("")
+    print("Preview:")
+    print(metrics["head"])
+    print("")
+    print("Key counts:")
+    for key in [
+        "n_fall_narrow",
+        "n_fall_broad",
+        "n_zolpidem_any",
+        "n_zolpidem_suspect",
+        "n_polypharmacy",
+    ]:
+        print(f"- {key}: {metrics[key]}")
+
+
+if __name__ == "__main__":
+    main()

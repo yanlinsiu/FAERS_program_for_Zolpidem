@@ -103,6 +103,13 @@ def process_reac(year, quarter, output_root):
     df = df[df["caseid"] != ""]
     print("REAC event rows after DEMO-primaryid filter:", len(df))
 
+    output_root = Path(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    event_output_file = output_root / f"reac_event_{year}{quarter.lower()}.parquet"
+    df[["caseid", "primaryid", "pt"]].to_parquet(event_output_file, index=False)
+    print(f"Saved event-level REAC: {event_output_file}")
+
     df["is_fall_narrow_row"] = df["pt"].isin(NARROW_FALL_TERMS)
     df["is_fall_broad_row"] = df["pt"].isin(BROAD_FALL_TERMS)
 
@@ -142,9 +149,6 @@ def process_reac(year, quarter, output_root):
         "Fall-related broad cases:",
         int(case_level_df["is_fall_broad"].sum()),
     )
-
-    output_root = Path(output_root)
-    output_root.mkdir(parents=True, exist_ok=True)
 
     output_file = output_root / f"reac_{year}{quarter.lower()}_case.parquet"
     case_level_df.to_parquet(output_file, index=False)

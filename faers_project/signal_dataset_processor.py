@@ -11,6 +11,13 @@ REQUIRED_CASE_BASE_COLS = [
     "quarter",
 ]
 
+OPTIONAL_CASE_BASE_COLS = [
+    "primaryid",
+    "fda_dt",
+    "reporter_country",
+    "occr_country",
+]
+
 REQUIRED_REAC_COLS = [
     "caseid",
     "is_fall_narrow",
@@ -174,6 +181,9 @@ def process_signal_dataset(year, quarter, output_root):
     _assert_has_columns(outc_case_df, ["caseid", "is_serious_any"], "outc_case")
 
     case_base_keep_cols = REQUIRED_CASE_BASE_COLS.copy()
+    case_base_keep_cols.extend(
+        col for col in OPTIONAL_CASE_BASE_COLS if col in case_base_df.columns
+    )
     if "serious" in case_base_df.columns:
         case_base_keep_cols.append("serious")
 
@@ -228,6 +238,17 @@ def process_signal_dataset(year, quarter, output_root):
     )
     signal_df.loc[signal_df["sex_clean"] == "", "sex_clean"] = "unknown"
 
+    for country_col in ["reporter_country", "occr_country"]:
+        if country_col in signal_df.columns:
+            signal_df[country_col] = (
+                signal_df[country_col]
+                .where(signal_df[country_col].notna(), "unknown")
+                .astype(str)
+                .str.strip()
+                .str.upper()
+            )
+            signal_df.loc[signal_df[country_col] == "", country_col] = "unknown"
+
     signal_df["target_drug_group"] = (
         signal_df["target_drug_group"]
         .where(signal_df["target_drug_group"].notna(), "no_suspect_drug")
@@ -280,9 +301,12 @@ def process_signal_dataset(year, quarter, output_root):
         "target_drug_group_ps",
         "age_group",
         "sex_clean",
+        "reporter_country",
+        "occr_country",
         "year",
         "quarter",
     ]
+    final_cols = [col for col in final_cols if col in signal_df.columns]
 
     if "serious" in signal_df.columns:
         final_cols.append("serious")

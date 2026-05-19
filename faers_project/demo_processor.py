@@ -19,6 +19,11 @@ CASE_BASE_COLUMNS = [
     "age_years",
     "age_group",
     "sex_clean",
+    "rept_cod",
+    "e_sub",
+    "event_dt",
+    "reporter_country",
+    "occr_country",
     "year",
     "quarter",
     "year_quarter",
@@ -42,6 +47,28 @@ def _build_case_base_dataset(df: pd.DataFrame, year: int, quarter: str) -> pd.Da
     case_base_df["sex_clean"] = (
         df["sex_clean"].where(df["sex_clean"].notna(), "").astype(str).str.strip()
     )
+    for demo_col in ["rept_cod", "e_sub", "event_dt"]:
+        if demo_col in df.columns:
+            case_base_df[demo_col] = (
+                df[demo_col]
+                .where(df[demo_col].notna(), "")
+                .astype(str)
+                .str.strip()
+                .str.upper()
+            )
+        else:
+            case_base_df[demo_col] = ""
+    for country_col in ["reporter_country", "occr_country"]:
+        if country_col in df.columns:
+            case_base_df[country_col] = (
+                df[country_col]
+                .where(df[country_col].notna(), "")
+                .astype(str)
+                .str.strip()
+                .str.upper()
+            )
+        else:
+            case_base_df[country_col] = ""
 
     if "serious" in df.columns and df["serious"].notna().any():
         case_base_df["serious"] = df["serious"]
@@ -52,7 +79,7 @@ def _build_case_base_dataset(df: pd.DataFrame, year: int, quarter: str) -> pd.Da
 
     case_base_columns = CASE_BASE_COLUMNS.copy()
     if "serious" in case_base_df.columns:
-        case_base_columns.insert(6, "serious")
+        case_base_columns.insert(11, "serious")
 
     case_base_df = case_base_df[case_base_columns]
     case_base_df = case_base_df[case_base_df["caseid"] != ""].copy()

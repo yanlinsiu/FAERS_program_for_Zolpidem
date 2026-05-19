@@ -6,15 +6,18 @@ from pathlib import Path
 
 import duckdb
 
-from config import GLOBAL_DATASET_DIR, GLOBAL_QC_DIR, OUTPUT_ROOT
+try:
+    from .config import GLOBAL_OUTPUT_ROOT, OUTPUT_ROOT
+except ImportError:
+    from config import GLOBAL_OUTPUT_ROOT, OUTPUT_ROOT
 
 
 YEAR_Q_PATTERN = re.compile(r"(\d{4})q([1-4])", re.IGNORECASE)
 
 
-def discover_quarterly_files(pattern: str) -> list[Path]:
+def discover_quarterly_files(pattern: str, output_root: Path = OUTPUT_ROOT) -> list[Path]:
     files: list[Path] = []
-    for year_dir in sorted(OUTPUT_ROOT.iterdir()):
+    for year_dir in sorted(output_root.iterdir()):
         if not year_dir.is_dir() or not year_dir.name.isdigit():
             continue
         quarterly_dir = year_dir / "quarterly"
@@ -42,13 +45,31 @@ def create_global_case_index(
     end_year: int,
 ) -> None:
     case_file_list = [file_path.as_posix() for file_path in case_files]
+    schema_df = con.execute(
+        "DESCRIBE SELECT * FROM read_parquet(?, union_by_name=true)",
+        [case_file_list],
+    ).df()
+    available_cols = set(schema_df["column_name"].astype(str).str.lower())
+    reporter_country_expr = (
+        "UPPER(NULLIF(TRIM(CAST(reporter_country AS VARCHAR)), '')) AS reporter_country"
+        if "reporter_country" in available_cols
+        else "'UNKNOWN' AS reporter_country"
+    )
+    occr_country_expr = (
+        "UPPER(NULLIF(TRIM(CAST(occr_country AS VARCHAR)), '')) AS occr_country"
+        if "occr_country" in available_cols
+        else "'UNKNOWN' AS occr_country"
+    )
+
     con.execute(
-        """
+        f"""
         CREATE OR REPLACE TEMP TABLE case_base_all AS
         SELECT
             TRIM(CAST(caseid AS VARCHAR)) AS caseid,
             CAST(primaryid AS BIGINT) AS primaryid,
             CAST(fda_dt AS DATE) AS fda_dt,
+            {reporter_country_expr},
+            {occr_country_expr},
             CAST(year AS INTEGER) AS year,
             UPPER(TRIM(CAST(quarter AS VARCHAR))) AS quarter
         FROM read_parquet(?, union_by_name=true)
@@ -74,6 +95,8 @@ def create_global_case_index(
                 caseid,
                 primaryid,
                 fda_dt,
+                reporter_country,
+                occr_country,
                 year,
                 quarter,
                 ROW_NUMBER() OVER (
@@ -96,6 +119,8 @@ def create_global_case_index(
             caseid,
             primaryid,
             fda_dt,
+            COALESCE(reporter_country, 'UNKNOWN') AS reporter_country,
+            COALESCE(occr_country, 'UNKNOWN') AS occr_country,
             year,
             quarter,
             CAST(year AS VARCHAR) || quarter AS year_quarter
@@ -170,16 +195,20 @@ def write_outputs(
     con: duckdb.DuckDBPyConnection,
     start_year: int,
     end_year: int,
+    global_output_root: Path = GLOBAL_OUTPUT_ROOT,
 ) -> tuple[Path, Path, Path, Path, Path]:
-    GLOBAL_DATASET_DIR.mkdir(parents=True, exist_ok=True)
-    GLOBAL_QC_DIR.mkdir(parents=True, exist_ok=True)
+    global_dataset_dir = global_output_root / "datasets"
+    global_qc_dir = global_output_root / "qc"
+
+    global_dataset_dir.mkdir(parents=True, exist_ok=True)
+    global_qc_dir.mkdir(parents=True, exist_ok=True)
 
     period_token = f"{start_year}_{end_year}"
-    case_index_file = GLOBAL_DATASET_DIR / f"global_case_index_{period_token}.parquet"
-    signal_file = GLOBAL_DATASET_DIR / f"signal_dataset_{period_token}.parquet"
-    feature_file = GLOBAL_DATASET_DIR / f"drug_feature_{period_token}_case.parquet"
-    qc_file = GLOBAL_QC_DIR / f"global_dataset_qc_{period_token}.csv"
-    qc_summary_file = GLOBAL_QC_DIR / f"global_signal_summary_{period_token}.csv"
+    case_index_file = global_dataset_dir / f"global_case_index_{period_token}.parquet"
+    signal_file = global_dataset_dir / f"signal_dataset_{period_token}.parquet"
+    feature_file = global_dataset_dir / f"drug_feature_{period_token}_case.parquet"
+    qc_file = global_qc_dir / f"global_dataset_qc_{period_token}.csv"
+    qc_summary_file = global_qc_dir / f"global_signal_summary_{period_token}.csv"
 
     con.execute(f"COPY global_case_index TO '{_sql_quoted(case_index_file)}' (FORMAT PARQUET)")
     con.execute(f"COPY signal_global TO '{_sql_quoted(signal_file)}' (FORMAT PARQUET)")
@@ -256,44 +285,94 @@ def write_outputs(
     return case_index_file, signal_file, feature_file, qc_file, qc_summary_file
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Build 2004-2025 global deduplicated FAERS datasets with DuckDB."
-    )
-    parser.add_argument("--start-year", type=int, default=2004)
-    parser.add_argument("--end-year", type=int, default=2025)
-    args = parser.parse_args()
-
-    start_year = int(args.start_year)
-    end_year = int(args.end_year)
+def build_global_datasets(
+    start_year: int = 2004,
+    end_year: int = 2025,
+    input_output_root: Path = OUTPUT_ROOT,
+    global_output_root: Path = GLOBAL_OUTPUT_ROOT,
+) -> dict[str, Path]:
+    start_year = int(start_year)
+    end_year = int(end_year)
     if start_year > end_year:
         raise ValueError("start_year must be <= end_year")
 
-    case_files = discover_quarterly_files("case_base_dataset_*q*.parquet")
-    signal_files = discover_quarterly_files("signal_dataset_*q*.parquet")
-    feature_files = discover_quarterly_files("drug_feature_*q*_case.parquet")
+    input_output_root = Path(input_output_root).resolve()
+    global_output_root = Path(global_output_root).resolve()
+
+    case_files = discover_quarterly_files("case_base_dataset_*q*.parquet", input_output_root)
+    signal_files = discover_quarterly_files("signal_dataset_*q*.parquet", input_output_root)
+    feature_files = discover_quarterly_files("drug_feature_*q*_case.parquet", input_output_root)
 
     if not case_files:
-        raise FileNotFoundError("No quarterly case_base_dataset parquet files found in OUTPUT/*/quarterly.")
+        raise FileNotFoundError(
+            f"No quarterly case_base_dataset parquet files found in {input_output_root}/*/quarterly."
+        )
     if not signal_files:
-        raise FileNotFoundError("No quarterly signal_dataset parquet files found in OUTPUT/*/quarterly.")
+        raise FileNotFoundError(
+            f"No quarterly signal_dataset parquet files found in {input_output_root}/*/quarterly."
+        )
 
     con = duckdb.connect()
     try:
         create_global_case_index(con, case_files, start_year, end_year)
         create_global_signal_dataset(con, signal_files, start_year, end_year)
         create_global_feature_dataset(con, feature_files)
-        case_file, signal_file, feature_file, qc_file, qc_summary_file = write_outputs(con, start_year, end_year)
+        case_file, signal_file, feature_file, qc_file, qc_summary_file = write_outputs(
+            con,
+            start_year,
+            end_year,
+            global_output_root=global_output_root,
+        )
     finally:
         con.close()
 
+    return {
+        "input_output_root": input_output_root,
+        "global_output_root": global_output_root,
+        "case_index": case_file,
+        "signal_dataset": signal_file,
+        "feature_dataset": feature_file,
+        "qc_summary": qc_file,
+        "signal_summary": qc_summary_file,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Build 2004-2025 global deduplicated FAERS datasets with DuckDB."
+    )
+    parser.add_argument("--start-year", type=int, default=2004)
+    parser.add_argument("--end-year", type=int, default=2025)
+    parser.add_argument(
+        "--input-output-root",
+        type=Path,
+        default=OUTPUT_ROOT,
+        help="Cleaned yearly output root to read from. Defaults to OUTPUT.",
+    )
+    parser.add_argument(
+        "--global-output-root",
+        type=Path,
+        default=GLOBAL_OUTPUT_ROOT,
+        help="Global output root to write to. Defaults to OUTPUT_GLOBAL.",
+    )
+    args = parser.parse_args()
+
+    outputs = build_global_datasets(
+        start_year=args.start_year,
+        end_year=args.end_year,
+        input_output_root=args.input_output_root,
+        global_output_root=args.global_output_root,
+    )
+
     print("Global datasets built successfully.")
     print("Global build reused cleaned quarterly datasets only.")
-    print(f"Case index: {case_file}")
-    print(f"Signal dataset: {signal_file}")
-    print(f"Feature dataset: {feature_file}")
-    print(f"QC summary: {qc_file}")
-    print(f"Signal summary: {qc_summary_file}")
+    print(f"Input cleaned output root: {outputs['input_output_root']}")
+    print(f"Global output root: {outputs['global_output_root']}")
+    print(f"Case index: {outputs['case_index']}")
+    print(f"Signal dataset: {outputs['signal_dataset']}")
+    print(f"Feature dataset: {outputs['feature_dataset']}")
+    print(f"QC summary: {outputs['qc_summary']}")
+    print(f"Signal summary: {outputs['signal_summary']}")
 
 
 if __name__ == "__main__":

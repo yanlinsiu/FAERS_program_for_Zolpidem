@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+from functools import lru_cache
 import io
 import importlib.util
 from pathlib import Path
@@ -15,14 +16,7 @@ if str(ANALYSIS_ROOT) not in sys.path:
     sys.path.insert(0, str(ANALYSIS_ROOT))
 
 from config import DEFAULT_OUTPUT_ROOT, RAW_ROOT
-from case_dataset_processor import process_case_dataset
-from demo_processor import process_demo
-from drug_exposure_processor import process_drug_exposure
-from drug_feature_processor import process_drug_feature
-from drug_processor import process_drug
-from outc_processor import process_outc
-from reac_processor import process_reac
-from signal_dataset_processor import process_signal_dataset
+from pipeline import PROCESSING_STEPS
 from utils import build_file_path
 
 
@@ -36,15 +30,15 @@ def _load_analysis_function(file_name: str, function_name: str):
     return getattr(module, function_name)
 
 
-build_signal_analysis = _load_analysis_function(
-    "01_signal_analysis.py", "build_signal_analysis"
-)
-build_comparative_analysis = _load_analysis_function(
-    "02_comparative_analysis.py", "build_comparative_analysis"
-)
-build_feature_analysis = _load_analysis_function(
-    "03_feature_analysis.py", "build_feature_analysis"
-)
+@lru_cache(maxsize=1)
+def _analysis_functions():
+    return {
+        "signal": _load_analysis_function("01_signal_analysis.py", "build_signal_analysis"),
+        "comparative": _load_analysis_function(
+            "02_comparative_analysis.py", "build_comparative_analysis"
+        ),
+        "feature": _load_analysis_function("03_feature_analysis.py", "build_feature_analysis"),
+    }
 
 
 QUARTERS = ("Q1", "Q2", "Q3", "Q4")
@@ -56,9 +50,13 @@ ANNUAL_DATASETS = {
     "drug_feature_dataset": "drug_feature_dataset_{year}.parquet",
     "drug_feature_case": "drug_feature_{year}_case.parquet",
     "drug_exposure_case": "drug_exposure_{year}_case.parquet",
+    "reac_event": "reac_event_{year}.parquet",
     "reac_case": "reac_{year}_case.parquet",
     "outcome_dataset": "outcome_dataset_{year}.parquet",
     "outc_case": "outc_{year}_case.parquet",
+    "indi_case": "indi_{year}_case.parquet",
+    "rpsr_case": "rpsr_{year}_case.parquet",
+    "ther_case": "ther_{year}_case.parquet",
     "case_dataset": "case_dataset_{year}.parquet",
     "signal_dataset": "signal_dataset_{year}.parquet",
 }
@@ -87,7 +85,20 @@ def _is_year_completed(year_root: Path) -> bool:
     signal_file = year_root / "analysis" / "01_signal_analysis_results.csv"
     comparative_file = year_root / "analysis" / "02_comparative_analysis_results.csv"
     feature_file = year_root / "analysis" / "03_feature_analysis_results.csv"
-    return all(path.exists() for path in [summary_file, signal_file, comparative_file, feature_file])
+    required_data_files = [
+        year_root / ANNUAL_DATASETS[key].format(year=year_root.name)
+        for key in ["indi_case", "rpsr_case", "ther_case"]
+    ]
+    return all(
+        path.exists()
+        for path in [
+            summary_file,
+            signal_file,
+            comparative_file,
+            feature_file,
+            *required_data_files,
+        ]
+    )
 
 
 def _looks_like_parquet(file_path: Path) -> bool:
@@ -143,9 +154,13 @@ def _combine_year_outputs(year: int, quarterly_root: Path, year_root: Path) -> d
         "drug_feature_dataset": f"drug_feature_dataset_{year_token}q*.parquet",
         "drug_feature_case": f"drug_feature_{year_token}q*_case.parquet",
         "drug_exposure_case": f"drug_exposure_{year_token}q*_case.parquet",
+        "reac_event": f"reac_event_{year_token}q*.parquet",
         "reac_case": f"reac_{year_token}q*_case.parquet",
         "outcome_dataset": f"outcome_dataset_{year_token}q*.parquet",
         "outc_case": f"outc_{year_token}q*_case.parquet",
+        "indi_case": f"indi_{year_token}q*_case.parquet",
+        "rpsr_case": f"rpsr_{year_token}q*_case.parquet",
+        "ther_case": f"ther_{year_token}q*_case.parquet",
         "case_dataset": f"case_dataset_{year_token}q*.parquet",
         "signal_dataset": f"signal_dataset_{year_token}q*.parquet",
     }
@@ -359,21 +374,10 @@ def process_year(
     if not quarters:
         raise FileNotFoundError(f"No raw FAERS quarters found for year {year}.")
 
-    steps = [
-        process_demo,
-        process_drug,
-        process_drug_feature,
-        process_drug_exposure,
-        process_reac,
-        process_outc,
-        process_case_dataset,
-        process_signal_dataset,
-    ]
-
     quarter_summary_rows: list[dict[str, object]] = []
     for quarter in quarters:
-        for step in steps:
-            _run_step(step, year, quarter, quarterly_root, quiet=quiet)
+        for step in PROCESSING_STEPS:
+            _run_step(step.processor, year, quarter, quarterly_root, quiet=quiet)
 
         signal_file = quarterly_root / f"signal_dataset_{year}{quarter.lower()}.parquet"
         signal_df = pd.read_parquet(signal_file)
@@ -409,15 +413,16 @@ def process_year(
 
     combined_summary = _combine_year_outputs(year, quarterly_root, year_root)
 
-    signal_results, signal_qc = build_signal_analysis(
+    analysis_functions = _analysis_functions()
+    signal_results, signal_qc = analysis_functions["signal"](
         signal_root=quarterly_root,
         output_dir=analysis_root,
     )
-    comparative_results, comparative_qc = build_comparative_analysis(
+    comparative_results, comparative_qc = analysis_functions["comparative"](
         signal_root=quarterly_root,
         output_dir=analysis_root,
     )
-    feature_results, feature_qc = build_feature_analysis(
+    feature_results, feature_qc = analysis_functions["feature"](
         signal_root=quarterly_root,
         output_dir=analysis_root,
     )

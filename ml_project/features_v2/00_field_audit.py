@@ -11,7 +11,7 @@ from feature_v2_common import (
     ensure_feature_v2_dirs,
     iter_quarters,
     period_token,
-    read_raw_table,
+    require_processed_case_file,
     write_csv,
 )
 
@@ -40,7 +40,7 @@ KEY_COLUMNS = {
 
 def audit_table(year: int, quarter: str, table_name: str) -> list[dict[str, object]]:
     try:
-        df = read_raw_table(year, quarter, table_name)
+        df = pd.read_parquet(require_processed_case_file(year, quarter, table_name))
     except FileNotFoundError:
         return [
             {
@@ -84,7 +84,7 @@ def audit_table(year: int, quarter: str, table_name: str) -> list[dict[str, obje
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Audit ML-v2 source fields.")
+    parser = argparse.ArgumentParser(description="Audit cleaned ML-v2 input fields.")
     parser.add_argument("--start-year", type=int, default=2004)
     parser.add_argument("--end-year", type=int, default=2025)
     args = parser.parse_args()

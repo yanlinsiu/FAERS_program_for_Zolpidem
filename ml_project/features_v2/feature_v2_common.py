@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-import sys
 from pathlib import Path
 from typing import Iterable
 
@@ -9,22 +8,6 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-FAERS_PROJECT_DIR = PROJECT_ROOT / "faers_project"
-if str(FAERS_PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(FAERS_PROJECT_DIR))
-
-from config import RAW_ROOT  # noqa: E402
-from utils import (  # noqa: E402
-    apply_demo_demographic_criteria,
-    attach_caseid_from_demo,
-    build_file_path,
-    deduplicate_demo_records,
-    exclude_deleted_caseids,
-    load_retained_demo_primaryids,
-    read_faers_txt,
-)
-
-
 OUTPUT_ROOT = PROJECT_ROOT / "OUTPUT"
 OUTPUT_ML_ROOT = PROJECT_ROOT / "OUTPUT_ML"
 FEATURE_V2_ROOT = OUTPUT_ML_ROOT / "features_v2"
@@ -47,9 +30,7 @@ def ensure_feature_v2_dirs() -> None:
 def iter_quarters(start_year: int, end_year: int) -> Iterable[tuple[int, str]]:
     for year in range(int(start_year), int(end_year) + 1):
         for quarter in QUARTERS:
-            try:
-                build_file_path(RAW_ROOT, year, quarter, "DEMO")
-            except FileNotFoundError:
+            if not processed_case_file(year, quarter, "DEMO").exists():
                 continue
             yield year, quarter
 
@@ -85,13 +66,6 @@ def normalize_meddra_term(series: pd.Series) -> pd.Series:
     )
 
 
-def read_raw_table(year: int, quarter: str, table_name: str) -> pd.DataFrame:
-    path = build_file_path(RAW_ROOT, year, quarter, table_name)
-    if not path.exists():
-        raise FileNotFoundError(f"Missing {table_name} file: {path}")
-    return read_faers_txt(path, dataset_name=table_name)
-
-
 def output_quarter_dir(year: int) -> Path:
     return OUTPUT_ROOT / str(int(year)) / "quarterly"
 
@@ -100,24 +74,38 @@ def processed_quarter_file(year: int, quarter: str, stem: str) -> Path:
     return output_quarter_dir(year) / f"{stem}_{quarter_token(year, quarter)}.parquet"
 
 
+def processed_case_file(year: int, quarter: str, table_name: str) -> Path:
+    table_key = str(table_name).upper()
+    stem_by_table = {
+        "DEMO": "case_base_dataset",
+        "DRUG": "drug",
+        "INDI": "indi",
+        "RPSR": "rpsr",
+        "THER": "ther",
+    }
+    if table_key not in stem_by_table:
+        raise ValueError(f"Unsupported processed case table: {table_name}")
+    suffix = "_case" if table_key in {"INDI", "RPSR", "THER"} else ""
+    return output_quarter_dir(year) / f"{stem_by_table[table_key]}_{quarter_token(year, quarter)}{suffix}.parquet"
+
+
+def require_processed_case_file(year: int, quarter: str, table_name: str) -> Path:
+    path = processed_case_file(year, quarter, table_name)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Missing cleaned {table_name} input: {path}. "
+            "Run faers_project/year_batch_runner.py first so ML-v2 reads only main cleaned outputs."
+        )
+    return path
+
+
 def load_clean_demo(year: int, quarter: str) -> pd.DataFrame:
-    df = read_raw_table(year, quarter, "DEMO")
-    df, _, _ = exclude_deleted_caseids(df, RAW_ROOT, year, quarter)
-    df = deduplicate_demo_records(df)
-    df = apply_demo_demographic_criteria(df)
-    return df
+    return pd.read_parquet(require_processed_case_file(year, quarter, "DEMO"))
 
 
 def load_clean_case_table(year: int, quarter: str, table_name: str) -> pd.DataFrame:
-    df = read_raw_table(year, quarter, table_name)
-    df = attach_caseid_from_demo(df, RAW_ROOT, year, quarter, output_root=output_quarter_dir(year))
+    df = pd.read_parquet(require_processed_case_file(year, quarter, table_name))
     df["caseid"] = clean_caseid(df["caseid"])
-    if "primaryid" in df.columns:
-        df["primaryid"] = pd.to_numeric(df["primaryid"], errors="coerce")
-        retained = load_retained_demo_primaryids(
-            RAW_ROOT, year, quarter, output_root=output_quarter_dir(year)
-        )
-        df = df[df["primaryid"].isin(retained)].copy()
     return df[df["caseid"] != ""].copy()
 
 

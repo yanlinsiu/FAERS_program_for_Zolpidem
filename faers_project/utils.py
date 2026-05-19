@@ -42,8 +42,11 @@ COLUMN_ALIASES = {
 OPTIONAL_DEFAULT_COLUMNS = {
     "demo": ["caseversion", "fda_dt", "age", "age_cod", "sex", "gndr_cod"],
     "drug": ["primaryid", "caseid", "prod_ai", "role_cod"],
+    "indi": ["primaryid", "caseid", "indi_pt"],
     "outc": ["primaryid", "caseid", "outc_cod"],
     "reac": ["primaryid", "caseid", "pt", "reac_pt"],
+    "rpsr": ["primaryid", "caseid", "rpsr_cod"],
+    "ther": ["primaryid", "caseid", "start_dt", "end_dt", "dur", "dur_cod"],
 }
 
 FALLBACK_MERGE_INDEX = {
