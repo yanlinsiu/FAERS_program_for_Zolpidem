@@ -45,6 +45,7 @@ OUTPUT_GLOBAL/
 package/
 data/
 OUTPUT_ML/
+docs_or_reports/
 
 # -----------------------------
 # Local runtime/generated files
