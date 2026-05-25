@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -8,15 +9,17 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_ROOT = PROJECT_ROOT / "OUTPUT"
-OUTPUT_ML_ROOT = PROJECT_ROOT / "OUTPUT_ML"
+OUTPUT_ROOT = Path(os.environ.get("FAERS_CLEAN_OUTPUT_ROOT", PROJECT_ROOT / "OUTPUT"))
+OUTPUT_ML_ROOT = Path(os.environ.get("FAERS_ML_OUTPUT_ROOT", PROJECT_ROOT / "OUTPUT_ML"))
 FEATURE_V2_ROOT = OUTPUT_ML_ROOT / "features_v2"
 AUDIT_DIR = FEATURE_V2_ROOT / "audit"
 LOOKUP_DIR = FEATURE_V2_ROOT / "lookup"
 QUARTERLY_DIR = FEATURE_V2_ROOT / "quarterly"
 DATASET_DIR = FEATURE_V2_ROOT / "datasets"
 QC_DIR = FEATURE_V2_ROOT / "qc"
-GLOBAL_DATASET_DIR = PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets"
+GLOBAL_DATASET_DIR = Path(
+    os.environ.get("FAERS_GLOBAL_DATASET_DIR", PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets")
+)
 
 TABLES = ("DEMO", "DRUG", "INDI", "RPSR", "THER")
 QUARTERS = ("Q1", "Q2", "Q3", "Q4")

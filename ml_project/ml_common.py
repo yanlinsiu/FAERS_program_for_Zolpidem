@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -34,8 +35,10 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-GLOBAL_DATASET_DIR = PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets"
-OUTPUT_ML_ROOT = PROJECT_ROOT / "OUTPUT_ML"
+GLOBAL_DATASET_DIR = Path(
+    os.environ.get("FAERS_GLOBAL_DATASET_DIR", PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets")
+)
+OUTPUT_ML_ROOT = Path(os.environ.get("FAERS_ML_OUTPUT_ROOT", PROJECT_ROOT / "OUTPUT_ML"))
 FEATURE_V2_DATASET_DIR = OUTPUT_ML_ROOT / "features_v2" / "datasets"
 
 TARGET_OPTIONS = ("is_fall_narrow", "is_fall_broad", "serious")

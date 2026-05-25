@@ -1,0 +1,9 @@
+﻿check_name,status,value,expected_or_rule
+dataset_rows,info,4155023,"Should match current thesis population, about 4,155,023 older cases."
+year_coverage,pass,2004-2025,Annual rows cover 2004-2025.
+full_period_primary_ror,pass,4.725481604738766,Should reproduce current primary ROR near 4.73.
+full_period_primary_reporting_rate,pass,0.13375224416517056,Should reproduce current exposed fall reporting proportion near 13.38%.
+annual_cell_totals,pass,0,"For every annual row, a+b+c+d equals n."
+annual_reporting_rate_formula,pass,0,zolpidem_fall_reporting_rate equals a/(a+b).
+unstable_annual_rows,info,0,Rows with a < 5 or exposed_n < 50 are marked unstable.
+unused_sanity_slice,info,1,Nonzero only confirms event table shape; not used for inference.

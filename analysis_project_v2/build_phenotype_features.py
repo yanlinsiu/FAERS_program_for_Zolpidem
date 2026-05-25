@@ -202,8 +202,9 @@ def process_quarter(
     quarter: str,
     llt_to_pt: dict[str, str],
     pt_to_column: dict[str, str],
+    cleaned_output_root: Path,
 ) -> tuple[pd.DataFrame, dict[str, object]]:
-    file_path = OUTPUT_ROOT / str(year) / "quarterly" / f"reac_event_{year}{quarter.lower()}.parquet"
+    file_path = cleaned_output_root / str(year) / "quarterly" / f"reac_event_{year}{quarter.lower()}.parquet"
     if not file_path.exists():
         raise FileNotFoundError(
             f"Cleaned REAC event file not found: {file_path}. "
@@ -290,6 +291,7 @@ def build_phenotype_features(
     end_year: int,
     case_index_file: Path,
     output_dir: Path,
+    cleaned_output_root: Path = OUTPUT_ROOT,
 ) -> dict[str, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     period_token = f"{start_year}_{end_year}"
@@ -311,6 +313,7 @@ def build_phenotype_features(
             quarter=quarter_str,
             llt_to_pt=llt_to_pt,
             pt_to_column=pt_to_column,
+            cleaned_output_root=cleaned_output_root,
         )
         phenotype_parts.append(part)
         qc_rows.append(qc)
@@ -361,6 +364,7 @@ def main() -> None:
     parser.add_argument("--end-year", type=int, default=2025)
     parser.add_argument("--case-index-file", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, default=PHENOTYPE_OUTPUT_DIR)
+    parser.add_argument("--cleaned-output-root", type=Path, default=OUTPUT_ROOT)
     args = parser.parse_args()
 
     period_token = f"{args.start_year}_{args.end_year}"
@@ -370,6 +374,7 @@ def main() -> None:
         end_year=args.end_year,
         case_index_file=case_index_file,
         output_dir=args.output_dir,
+        cleaned_output_root=args.cleaned_output_root,
     )
     print("phenotype feature build completed.")
     for name, path in outputs.items():

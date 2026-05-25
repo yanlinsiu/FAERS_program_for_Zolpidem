@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import os
 from pathlib import Path
 import sys
 
@@ -50,7 +51,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the full ML-v2 feature-building pipeline.")
     parser.add_argument("--start-year", type=int, default=2004)
     parser.add_argument("--end-year", type=int, default=2025)
+    parser.add_argument("--cleaned-output-root", type=Path, default=None)
+    parser.add_argument("--global-dataset-dir", type=Path, default=None)
+    parser.add_argument("--ml-output-root", type=Path, default=None)
     args = parser.parse_args()
+
+    if args.cleaned_output_root is not None:
+        os.environ["FAERS_CLEAN_OUTPUT_ROOT"] = str(args.cleaned_output_root.resolve())
+    if args.global_dataset_dir is not None:
+        os.environ["FAERS_GLOBAL_DATASET_DIR"] = str(args.global_dataset_dir.resolve())
+    if args.ml_output_root is not None:
+        os.environ["FAERS_ML_OUTPUT_ROOT"] = str(args.ml_output_root.resolve())
 
     run_feature_v2_pipeline(start_year=args.start_year, end_year=args.end_year)
 
