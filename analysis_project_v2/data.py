@@ -5,7 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from config import BOOL_COLUMNS, GLOBAL_DATASET_DIR
+try:
+    from .config import BOOL_COLUMNS, GLOBAL_DATASET_DIR
+except ImportError:
+    from config import BOOL_COLUMNS, GLOBAL_DATASET_DIR
 
 
 @dataclass(frozen=True)

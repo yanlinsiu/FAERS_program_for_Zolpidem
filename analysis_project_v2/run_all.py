@@ -3,10 +3,16 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from config import GLOBAL_DATASET_DIR, GLOBAL_OUTPUT_DIR
-from regulatory_trend_analysis import DEFAULT_OUTPUT_DIR as DEFAULT_TREND_OUTPUT_DIR
-from regulatory_trend_analysis import run as run_regulatory_trend
-from run_analysis import run as run_main_analysis
+try:
+    from .config import GLOBAL_DATASET_DIR, GLOBAL_OUTPUT_DIR
+    from .regulatory_trend_analysis import DEFAULT_OUTPUT_DIR as DEFAULT_TREND_OUTPUT_DIR
+    from .regulatory_trend_analysis import run as run_regulatory_trend
+    from .run_analysis import run as run_main_analysis
+except ImportError:
+    from config import GLOBAL_DATASET_DIR, GLOBAL_OUTPUT_DIR
+    from regulatory_trend_analysis import DEFAULT_OUTPUT_DIR as DEFAULT_TREND_OUTPUT_DIR
+    from regulatory_trend_analysis import run as run_regulatory_trend
+    from run_analysis import run as run_main_analysis
 
 
 def run(

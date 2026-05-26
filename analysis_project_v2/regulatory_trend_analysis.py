@@ -10,8 +10,12 @@ from typing import Any, Iterable
 
 import pandas as pd
 
-from data import load_analysis_frame, resolve_dataset_bundle
-from signal_metrics import signal_metrics, two_by_two_counts
+try:
+    from .data import load_analysis_frame, resolve_dataset_bundle
+    from .signal_metrics import signal_metrics, two_by_two_counts
+except ImportError:
+    from data import load_analysis_frame, resolve_dataset_bundle
+    from signal_metrics import signal_metrics, two_by_two_counts
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

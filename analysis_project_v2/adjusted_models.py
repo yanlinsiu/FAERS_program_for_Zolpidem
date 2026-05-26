@@ -6,13 +6,22 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 
-from config import (
-    BASE_ADJUSTMENT_COLUMNS,
-    OUTCOMES_BY_NAME,
-    SERIOUS_ADJUSTMENT_COLUMNS,
-    SIGNAL_SPECS,
-    SignalSpec,
-)
+try:
+    from .config import (
+        BASE_ADJUSTMENT_COLUMNS,
+        OUTCOMES_BY_NAME,
+        SERIOUS_ADJUSTMENT_COLUMNS,
+        SIGNAL_SPECS,
+        SignalSpec,
+    )
+except ImportError:
+    from config import (
+        BASE_ADJUSTMENT_COLUMNS,
+        OUTCOMES_BY_NAME,
+        SERIOUS_ADJUSTMENT_COLUMNS,
+        SIGNAL_SPECS,
+        SignalSpec,
+    )
 
 
 def _prepare_model_frame(

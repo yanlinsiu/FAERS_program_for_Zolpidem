@@ -6,25 +6,46 @@ from typing import Any
 
 import pandas as pd
 
-from adjusted_models import build_adjusted_analysis
-from config import (
-    EXPLORATORY_SIGNAL_SPECS,
-    FEATURE_SPECS,
-    GLOBAL_DATASET_DIR,
-    GLOBAL_OUTPUT_DIR,
-    GROUP_COMPARISON_SPECS,
-    OUTCOMES_BY_NAME,
-    SIGNAL_SPECS,
-)
-from data import load_analysis_frame, resolve_dataset_bundle
-from report_tables import build_exploratory_summary, build_primary_summary
-from signal_metrics import (
-    add_signal_classification,
-    apply_bh_fdr,
-    feature_mask,
-    signal_metrics,
-    two_by_two_counts,
-)
+try:
+    from .adjusted_models import build_adjusted_analysis
+    from .config import (
+        EXPLORATORY_SIGNAL_SPECS,
+        FEATURE_SPECS,
+        GLOBAL_DATASET_DIR,
+        GLOBAL_OUTPUT_DIR,
+        GROUP_COMPARISON_SPECS,
+        OUTCOMES_BY_NAME,
+        SIGNAL_SPECS,
+    )
+    from .data import load_analysis_frame, resolve_dataset_bundle
+    from .report_tables import build_exploratory_summary, build_primary_summary
+    from .signal_metrics import (
+        add_signal_classification,
+        apply_bh_fdr,
+        feature_mask,
+        signal_metrics,
+        two_by_two_counts,
+    )
+except ImportError:
+    from adjusted_models import build_adjusted_analysis
+    from config import (
+        EXPLORATORY_SIGNAL_SPECS,
+        FEATURE_SPECS,
+        GLOBAL_DATASET_DIR,
+        GLOBAL_OUTPUT_DIR,
+        GROUP_COMPARISON_SPECS,
+        OUTCOMES_BY_NAME,
+        SIGNAL_SPECS,
+    )
+    from data import load_analysis_frame, resolve_dataset_bundle
+    from report_tables import build_exploratory_summary, build_primary_summary
+    from signal_metrics import (
+        add_signal_classification,
+        apply_bh_fdr,
+        feature_mask,
+        signal_metrics,
+        two_by_two_counts,
+    )
 
 
 def _metrics_row(base: dict[str, Any], exposed: pd.Series, outcome: pd.Series) -> dict[str, Any]:

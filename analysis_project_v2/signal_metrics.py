@@ -8,7 +8,10 @@ import pandas as pd
 from scipy.special import digamma
 from scipy.stats import chi2, gamma
 
-from config import MIN_EXPOSED_CASES, MIN_EXPOSED_OUTCOME_CASES
+try:
+    from .config import MIN_EXPOSED_CASES, MIN_EXPOSED_OUTCOME_CASES
+except ImportError:
+    from config import MIN_EXPOSED_CASES, MIN_EXPOSED_OUTCOME_CASES
 
 
 def two_by_two_counts(exposed: pd.Series, outcome: pd.Series) -> dict[str, int]:
