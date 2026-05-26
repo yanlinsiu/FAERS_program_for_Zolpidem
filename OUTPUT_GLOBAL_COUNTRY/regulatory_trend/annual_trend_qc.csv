@@ -5,5 +5,11 @@ full_period_primary_ror,pass,4.725481604738766,Should reproduce current primary 
 full_period_primary_reporting_rate,pass,0.13375224416517056,Should reproduce current exposed fall reporting proportion near 13.38%.
 annual_cell_totals,pass,0,"For every annual row, a+b+c+d equals n."
 annual_reporting_rate_formula,pass,0,zolpidem_fall_reporting_rate equals a/(a+b).
+event_cell_totals,pass,0,"For every event-period row, a+b+c+d equals n."
+event_reporting_rate_formula,pass,0,zolpidem_fall_reporting_rate equals a/(a+b).
+rolling_window_coverage,pass,20,Primary rolling rows cover every 3-year window from 2004-2006 through 2023-2025.
+rolling_cell_totals,pass,0,"For every rolling row, a+b+c+d equals n."
+rolling_reporting_rate_formula,pass,0,zolpidem_fall_reporting_rate equals a/(a+b).
+paper_summary_scope,pass,"full_period,2013_fda_dose_reduction,2019_fda_boxed_warning",Paper summary contains full period plus 2013 and 2019 main FDA periods only.
 unstable_annual_rows,info,0,Rows with a < 5 or exposed_n < 50 are marked unstable.
 unused_sanity_slice,info,1,Nonzero only confirms event table shape; not used for inference.

@@ -101,6 +101,10 @@ EVENT_PERIODS: tuple[EventPeriod, ...] = (
     EventPeriod("2023_ags_beers_criteria", 2023, "post_2023", 2023, 2025, "exploratory"),
 )
 
+ROLLING_WINDOW_YEARS = 3
+PAPER_ANALYSIS = "primary_ps_ss"
+PAPER_OUTCOME = "strict_fall"
+
 
 def _coerce_year(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
@@ -186,7 +190,138 @@ def build_event_period_comparison(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_qc(df: pd.DataFrame, annual_df: pd.DataFrame, event_df: pd.DataFrame) -> pd.DataFrame:
+def build_rolling_trend(
+    df: pd.DataFrame,
+    window_years: int = ROLLING_WINDOW_YEARS,
+) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+    if window_years < 2:
+        raise ValueError("Rolling trend window must be at least 2 years.")
+
+    for spec in TREND_SPECS:
+        subset = _analysis_subset(df, spec)
+        for start_year in range(START_YEAR, END_YEAR - window_years + 2):
+            end_year = start_year + window_years - 1
+            window_subset = subset[subset["year"].between(start_year, end_year)]
+            rows.append(
+                _metrics_row(
+                    {
+                        "window_label": f"{start_year}-{end_year}",
+                        "window_years": window_years,
+                        "start_year": start_year,
+                        "end_year": end_year,
+                        "center_year": start_year + (window_years - 1) / 2,
+                        "analysis": spec.analysis,
+                        "comparison": spec.comparison,
+                        "exposure_definition": spec.exposure_column,
+                        "outcome_name": spec.outcome_name,
+                        "outcome_definition": spec.outcome_definition,
+                    },
+                    window_subset,
+                    spec,
+                )
+            )
+    return pd.DataFrame(rows)
+
+
+def build_paper_regulatory_trend_summary(
+    df: pd.DataFrame,
+    event_df: pd.DataFrame,
+) -> pd.DataFrame:
+    all_period_subset = _analysis_subset(df, TREND_SPECS[0])
+    all_period = _metrics_row(
+        {
+            "summary_type": "full_period",
+            "event_name": "full_period",
+            "event_year": None,
+            "period_label": "2004_2025",
+            "start_year": START_YEAR,
+            "end_year": END_YEAR,
+            "interpretation_scope": "main",
+            "analysis": PAPER_ANALYSIS,
+            "outcome_name": PAPER_OUTCOME,
+            "outcome_definition": TREND_SPECS[0].outcome_definition,
+        },
+        all_period_subset,
+        TREND_SPECS[0],
+    )
+
+    period_rows = event_df[
+        event_df["analysis"].eq(PAPER_ANALYSIS)
+        & event_df["outcome_name"].eq(PAPER_OUTCOME)
+        & event_df["interpretation_scope"].eq("main")
+    ].copy()
+    period_rows.insert(0, "summary_type", "regulatory_period")
+    summary = pd.concat([pd.DataFrame([all_period]), period_rows], ignore_index=True, sort=False)
+    summary["zolpidem_fall_reporting_rate_pct"] = summary["zolpidem_fall_reporting_rate"] * 100
+    summary["reference_fall_reporting_rate_pct"] = summary["reporting_rate_unexposed"] * 100
+    summary["ror_95ci"] = summary.apply(
+        lambda row: (
+            f"{row['ror']:.2f} ({row['ror_ci_low']:.2f}-{row['ror_ci_high']:.2f})"
+            if pd.notna(row["ror"]) and pd.notna(row["ror_ci_low"]) and pd.notna(row["ror_ci_high"])
+            else ""
+        ),
+        axis=1,
+    )
+    summary["interpretation_note"] = (
+        "FAERS reporting pattern only; event-year splits are descriptive and not causal effects."
+    )
+    columns = [
+        "summary_type",
+        "event_name",
+        "event_year",
+        "period_label",
+        "start_year",
+        "end_year",
+        "interpretation_scope",
+        "analysis",
+        "outcome_name",
+        "outcome_definition",
+        "zolpidem_cases",
+        "zolpidem_fall_cases",
+        "zolpidem_fall_reporting_rate",
+        "zolpidem_fall_reporting_rate_pct",
+        "reporting_rate_unexposed",
+        "reference_fall_reporting_rate_pct",
+        "ror",
+        "ror_ci_low",
+        "ror_ci_high",
+        "ror_95ci",
+        "prr",
+        "ic",
+        "ebgm",
+        "stability_status",
+        "interpretation_note",
+    ]
+    return summary[columns]
+
+
+def _invalid_rate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    return df[
+        df["exposed_n"].gt(0)
+        & (
+            (
+                df["zolpidem_fall_cases"] / df["zolpidem_cases"]
+                - df["zolpidem_fall_reporting_rate"]
+            ).abs()
+            > 1e-12
+        )
+    ]
+
+
+def _invalid_cell_total_count(df: pd.DataFrame) -> int:
+    check = df.copy()
+    check["cell_total"] = check[["a", "b", "c", "d"]].sum(axis=1)
+    return int((check["cell_total"] != check["n"]).sum())
+
+
+def build_qc(
+    df: pd.DataFrame,
+    annual_df: pd.DataFrame,
+    event_df: pd.DataFrame,
+    rolling_df: pd.DataFrame,
+    paper_df: pd.DataFrame,
+) -> pd.DataFrame:
     rows: list[dict[str, Any]] = [
         {
             "check_name": "dataset_rows",
@@ -243,32 +378,86 @@ def build_qc(df: pd.DataFrame, annual_df: pd.DataFrame, event_df: pd.DataFrame) 
         }
     )
 
-    annual_check = annual_df.copy()
-    annual_check["cell_total"] = annual_check[["a", "b", "c", "d"]].sum(axis=1)
-    invalid_cell_total = int((annual_check["cell_total"] != annual_check["n"]).sum())
-    invalid_rate = annual_check[
-        annual_check["exposed_n"].gt(0)
-        & (
-            (
-                annual_check["zolpidem_fall_cases"] / annual_check["zolpidem_cases"]
-                - annual_check["zolpidem_fall_reporting_rate"]
-            ).abs()
-            > 1e-12
-        )
-    ]
+    invalid_annual_cell_total = _invalid_cell_total_count(annual_df)
+    invalid_event_cell_total = _invalid_cell_total_count(event_df)
+    invalid_rolling_cell_total = _invalid_cell_total_count(rolling_df)
+    invalid_annual_rate = _invalid_rate_rows(annual_df)
+    invalid_event_rate = _invalid_rate_rows(event_df)
+    invalid_rolling_rate = _invalid_rate_rows(rolling_df)
     rows.extend(
         [
             {
                 "check_name": "annual_cell_totals",
-                "status": "pass" if invalid_cell_total == 0 else "fail",
-                "value": invalid_cell_total,
+                "status": "pass" if invalid_annual_cell_total == 0 else "fail",
+                "value": invalid_annual_cell_total,
                 "expected_or_rule": "For every annual row, a+b+c+d equals n.",
             },
             {
                 "check_name": "annual_reporting_rate_formula",
-                "status": "pass" if invalid_rate.empty else "fail",
-                "value": int(len(invalid_rate)),
+                "status": "pass" if invalid_annual_rate.empty else "fail",
+                "value": int(len(invalid_annual_rate)),
                 "expected_or_rule": "zolpidem_fall_reporting_rate equals a/(a+b).",
+            },
+            {
+                "check_name": "event_cell_totals",
+                "status": "pass" if invalid_event_cell_total == 0 else "fail",
+                "value": invalid_event_cell_total,
+                "expected_or_rule": "For every event-period row, a+b+c+d equals n.",
+            },
+            {
+                "check_name": "event_reporting_rate_formula",
+                "status": "pass" if invalid_event_rate.empty else "fail",
+                "value": int(len(invalid_event_rate)),
+                "expected_or_rule": "zolpidem_fall_reporting_rate equals a/(a+b).",
+            },
+            {
+                "check_name": "rolling_window_coverage",
+                "status": (
+                    "pass"
+                    if sorted(
+                        rolling_df[
+                            rolling_df["analysis"].eq(PAPER_ANALYSIS)
+                            & rolling_df["outcome_name"].eq(PAPER_OUTCOME)
+                        ]["window_label"].tolist()
+                    )
+                    == [
+                        f"{year}-{year + ROLLING_WINDOW_YEARS - 1}"
+                        for year in range(START_YEAR, END_YEAR - ROLLING_WINDOW_YEARS + 2)
+                    ]
+                    else "fail"
+                ),
+                "value": int(
+                    len(
+                        rolling_df[
+                            rolling_df["analysis"].eq(PAPER_ANALYSIS)
+                            & rolling_df["outcome_name"].eq(PAPER_OUTCOME)
+                        ]
+                    )
+                ),
+                "expected_or_rule": "Primary rolling rows cover every 3-year window from 2004-2006 through 2023-2025.",
+            },
+            {
+                "check_name": "rolling_cell_totals",
+                "status": "pass" if invalid_rolling_cell_total == 0 else "fail",
+                "value": invalid_rolling_cell_total,
+                "expected_or_rule": "For every rolling row, a+b+c+d equals n.",
+            },
+            {
+                "check_name": "rolling_reporting_rate_formula",
+                "status": "pass" if invalid_rolling_rate.empty else "fail",
+                "value": int(len(invalid_rolling_rate)),
+                "expected_or_rule": "zolpidem_fall_reporting_rate equals a/(a+b).",
+            },
+            {
+                "check_name": "paper_summary_scope",
+                "status": (
+                    "pass"
+                    if set(paper_df["event_name"].dropna())
+                    == {"full_period", "2013_fda_dose_reduction", "2019_fda_boxed_warning"}
+                    else "fail"
+                ),
+                "value": ",".join(paper_df["event_name"].dropna().astype(str).unique().tolist()),
+                "expected_or_rule": "Paper summary contains full period plus 2013 and 2019 main FDA periods only.",
             },
             {
                 "check_name": "unstable_annual_rows",
@@ -552,15 +741,21 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
 
     annual_df = build_annual_trend(df)
     event_df = build_event_period_comparison(df)
-    qc_df = build_qc(df, annual_df, event_df)
+    rolling_df = build_rolling_trend(df)
+    paper_df = build_paper_regulatory_trend_summary(df, event_df)
+    qc_df = build_qc(df, annual_df, event_df, rolling_df, paper_df)
 
     outputs = {
         "annual_trend": output_dir / "annual_trend.csv",
+        "rolling_trend": output_dir / "rolling_trend.csv",
         "event_period_comparison": output_dir / "event_period_comparison.csv",
+        "paper_regulatory_trend_summary": output_dir / "paper_regulatory_trend_summary.csv",
         "annual_trend_qc": output_dir / "annual_trend_qc.csv",
     }
     _write_csv(annual_df, outputs["annual_trend"])
+    _write_csv(rolling_df, outputs["rolling_trend"])
     _write_csv(event_df, outputs["event_period_comparison"])
+    _write_csv(paper_df, outputs["paper_regulatory_trend_summary"])
     _write_csv(qc_df, outputs["annual_trend_qc"])
     outputs.update(write_figures(annual_df, output_dir))
 

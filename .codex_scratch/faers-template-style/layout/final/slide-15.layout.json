@@ -1,0 +1,1284 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/i6y69x",
+    "id": "i6y69x",
+    "slide": 15,
+    "layoutId": "9f0a314a-5606-4d95-a6a6-88c01ffec197",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Microsoft YaHei"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "9f0a314a-5606-4d95-a6a6-88c01ffec197",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1w7mp0bi",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/q5o7qpg3",
+      "id": "2",
+      "bbox": [
+        0,
+        0,
+        1280,
+        58
+      ],
+      "geometry": "rect",
+      "fillColor": "#EEEEEE",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/a1gvy90j",
+      "id": "3",
+      "bbox": [
+        18,
+        4,
+        194,
+        50
+      ],
+      "alt": "Sun Yat-sen University",
+      "contentType": "image/png",
+      "asset": {
+        "assetId": "bf3fd9d0-adab-4ac1-8746-b6f99371f015",
+        "contentType": "image/png",
+        "byteLength": 167914
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8nqxs72x",
+      "id": "4",
+      "bbox": [
+        270,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "研究背景",
+      "textPreview": "研究背景",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "研究背景"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "研究背景",
+          "runs": [
+            {
+              "index": 1,
+              "text": "研究背景",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/18jqh0fe",
+      "id": "5",
+      "bbox": [
+        470,
+        0,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qh0fepkz",
+      "id": "6",
+      "bbox": [
+        470,
+        12,
+        190,
+        34
+      ],
+      "geometry": "rect",
+      "text": "第二章",
+      "textPreview": "第二章",
+      "resolvedFontSize": 28,
+      "resolvedTextStyle": {
+        "fontSize": 28,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第二章"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第二章",
+          "runs": [
+            {
+              "index": 1,
+              "text": "第二章",
+              "fontSize": 28,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/j2t83itg",
+      "id": "7",
+      "bbox": [
+        700,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "第三章",
+      "textPreview": "第三章",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第三章"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第三章",
+          "runs": [
+            {
+              "index": 1,
+              "text": "第三章",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/crmhk3q5",
+      "id": "8",
+      "bbox": [
+        930,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "研究总结",
+      "textPreview": "研究总结",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "研究总结"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "研究总结",
+          "runs": [
+            {
+              "index": 1,
+              "text": "研究总结",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1cfa9w3m",
+      "id": "9",
+      "bbox": [
+        0,
+        57,
+        1280,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8C8C8",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1gvy90je",
+      "id": "10",
+      "bbox": [
+        0,
+        58,
+        1280,
+        8
+      ],
+      "geometry": "rect",
+      "fillColor": "#D5D5D5",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8z25kb6x",
+      "id": "11",
+      "bbox": [
+        68,
+        695,
+        780,
+        18
+      ],
+      "geometry": "rect",
+      "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+      "textPreview": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+      "resolvedFontSize": 9,
+      "resolvedTextStyle": {
+        "fontSize": 9,
+        "typeface": "Microsoft YaHei",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+              "fontSize": 9,
+              "typeface": "Microsoft YaHei",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/je9cvixc",
+      "id": "12",
+      "bbox": [
+        1155,
+        688,
+        70,
+        22
+      ],
+      "geometry": "rect",
+      "text": "15/39",
+      "textPreview": "15/39",
+      "resolvedFontSize": 14,
+      "resolvedTextStyle": {
+        "fontSize": 14,
+        "typeface": "Microsoft YaHei",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "15/39"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "15/39",
+          "runs": [
+            {
+              "index": 1,
+              "text": "15/39",
+              "fontSize": 14,
+              "typeface": "Microsoft YaHei",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qtcj6tov",
+      "id": "13",
+      "bbox": [
+        18,
+        82,
+        620,
+        64
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xs72x4na",
+      "id": "14",
+      "bbox": [
+        36,
+        89,
+        586,
+        50
+      ],
+      "geometry": "rect",
+      "text": "暴露与结局分布",
+      "textPreview": "暴露与结局分布",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "暴露与结局分布"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "暴露与结局分布",
+          "runs": [
+            {
+              "index": 1,
+              "text": "暴露与结局分布",
+              "fontSize": 26,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/87ed8bat",
+      "id": "15",
+      "bbox": [
+        120,
+        160,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fmlkjm1c",
+      "id": "16",
+      "bbox": [
+        126,
+        168,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "指标",
+      "textPreview": "指标",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "指标"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "指标",
+          "runs": [
+            {
+              "index": 1,
+              "text": "指标",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/q1orytsv",
+      "id": "17",
+      "bbox": [
+        666,
+        168,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "数量",
+      "textPreview": "数量",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "数量"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "数量",
+          "runs": [
+            {
+              "index": 1,
+              "text": "数量",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/x4nap4r6",
+      "id": "18",
+      "bbox": [
+        120,
+        216,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8jqh0fep",
+      "id": "19",
+      "bbox": [
+        126,
+        224,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "唑吡坦 only PS/SS 暴露病例",
+      "textPreview": "唑吡坦 only PS/SS 暴露病例",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "唑吡坦 only PS/SS 暴露病例"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "唑吡坦 only PS/SS 暴露病例",
+          "runs": [
+            {
+              "index": 1,
+              "text": "唑吡坦 only PS/SS 暴露病例",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4vmtwra5",
+      "id": "20",
+      "bbox": [
+        666,
+        224,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "7,798",
+      "textPreview": "7,798",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "7,798"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "7,798",
+          "runs": [
+            {
+              "index": 1,
+              "text": "7,798",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tgfmlkjm",
+      "id": "21",
+      "bbox": [
+        120,
+        272,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#F5F8F6",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mp0bi9s3",
+      "id": "22",
+      "bbox": [
+        126,
+        280,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "其他 Z-drug only PS/SS 暴露病例",
+      "textPreview": "其他 Z-drug only PS/SS 暴露病例",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "其他 Z-drug only PS/SS 暴露病例"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "其他 Z-drug only PS/SS 暴露病例",
+          "runs": [
+            {
+              "index": 1,
+              "text": "其他 Z-drug only PS/SS 暴露病例",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bat47y1k",
+      "id": "23",
+      "bbox": [
+        666,
+        280,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "6,799",
+      "textPreview": "6,799",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "6,799"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "6,799",
+          "runs": [
+            {
+              "index": 1,
+              "text": "6,799",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/47y1kre1",
+      "id": "24",
+      "bbox": [
+        120,
+        328,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tsvu9kni",
+      "id": "25",
+      "bbox": [
+        126,
+        336,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "唑吡坦 suspect 暴露病例",
+      "textPreview": "唑吡坦 suspect 暴露病例",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "唑吡坦 suspect 暴露病例"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "唑吡坦 suspect 暴露病例",
+          "runs": [
+            {
+              "index": 1,
+              "text": "唑吡坦 suspect 暴露病例",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/m1cfa9w3",
+      "id": "26",
+      "bbox": [
+        666,
+        336,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "8,011",
+      "textPreview": "8,011",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "8,011"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "8,011",
+          "runs": [
+            {
+              "index": 1,
+              "text": "8,011",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bm58z25k",
+      "id": "27",
+      "bbox": [
+        120,
+        384,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#F5F8F6",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4byhgn29",
+      "id": "28",
+      "bbox": [
+        126,
+        392,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "狭义跌倒事件",
+      "textPreview": "狭义跌倒事件",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "狭义跌倒事件"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "狭义跌倒事件",
+          "runs": [
+            {
+              "index": 1,
+              "text": "狭义跌倒事件",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 29,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/twra5gbq",
+      "id": "29",
+      "bbox": [
+        666,
+        392,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "132,266",
+      "textPreview": "132,266",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "132,266"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "132,266",
+          "runs": [
+            {
+              "index": 1,
+              "text": "132,266",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 30,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/j2t83itg",
+      "id": "30",
+      "bbox": [
+        120,
+        440,
+        820,
+        56
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 31,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qh0fepkz",
+      "id": "31",
+      "bbox": [
+        126,
+        448,
+        528,
+        20
+      ],
+      "geometry": "rect",
+      "text": "广义跌倒相关事件",
+      "textPreview": "广义跌倒相关事件",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "广义跌倒相关事件"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "广义跌倒相关事件",
+          "runs": [
+            {
+              "index": 1,
+              "text": "广义跌倒相关事件",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 32,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/18jqh0fe",
+      "id": "32",
+      "bbox": [
+        666,
+        448,
+        268,
+        20
+      ],
+      "geometry": "rect",
+      "text": "298,906",
+      "textPreview": "298,906",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "298,906"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "298,906",
+          "runs": [
+            {
+              "index": 1,
+              "text": "298,906",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 33,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8nqxs72x",
+      "id": "33",
+      "bbox": [
+        145,
+        575,
+        880,
+        30
+      ],
+      "geometry": "rect",
+      "text": "这页用于说明：主分析人群和结局不是临时挑出来的，而是在清洗流程中预先定义。",
+      "textPreview": "这页用于说明：主分析人群和结局不是临时挑出来的，而是在清洗流程中预先定义。",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "这页用于说明：主分析人群和结局不是临时挑出来的，而是在清洗流程中预先定义。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "这页用于说明：主分析人群和结局不是临时挑出来的，而是在清洗流程中预先定义。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "这页用于说明：主分析人群和结局不是临时挑出来的，而是在清洗流程中预先定义。",
+              "fontSize": 22,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

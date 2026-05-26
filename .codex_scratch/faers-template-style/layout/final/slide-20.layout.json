@@ -1,0 +1,1663 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/3xgseh",
+    "id": "3xgseh",
+    "slide": 20,
+    "layoutId": "9f0a314a-5606-4d95-a6a6-88c01ffec197",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Microsoft YaHei"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "9f0a314a-5606-4d95-a6a6-88c01ffec197",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "019d64cd-e74b-4073-a616-9ee9d45a2b56",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mlkjm1cf",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xc3ylc7u",
+      "id": "2",
+      "bbox": [
+        0,
+        0,
+        1280,
+        58
+      ],
+      "geometry": "rect",
+      "fillColor": "#EEEEEE",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/lkjm1cfa",
+      "id": "3",
+      "bbox": [
+        18,
+        4,
+        194,
+        50
+      ],
+      "alt": "Sun Yat-sen University",
+      "contentType": "image/png",
+      "asset": {
+        "assetId": "00c7bcd2-74e7-418b-ba53-e902ab171037",
+        "contentType": "image/png",
+        "byteLength": 167914
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fepkzupw",
+      "id": "4",
+      "bbox": [
+        270,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "研究背景",
+      "textPreview": "研究背景",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "研究背景"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "研究背景",
+          "runs": [
+            {
+              "index": 1,
+              "text": "研究背景",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mtwra5gb",
+      "id": "5",
+      "bbox": [
+        470,
+        0,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xkf6dcbu",
+      "id": "6",
+      "bbox": [
+        470,
+        12,
+        190,
+        34
+      ],
+      "geometry": "rect",
+      "text": "第二章",
+      "textPreview": "第二章",
+      "resolvedFontSize": 28,
+      "resolvedTextStyle": {
+        "fontSize": 28,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第二章"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第二章",
+          "runs": [
+            {
+              "index": 1,
+              "text": "第二章",
+              "fontSize": 28,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4zidonyd",
+      "id": "7",
+      "bbox": [
+        700,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "第三章",
+      "textPreview": "第三章",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "第三章"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "第三章",
+          "runs": [
+            {
+              "index": 1,
+              "text": "第三章",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fil0rqd4",
+      "id": "8",
+      "bbox": [
+        930,
+        16,
+        190,
+        28
+      ],
+      "geometry": "rect",
+      "text": "研究总结",
+      "textPreview": "研究总结",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "研究总结"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "研究总结",
+          "runs": [
+            {
+              "index": 1,
+              "text": "研究总结",
+              "fontSize": 24,
+              "typeface": "Microsoft YaHei",
+              "color": "#888888",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qxs72x4n",
+      "id": "9",
+      "bbox": [
+        0,
+        57,
+        1280,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8C8C8",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0bi9s36h",
+      "id": "10",
+      "bbox": [
+        0,
+        58,
+        1280,
+        8
+      ],
+      "geometry": "rect",
+      "fillColor": "#D5D5D5",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pwb2hwfy",
+      "id": "11",
+      "bbox": [
+        68,
+        695,
+        780,
+        18
+      ],
+      "geometry": "rect",
+      "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+      "textPreview": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+      "resolvedFontSize": 9,
+      "resolvedTextStyle": {
+        "fontSize": 9,
+        "typeface": "Microsoft YaHei",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "资料来源：FAERS 2004-2025 数据处理结果、项目论文初稿及模型输出。",
+              "fontSize": 9,
+              "typeface": "Microsoft YaHei",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i5sneloj",
+      "id": "12",
+      "bbox": [
+        1155,
+        688,
+        70,
+        22
+      ],
+      "geometry": "rect",
+      "text": "20/39",
+      "textPreview": "20/39",
+      "resolvedFontSize": 14,
+      "resolvedTextStyle": {
+        "fontSize": 14,
+        "typeface": "Microsoft YaHei",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "20/39"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "20/39",
+          "runs": [
+            {
+              "index": 1,
+              "text": "20/39",
+              "fontSize": 14,
+              "typeface": "Microsoft YaHei",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7qpg3ex0",
+      "id": "13",
+      "bbox": [
+        18,
+        82,
+        620,
+        64
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wjudg7ad",
+      "id": "14",
+      "bbox": [
+        36,
+        89,
+        586,
+        50
+      ],
+      "geometry": "rect",
+      "text": "监管节点前后，主信号方向没有反转",
+      "textPreview": "监管节点前后，主信号方向没有反转",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "监管节点前后，主信号方向没有反转"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "监管节点前后，主信号方向没有反转",
+          "runs": [
+            {
+              "index": 1,
+              "text": "监管节点前后，主信号方向没有反转",
+              "fontSize": 26,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p4r65wju",
+      "id": "15",
+      "bbox": [
+        120,
+        165,
+        840,
+        60
+      ],
+      "geometry": "rect",
+      "fillColor": "#00512C",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ed8v6psf",
+      "id": "16",
+      "bbox": [
+        126,
+        173,
+        288,
+        20
+      ],
+      "geometry": "rect",
+      "text": "监管节点",
+      "textPreview": "监管节点",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "监管节点"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "监管节点",
+          "runs": [
+            {
+              "index": 1,
+              "text": "监管节点",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7y1kre1w",
+      "id": "17",
+      "bbox": [
+        426,
+        173,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "时期",
+      "textPreview": "时期",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "时期"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "时期",
+          "runs": [
+            {
+              "index": 1,
+              "text": "时期",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0nuxc3yl",
+      "id": "18",
+      "bbox": [
+        586,
+        173,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "ROR",
+      "textPreview": "ROR",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "ROR"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "ROR",
+          "runs": [
+            {
+              "index": 1,
+              "text": "ROR",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p8nqxs72",
+      "id": "19",
+      "bbox": [
+        746,
+        173,
+        208,
+        20
+      ],
+      "geometry": "rect",
+      "text": "跌倒报告比例",
+      "textPreview": "跌倒报告比例",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "跌倒报告比例"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "跌倒报告比例",
+          "runs": [
+            {
+              "index": 1,
+              "text": "跌倒报告比例",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dcbulwva",
+      "id": "20",
+      "bbox": [
+        120,
+        225,
+        840,
+        60
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kre1w7mp",
+      "id": "21",
+      "bbox": [
+        126,
+        233,
+        288,
+        20
+      ],
+      "geometry": "rect",
+      "text": "2013 FDA 剂量调整",
+      "textPreview": "2013 FDA 剂量调整",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2013 FDA 剂量调整"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2013 FDA 剂量调整",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2013 FDA 剂量调整",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/val87ed8",
+      "id": "22",
+      "bbox": [
+        426,
+        233,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "调整前",
+      "textPreview": "调整前",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "调整前"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "调整前",
+          "runs": [
+            {
+              "index": 1,
+              "text": "调整前",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6psfil0r",
+      "id": "23",
+      "bbox": [
+        586,
+        233,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "4.84",
+      "textPreview": "4.84",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "4.84"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "4.84",
+          "runs": [
+            {
+              "index": 1,
+              "text": "4.84",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/donyd0z6",
+      "id": "24",
+      "bbox": [
+        746,
+        233,
+        208,
+        20
+      ],
+      "geometry": "rect",
+      "text": "15.46%",
+      "textPreview": "15.46%",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "15.46%"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "15.46%",
+          "runs": [
+            {
+              "index": 1,
+              "text": "15.46%",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/k3q5o7qp",
+      "id": "25",
+      "bbox": [
+        120,
+        285,
+        840,
+        60
+      ],
+      "geometry": "rect",
+      "fillColor": "#F5F8F6",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vixczed8",
+      "id": "26",
+      "bbox": [
+        126,
+        293,
+        288,
+        20
+      ],
+      "geometry": "rect",
+      "text": "2013 FDA 剂量调整",
+      "textPreview": "2013 FDA 剂量调整",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2013 FDA 剂量调整"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2013 FDA 剂量调整",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2013 FDA 剂量调整",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2x4nap4r",
+      "id": "27",
+      "bbox": [
+        426,
+        293,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "调整后",
+      "textPreview": "调整后",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "调整后"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "调整后",
+          "runs": [
+            {
+              "index": 1,
+              "text": "调整后",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d0z61032",
+      "id": "28",
+      "bbox": [
+        586,
+        293,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "4.63",
+      "textPreview": "4.63",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "4.63"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "4.63",
+          "runs": [
+            {
+              "index": 1,
+              "text": "4.63",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 29,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kf6dcbul",
+      "id": "29",
+      "bbox": [
+        746,
+        293,
+        208,
+        20
+      ],
+      "geometry": "rect",
+      "text": "12.83%",
+      "textPreview": "12.83%",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "12.83%"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "12.83%",
+          "runs": [
+            {
+              "index": 1,
+              "text": "12.83%",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 30,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/y90je9cv",
+      "id": "30",
+      "bbox": [
+        120,
+        345,
+        840,
+        60
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 31,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nuxc3ylc",
+      "id": "31",
+      "bbox": [
+        126,
+        353,
+        288,
+        20
+      ],
+      "geometry": "rect",
+      "text": "2019 FDA 黑框警告",
+      "textPreview": "2019 FDA 黑框警告",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2019 FDA 黑框警告"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2019 FDA 黑框警告",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2019 FDA 黑框警告",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 32,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gbq1oryt",
+      "id": "32",
+      "bbox": [
+        426,
+        353,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "警告前",
+      "textPreview": "警告前",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "警告前"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "警告前",
+          "runs": [
+            {
+              "index": 1,
+              "text": "警告前",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 33,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5wjudg7a",
+      "id": "33",
+      "bbox": [
+        586,
+        353,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "4.44",
+      "textPreview": "4.44",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "4.44"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "4.44",
+          "runs": [
+            {
+              "index": 1,
+              "text": "4.44",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 34,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/yhgn29gr",
+      "id": "34",
+      "bbox": [
+        746,
+        353,
+        208,
+        20
+      ],
+      "geometry": "rect",
+      "text": "13.41%",
+      "textPreview": "13.41%",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "13.41%"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "13.41%",
+          "runs": [
+            {
+              "index": 1,
+              "text": "13.41%",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 35,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/n29gr2p8",
+      "id": "35",
+      "bbox": [
+        120,
+        405,
+        840,
+        60
+      ],
+      "geometry": "rect",
+      "fillColor": "#F5F8F6",
+      "lineColor": "#DDDDDD",
+      "lineWidth": 1
+    },
+    {
+      "order": 36,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gn29gr2p",
+      "id": "36",
+      "bbox": [
+        126,
+        413,
+        288,
+        20
+      ],
+      "geometry": "rect",
+      "text": "2019 FDA 黑框警告",
+      "textPreview": "2019 FDA 黑框警告",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2019 FDA 黑框警告"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2019 FDA 黑框警告",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2019 FDA 黑框警告",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 37,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/58z25kb6",
+      "id": "37",
+      "bbox": [
+        426,
+        413,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "警告后",
+      "textPreview": "警告后",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "警告后"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "警告后",
+          "runs": [
+            {
+              "index": 1,
+              "text": "警告后",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 38,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ytsvu9kn",
+      "id": "38",
+      "bbox": [
+        586,
+        413,
+        148,
+        20
+      ],
+      "geometry": "rect",
+      "text": "5.02",
+      "textPreview": "5.02",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "5.02"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "5.02",
+          "runs": [
+            {
+              "index": 1,
+              "text": "5.02",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 39,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/neloj2t8",
+      "id": "39",
+      "bbox": [
+        746,
+        413,
+        208,
+        20
+      ],
+      "geometry": "rect",
+      "text": "13.32%",
+      "textPreview": "13.32%",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Microsoft YaHei",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "13.32%"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "13.32%",
+          "runs": [
+            {
+              "index": 1,
+              "text": "13.32%",
+              "fontSize": 12.51,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 40,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/r65wjudg",
+      "id": "40",
+      "bbox": [
+        150,
+        565,
+        850,
+        30
+      ],
+      "geometry": "rect",
+      "text": "监管节点前后均为同向阳性，比较像长期存在的药物警戒现象。",
+      "textPreview": "监管节点前后均为同向阳性，比较像长期存在的药物警戒现象。",
+      "resolvedFontSize": 23,
+      "resolvedTextStyle": {
+        "fontSize": 23,
+        "typeface": "Microsoft YaHei",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "监管节点前后均为同向阳性，比较像长期存在的药物警戒现象。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "监管节点前后均为同向阳性，比较像长期存在的药物警戒现象。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "监管节点前后均为同向阳性，比较像长期存在的药物警戒现象。",
+              "fontSize": 23,
+              "typeface": "Microsoft YaHei",
+              "color": "#222222",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}
