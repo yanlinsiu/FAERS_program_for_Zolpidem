@@ -170,7 +170,6 @@ def _missingness(df: pd.DataFrame) -> pd.DataFrame:
         "serious",
         "is_serious_any",
         "is_fall_narrow",
-        "is_fall_broad",
         "fall_pt_list",
         "is_zolpidem",
         "is_zolpidem_suspect",
@@ -291,16 +290,16 @@ def _target_group_distribution(df: pd.DataFrame, total_n: int) -> pd.DataFrame:
 
 def _top_fall_pt(df: pd.DataFrame, total_n: int, top_n: int = 20) -> pd.DataFrame:
     if "fall_pt_list" not in df.columns:
-        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 broad_fall 百分比"])
+        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
-    broad_mask = _coerce_bool(df["is_fall_broad"]) if "is_fall_broad" in df.columns else None
-    if broad_mask is None or int(broad_mask.sum()) == 0:
-        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 broad_fall 百分比"])
+    fall_mask = _coerce_bool(df["is_fall_narrow"]) if "is_fall_narrow" in df.columns else None
+    if fall_mask is None or int(fall_mask.sum()) == 0:
+        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
     if "caseid" not in df.columns:
-        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 broad_fall 百分比"])
+        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
-    pt_df = df.loc[broad_mask, ["caseid", "fall_pt_list"]].copy()
+    pt_df = df.loc[fall_mask, ["caseid", "fall_pt_list"]].copy()
     pt_df = pt_df.dropna(subset=["fall_pt_list"])
     pt_df["PT"] = pt_df["fall_pt_list"].astype(str).str.split("|", regex=False)
     pt_df = pt_df.explode("PT")
@@ -308,13 +307,13 @@ def _top_fall_pt(df: pd.DataFrame, total_n: int, top_n: int = 20) -> pd.DataFram
     pt_df = pt_df[pt_df["PT"].ne("")]
     pt_df = pt_df[["caseid", "PT"]].drop_duplicates()
     if pt_df.empty:
-        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 broad_fall 百分比"])
+        return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
     counts = pt_df["PT"].value_counts().head(top_n).reset_index()
     counts.columns = ["PT", "涉及病例数"]
-    broad_n = int(broad_mask.sum())
+    fall_n = int(fall_mask.sum())
     counts["占总体百分比"] = counts["涉及病例数"].map(lambda x: _safe_pct(x, total_n))
-    counts["占 broad_fall 百分比"] = counts["涉及病例数"].map(lambda x: _safe_pct(x, broad_n))
+    counts["占 fall 百分比"] = counts["涉及病例数"].map(lambda x: _safe_pct(x, fall_n))
     return counts
 
 
@@ -347,7 +346,6 @@ def _build_markdown_report(
         return int(df.iloc[0][column])
 
     strict_fall_n = 0
-    broad_fall_n = 0
     zolpidem_any_n = 0
     zolpidem_suspect_n = 0
     zolpidem_suspect_ps_n = 0
@@ -356,8 +354,6 @@ def _build_markdown_report(
         for _, row in outcome_df.iterrows():
             if row["变量"] == "is_fall_narrow":
                 strict_fall_n = int(row["例数"])
-            elif row["变量"] == "is_fall_broad":
-                broad_fall_n = int(row["例数"])
 
     if not exposure_df.empty:
         for _, row in exposure_df.iterrows():
@@ -383,7 +379,6 @@ def _build_markdown_report(
         f"- zolpidem suspect（PS+SS）：{_fmt_n_pct(zolpidem_suspect_n, _safe_pct(zolpidem_suspect_n, total_n))}",
         f"- zolpidem suspect（PS only）：{_fmt_n_pct(zolpidem_suspect_ps_n, _safe_pct(zolpidem_suspect_ps_n, total_n))}",
         f"- 狭义跌倒：{_fmt_n_pct(strict_fall_n, _safe_pct(strict_fall_n, total_n))}",
-        f"- 广义跌倒相关：{_fmt_n_pct(broad_fall_n, _safe_pct(broad_fall_n, total_n))}",
         "",
         "## 3. 数据完整性",
     ]
@@ -513,12 +508,12 @@ def _build_markdown_report(
         lines.extend(
             [
                 "",
-                "## 10. broad_fall 中最常见 PT（前 20）",
+                "## 10. fall 中最常见 PT（前 20）",
             ]
         )
         for _, row in top_pt_df.iterrows():
             lines.append(
-                f"- {row['PT']}：{int(row['涉及病例数'])} 例，占总体 {_fmt_num(row['占总体百分比'])}%，占 broad_fall {_fmt_num(row['占 broad_fall 百分比'])}%"
+                f"- {row['PT']}：{int(row['涉及病例数'])} 例，占总体 {_fmt_num(row['占总体百分比'])}%，占 fall {_fmt_num(row['占 fall 百分比'])}%"
             )
 
     lines.extend(
@@ -537,7 +532,7 @@ def _build_markdown_report(
             "- `10_medication_burden_distribution.csv`：用药负担分布",
             "- `11_comedication_distribution.csv`：合并用药分布",
             "- `12_exposure_outcome_crosstab.csv`：暴露-结局粗交叉表",
-            "- `13_top_fall_pt.csv`：broad_fall 中最常见 PT",
+            "- `13_top_fall_pt.csv`：fall 中最常见 PT",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -566,7 +561,7 @@ def build_descriptive_report(case_file: Path, output_dir: Path | None = None) ->
     age_group_df = _series_distribution(df, "age_group", len(df))
     sex_df = _series_distribution(df, "sex_clean", len(df))
     serious_df = _available_bool_distribution(df, ["serious", "is_serious_any"], len(df))
-    outcome_df = _bool_distribution(df, ["is_fall_narrow", "is_fall_broad"], len(df))
+    outcome_df = _bool_distribution(df, ["is_fall_narrow"], len(df))
     exposure_df = _bool_distribution(
         df,
         [
@@ -596,16 +591,16 @@ def build_descriptive_report(case_file: Path, output_dir: Path | None = None) ->
     )
     crosstab_df = pd.concat(
         [
-            _exposure_outcome_crosstab(df, "is_zolpidem", ["is_fall_narrow", "is_fall_broad"]),
+            _exposure_outcome_crosstab(df, "is_zolpidem", ["is_fall_narrow"]),
             _exposure_outcome_crosstab(
                 df,
                 "is_zolpidem_suspect",
-                ["is_fall_narrow", "is_fall_broad"],
+                ["is_fall_narrow"],
             ),
             _exposure_outcome_crosstab(
                 df,
                 "is_zolpidem_suspect_ps",
-                ["is_fall_narrow", "is_fall_broad"],
+                ["is_fall_narrow"],
             ),
         ],
         ignore_index=True,

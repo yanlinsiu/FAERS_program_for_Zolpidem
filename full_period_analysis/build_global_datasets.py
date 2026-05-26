@@ -240,8 +240,6 @@ def write_outputs(
             UNION ALL
             SELECT 'strict_fall_cases', SUM(CASE WHEN is_fall_narrow THEN 1 ELSE 0 END)::BIGINT FROM signal_global
             UNION ALL
-            SELECT 'broad_fall_cases', SUM(CASE WHEN is_fall_broad THEN 1 ELSE 0 END)::BIGINT FROM signal_global
-            UNION ALL
             SELECT 'suspect_any_cases_ps_ss', SUM(CASE WHEN suspect_role_any THEN 1 ELSE 0 END)::BIGINT FROM signal_global
             UNION ALL
             SELECT 'suspect_any_cases_ps_only', SUM(CASE WHEN suspect_role_any_ps THEN 1 ELSE 0 END)::BIGINT FROM signal_global

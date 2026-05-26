@@ -37,7 +37,6 @@ REQUIRED_DRUG_EXPOSURE_COLS = [
 
 BOOL_COLS = [
     "is_fall_narrow",
-    "is_fall_broad",
     "is_zolpidem_any",
     "suspect_role_any",
     "suspect_role_any_ps",
@@ -48,7 +47,6 @@ BOOL_COLS = [
 ]
 
 OPTIONAL_FALL_COLS = [
-    "is_fall_broad",
     "fall_narrow_pt_count",
     "fall_pt_list",
 ]
@@ -310,8 +308,6 @@ def process_signal_dataset(year, quarter, output_root):
 
     if "serious" in signal_df.columns:
         final_cols.append("serious")
-    if "is_fall_broad" in signal_df.columns:
-        final_cols.append("is_fall_broad")
     if "fall_narrow_pt_count" in signal_df.columns:
         final_cols.append("fall_narrow_pt_count")
     if "fall_pt_list" in signal_df.columns:
@@ -325,9 +321,7 @@ def process_signal_dataset(year, quarter, output_root):
     signal_df.to_parquet(output_file, index=False)
 
     print("signal_dataset rows:", len(signal_df))
-    print("fall cases (narrow):", int(signal_df["is_fall_narrow"].sum()))
-    if "is_fall_broad" in signal_df.columns:
-        print("fall-related broad cases:", int(signal_df["is_fall_broad"].sum()))
+    print("fall cases (definite):", int(signal_df["is_fall_narrow"].sum()))
     print("zolpidem any-exposure cases:", int(signal_df["is_zolpidem_any"].sum()))
     print("zolpidem suspect cases:", int(signal_df["is_zolpidem_suspect"].sum()))
     print("other z-drug suspect cases:", int(signal_df["is_other_zdrug_suspect"].sum()))

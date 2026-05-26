@@ -362,7 +362,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--age-operator", choices=[">", ">="], default=">=")
     parser.add_argument(
         "--fall-column",
-        choices=["is_fall_narrow", "is_fall_broad"],
+        choices=["is_fall_narrow"],
         default="is_fall_narrow",
     )
     parser.add_argument(

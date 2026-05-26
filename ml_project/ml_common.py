@@ -41,7 +41,7 @@ GLOBAL_DATASET_DIR = Path(
 OUTPUT_ML_ROOT = Path(os.environ.get("FAERS_ML_OUTPUT_ROOT", PROJECT_ROOT / "OUTPUT_ML"))
 FEATURE_V2_DATASET_DIR = OUTPUT_ML_ROOT / "features_v2" / "datasets"
 
-TARGET_OPTIONS = ("is_fall_narrow", "is_fall_broad", "serious")
+TARGET_OPTIONS = ("is_fall_narrow", "serious")
 SEARCH_MODES = ("none", "fast", "full")
 COHORT_OPTIONS = ("all", "zolpidem", "zdrug")
 FEATURE_VERSION_OPTIONS = ("v1", "v2")

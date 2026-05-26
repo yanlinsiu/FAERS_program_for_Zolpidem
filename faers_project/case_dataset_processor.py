@@ -56,8 +56,7 @@ def process_case_dataset(year, quarter, output_root):
     输出数据结构:
         - caseid: 病例 ID（主键）
         - DEMO 表的所有字段（如 primaryid, fda_dt, caseversion 等）
-        - is_fall_narrow: 狭义跌倒结局标识（True/False）
-        - is_fall_broad: 广义跌倒相关结局标识（True/False）
+        - is_fall_narrow: 明确跌倒事件标识（FALL 或 DROP ATTACKS，True/False）
         - is_zolpidem 等药物类别标识
         - drug_n: 病例内去重后的药物数
         - polypharmacy_5: 是否满足多药并用（distinct_drug_n >= 5）
@@ -281,7 +280,6 @@ def process_case_dataset(year, quarter, output_root):
     # 2. 转换为布尔类型
     reac_bool_cols = [
         "is_fall_narrow",
-        "is_fall_broad",
     ]
     for col in reac_bool_cols:
         if col in reac_case_df.columns:
@@ -467,9 +465,7 @@ def process_case_dataset(year, quarter, output_root):
 
     # 打印统计信息
     print("病例级分析数据行数:", len(case_df))
-    print("狭义跌倒病例数:", int(case_df["is_fall_narrow"].sum()))
-    if "is_fall_broad" in case_df.columns:
-        print("广义跌倒相关病例数:", int(case_df["is_fall_broad"].sum()))
+    print("明确跌倒事件病例数:", int(case_df["is_fall_narrow"].sum()))
     print("多药并用病例数(polypharmacy_5):", int(case_df["polypharmacy_5"].sum()))
     print(f"已保存：{output_file}")
 

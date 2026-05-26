@@ -23,12 +23,7 @@ OUTCOME_SPECS = [
     {
         "outcome_name": "strict_fall",
         "outcome_col": "is_fall_narrow",
-        "outcome_label": "Narrow fall definition",
-    },
-    {
-        "outcome_name": "broad_fall",
-        "outcome_col": "is_fall_broad",
-        "outcome_label": "Broad fall-related definition",
+        "outcome_label": "OCMQ-compatible narrow fall event",
     },
 ]
 
@@ -108,8 +103,6 @@ def load_signal_dataset(
     combined = combined[combined["caseid"] != ""].copy()
     if "is_fall_narrow" not in combined.columns and "is_fall" in combined.columns:
         combined["is_fall_narrow"] = combined["is_fall"].fillna(False).astype(bool)
-    if "is_fall_broad" not in combined.columns and "is_fall_narrow" in combined.columns:
-        combined["is_fall_broad"] = combined["is_fall_narrow"].fillna(False).astype(bool)
     if "serious" in combined.columns:
         combined["serious"] = combined["serious"].fillna(False).astype(bool)
     return combined
@@ -160,7 +153,6 @@ def merge_signal_and_feature(
         "polypharmacy",
         "serious",
         "is_fall_narrow",
-        "is_fall_broad",
     ]
     for col in feature_bool_cols:
         if col in merged.columns:

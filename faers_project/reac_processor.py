@@ -13,57 +13,7 @@ from config import RAW_ROOT
 
 NARROW_FALL_TERMS = {
     "FALL",
-    "FALLING",
-    "FALLING DOWN",
-}
-
-# Broad fall-related PT definition adapted from the reference paper and
-# reconciled against FAERS terms that actually appear in the local data.
-# We keep the paper-origin candidates for reproducibility and add a small
-# number of close FAERS PT variants (e.g. GAIT INABILITY, VERTIGO POSITIONAL).
-BROAD_FALL_TERMS = {
-    # Narrow fall events
-    "FALL",
-    "FALLING",
-    "FALLING DOWN",
-    # Balance / gait
-    "DISEQUILIBRIUM",
-    "DISEQUILIBRIUM SYNDROME",
-    "GAIT ABNORMAL",
-    "GAIT ABNORMAL NOS",
-    "GAIT DISORDER",
-    "GAIT DISTURBANCE",
-    "GAIT INABILITY",
-    "GAIT INSTABILITY",
-    "BALANCE DISORDER",
-    # Vertigo / vestibular
-    "VERTIGO",
-    "VERTIGO (EXCL. DIZZINESS)",
-    "VERTIGO AGGRAVATED",
-    "VERTIGO CNS ORIGIN",
-    "VERTIGO LABYRINTHINE",
-    "VERTIGO POSITIONAL",
-    "VESTIBULAR ABNORMALITIES",
-    "VESTIBULAR DISORDER",
-    "VESTIBULAR VERTIGO",
-    # Visual impairment
-    "VISUAL ACUITY DECREASED",
-    "VISUAL ACUITY LOST",
-    "VISUAL ACUITY REDUCED",
-    "VISUAL DISTURBANCE",
-    "VISUAL DISTURBANCE NOS",
-    "VISUAL DISTURBANCES",
-    "VISUAL IMPAIRMENT",
-    # Hypotension / orthostatic hypotension
-    "HYPOTENSION",
-    "HYPOTENSION AGGRAVATED",
-    "HYPOTENSION ORTHOSTATIC",
-    "HYPOTENSION ORTHOSTATIC ASYMPTOMATIC",
-    "HYPOTENSION ORTHOSTATIC SYMPTOMATIC",
-    "HYPOTENSION POSTURAL",
-    "HYPOTENSION POSTURAL AGGRAVATED",
-    "ORTHOSTATIC HYPOTENSION",
-    "POSTURAL HYPOTENSION",
+    "DROP ATTACKS",
 }
 
 
@@ -111,17 +61,15 @@ def process_reac(year, quarter, output_root):
     print(f"Saved event-level REAC: {event_output_file}")
 
     df["is_fall_narrow_row"] = df["pt"].isin(NARROW_FALL_TERMS)
-    df["is_fall_broad_row"] = df["pt"].isin(BROAD_FALL_TERMS)
 
     case_level_df = df.groupby("caseid", as_index=False).agg(
         is_fall_narrow=("is_fall_narrow_row", "max"),
         fall_narrow_pt_count=("is_fall_narrow_row", "sum"),
         all_reac_n=("pt", "size"),
-        is_fall_broad=("is_fall_broad_row", "max"),
     )
 
     fall_pt_list_df = (
-        df.loc[df["is_fall_broad_row"], ["caseid", "pt"]]
+        df.loc[df["is_fall_narrow_row"], ["caseid", "pt"]]
         .drop_duplicates()
         .groupby("caseid")["pt"]
         .apply(lambda s: "|".join(sorted(s)))
@@ -138,16 +86,11 @@ def process_reac(year, quarter, output_root):
         "fall_narrow_pt_count"
     ].astype(int)
     case_level_df["all_reac_n"] = case_level_df["all_reac_n"].astype(int)
-    case_level_df["is_fall_broad"] = case_level_df["is_fall_broad"].astype(bool)
 
     print("Case-level REAC rows:", len(case_level_df))
     print(
-        "Fall cases (narrow PT definition):",
+        "Fall cases (definite PT definition):",
         int(case_level_df["is_fall_narrow"].sum()),
-    )
-    print(
-        "Fall-related broad cases:",
-        int(case_level_df["is_fall_broad"].sum()),
     )
 
     output_file = output_root / f"reac_{year}{quarter.lower()}_case.parquet"

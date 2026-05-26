@@ -86,8 +86,6 @@ def _normalize_caseid(df: pd.DataFrame, label: str) -> pd.DataFrame:
 
 def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     normalized = df.copy()
-    if "is_fall_broad" not in normalized.columns and "is_fall_narrow" in normalized.columns:
-        normalized["is_fall_broad"] = normalized["is_fall_narrow"]
     if "polypharmacy_5" not in normalized.columns and "polypharmacy" in normalized.columns:
         normalized["polypharmacy_5"] = normalized["polypharmacy"]
     if "polypharmacy" not in normalized.columns and "polypharmacy_5" in normalized.columns:

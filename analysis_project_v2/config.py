@@ -51,8 +51,7 @@ class FeatureSpec:
 
 
 OUTCOME_SPECS: tuple[OutcomeSpec, ...] = (
-    OutcomeSpec("strict_fall", "is_fall_narrow", "Narrow fall definition"),
-    OutcomeSpec("broad_fall", "is_fall_broad", "Broad fall-related definition"),
+    OutcomeSpec("strict_fall", "is_fall_narrow", "OCMQ-compatible narrow fall event"),
 )
 
 OUTCOMES_BY_NAME = {spec.name: spec for spec in OUTCOME_SPECS}
@@ -68,21 +67,12 @@ SIGNAL_SPECS: tuple[SignalSpec, ...] = (
         comparison="zolpidem_suspect_vs_all_other_suspect_drugs_excluding_mixed_zdrug_cases",
     ),
     SignalSpec(
-        analysis="primary_ps_ss",
-        tier="sensitivity",
-        exposure_column="is_zolpidem_suspect",
-        suspect_column="suspect_role_any",
-        group_column="target_drug_group",
-        outcome_names=("broad_fall",),
-        comparison="zolpidem_suspect_vs_all_other_suspect_drugs_excluding_mixed_zdrug_cases",
-    ),
-    SignalSpec(
         analysis="sensitivity_ps_only",
         tier="sensitivity",
         exposure_column="is_zolpidem_suspect_ps",
         suspect_column="suspect_role_any_ps",
         group_column="target_drug_group_ps",
-        outcome_names=("strict_fall", "broad_fall"),
+        outcome_names=("strict_fall",),
         comparison="zolpidem_primary_suspect_vs_all_other_primary_suspect_drugs_excluding_mixed_zdrug_cases",
     ),
 )
@@ -94,7 +84,7 @@ GROUP_COMPARISON_SPECS: tuple[GroupComparisonSpec, ...] = (
         group_column="target_drug_group",
         exposed_value="zolpidem_only",
         reference_value="other_zdrug_only",
-        outcome_names=("strict_fall", "broad_fall"),
+        outcome_names=("strict_fall",),
         comparison="zolpidem_only_vs_other_zdrug_only",
     ),
     GroupComparisonSpec(
@@ -103,7 +93,7 @@ GROUP_COMPARISON_SPECS: tuple[GroupComparisonSpec, ...] = (
         group_column="target_drug_group_ps",
         exposed_value="zolpidem_only",
         reference_value="other_zdrug_only",
-        outcome_names=("strict_fall", "broad_fall"),
+        outcome_names=("strict_fall",),
         comparison="zolpidem_only_vs_other_zdrug_only_primary_suspect_only",
     ),
 )
@@ -115,7 +105,7 @@ EXPLORATORY_SIGNAL_SPECS: tuple[SignalSpec, ...] = (
         exposure_column="is_zolpidem_suspect",
         suspect_column="suspect_role_any",
         group_column="target_drug_group",
-        outcome_names=("strict_fall", "broad_fall"),
+        outcome_names=("strict_fall",),
         comparison="feature_positive_vs_feature_negative_among_zolpidem_suspect_cases",
     ),
     SignalSpec(
@@ -124,7 +114,7 @@ EXPLORATORY_SIGNAL_SPECS: tuple[SignalSpec, ...] = (
         exposure_column="is_zolpidem_suspect_ps",
         suspect_column="suspect_role_any_ps",
         group_column="target_drug_group_ps",
-        outcome_names=("strict_fall", "broad_fall"),
+        outcome_names=("strict_fall",),
         comparison="feature_positive_vs_feature_negative_among_zolpidem_primary_suspect_cases",
     ),
 )
@@ -160,7 +150,6 @@ SERIOUS_ADJUSTMENT_COLUMNS: tuple[str, ...] = (*BASE_ADJUSTMENT_COLUMNS, "seriou
 
 BOOL_COLUMNS: tuple[str, ...] = (
     "is_fall_narrow",
-    "is_fall_broad",
     "is_zolpidem_any",
     "is_zolpidem_suspect",
     "is_zolpidem_suspect_ps",

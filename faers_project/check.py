@@ -35,7 +35,6 @@ def inspect_case_dataset(case_file: Path, head: int = 5) -> dict[str, object]:
         "columns": list(df.columns),
         "head": df.head(int(head)),
         "n_fall_narrow": _bool_count(df, "is_fall_narrow"),
-        "n_fall_broad": _bool_count(df, "is_fall_broad"),
         "n_zolpidem_any": _bool_count(df, "is_zolpidem"),
         "n_zolpidem_suspect": _bool_count(df, "is_zolpidem_suspect"),
         "n_polypharmacy": _bool_count(df, "polypharmacy"),
@@ -71,7 +70,6 @@ def main() -> None:
     print("Key counts:")
     for key in [
         "n_fall_narrow",
-        "n_fall_broad",
         "n_zolpidem_any",
         "n_zolpidem_suspect",
         "n_polypharmacy",
