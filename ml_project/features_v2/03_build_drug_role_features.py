@@ -1,9 +1,20 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
 import pandas as pd
 
+CURRENT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = CURRENT_DIR.parents[1]
+FAERS_PROJECT_ROOT = PROJECT_ROOT / "faers_project"
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+if str(FAERS_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(FAERS_PROJECT_ROOT))
+
+from drug_dictionary import build_zdrug_exposure_terms, normalize_dictionary_term
 from feature_v2_common import (
     QC_DIR,
     QUARTERLY_DIR,
@@ -21,8 +32,7 @@ from feature_v2_common import (
 )
 
 
-ZOLPIDEM_TERMS = ["ZOLPIDEM", "AMBIEN", "STILNOX", "EDLUAR", "INTERMEZZO", "ZOLPIMIST"]
-OTHER_ZDRUG_TERMS = ["ZALEPLON", "SONATA", "ZOPICLONE", "IMOVANE", "ZIMOVANE", "ESZOPICLONE", "LUNESTA"]
+ZOLPIDEM_TERMS, OTHER_ZDRUG_TERMS = build_zdrug_exposure_terms()
 
 
 def build_drug_role_features(year: int, quarter: str) -> pd.DataFrame:
@@ -33,8 +43,8 @@ def build_drug_role_features(year: int, quarter: str) -> pd.DataFrame:
         raise ValueError(f"DRUG missing columns: {missing}")
 
     df["caseid"] = clean_caseid(df["caseid"])
-    df["drugname"] = normalize_text(df["drugname"])
-    df["prod_ai"] = normalize_text(df["prod_ai"])
+    df["drugname"] = normalize_text(df["drugname"]).map(normalize_dictionary_term)
+    df["prod_ai"] = normalize_text(df["prod_ai"]).map(normalize_dictionary_term)
     df["role_cod"] = normalize_text(df["role_cod"])
     df = df[df["caseid"] != ""].copy()
     df = df[~((df["drugname"] == "") & (df["prod_ai"] == ""))].copy()

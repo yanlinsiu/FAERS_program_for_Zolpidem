@@ -1,13 +1,17 @@
 raw_name,clean_name,standard_name,drug_class,role_in_study,is_brand,country_or_source,include,evidence_level,evidence_source,evidence_note,dosage_form,exclude_reason,note
-zolpidem,zolpidem,zolpidem,Z-drug,target,false,INN/RxNorm,true,rxnorm_confirmed,NLM RxNorm/RxNav,RxNorm ingredient concept for zolpidem,oral,,generic active ingredient
-zolpidem tartrate,zolpidem tartrate,zolpidem,Z-drug,target,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US product labels list zolpidem tartrate as active ingredient/active moiety zolpidem,oral,,salt form mapped to zolpidem
-ambien,ambien,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Ambien label lists active ingredient zolpidem tartrate,oral tablet,,brand name
-ambien cr,ambien cr,zolpidem,Z-drug,target,true,DailyMed,true,label_confirmed,FDA DailyMed,Ambien CR label lists active ingredient zolpidem tartrate,extended release oral tablet,,brand name controlled release
-edluar,edluar,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Edluar label lists zolpidem tartrate sublingual tablets,sublingual tablet,,brand name
-intermezzo,intermezzo,zolpidem,Z-drug,target,true,DailyMed/FDA,true,label_confirmed,FDA DailyMed/FDA safety information,FDA zolpidem safety materials identify Intermezzo as zolpidem,sublingual tablet,,brand name
-zolpimist,zolpimist,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Zolpimist label lists zolpidem tartrate oral spray,oral spray,,brand name
-zopiclone,zopiclone,zopiclone,Z-drug,comparator,false,RxNorm,true,rxnorm_confirmed,NLM RxNorm/RxNav,RxNorm ingredient concept for zopiclone,oral,,generic active ingredient
-eszopiclone,eszopiclone,eszopiclone,Z-drug,comparator,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US labels and RxNorm identify eszopiclone active ingredient,oral tablet,,generic active ingredient
-lunesta,lunesta,eszopiclone,Z-drug,comparator,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Lunesta label identifies eszopiclone active ingredient,oral tablet,,brand name
-zaleplon,zaleplon,zaleplon,Z-drug,comparator,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US labels and RxNorm identify zaleplon active ingredient,oral capsule,,generic active ingredient
-sonata,sonata,zaleplon,Z-drug,comparator,true,DailyMed/FDA,true,label_confirmed,FDA DailyMed/FDA safety information,FDA Z-drug safety materials identify Sonata as zaleplon,oral capsule,,brand name
+zolpidem,zolpidem,zolpidem,Z-drug,target,false,INN/RxNorm,true,standard_vocabulary_confirmed,NLM RxNorm/RxNav,RxNorm ingredient concept for zolpidem,oral,,generic active ingredient
+zolpidem tartrate,zolpidem tartrate,zolpidem,Z-drug,target,false,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed,US labels identify zolpidem tartrate as the active ingredient/active moiety zolpidem,oral,,salt form mapped to zolpidem
+ambien,ambien,zolpidem,Z-drug,target,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed,Ambien label identifies zolpidem tartrate,oral tablet,,brand name
+ambien cr,ambien cr,zolpidem,Z-drug,target,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed,Ambien CR label identifies zolpidem tartrate,extended release oral tablet,,brand name
+edluar,edluar,zolpidem,Z-drug,target,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed/FDA safety materials,Edluar is listed as a zolpidem product,sublingual tablet,,brand name
+intermezzo,intermezzo,zolpidem,Z-drug,target,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed/FDA safety materials,Intermezzo is listed as a zolpidem product,sublingual tablet,,brand name
+zolpimist,zolpimist,zolpidem,Z-drug,target,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed/FDA safety materials,Zolpimist is listed as a zolpidem product,oral spray,,brand name
+stilnox,stilnox,zolpidem,Z-drug,target,true,TGA/Australian Medicine Finder,true,regulatory_label_confirmed,Australian Medicine Finder/TGA,Stilnox active ingredient is zolpidem tartrate,oral tablet,,brand name
+zopiclone,zopiclone,zopiclone,Z-drug,comparator,false,NICE/RxNorm/PubChem/DrugBank,true,standard_vocabulary_confirmed,NICE; NLM RxNorm/RxNav; PubChem; DrugBank,Zopiclone is included as a Z-drug active ingredient,oral,,generic active ingredient
+imovane,imovane,zopiclone,Z-drug,comparator,true,TGA/Health Canada,true,regulatory_label_confirmed,Australian Medicine Finder; Health Canada-related drug database,Imovane active ingredient/generic name is zopiclone,oral tablet,,brand name
+zimovane,zimovane,zopiclone,Z-drug,comparator,true,UK eMC,true,regulatory_label_confirmed,UK eMC SmPC,Zimovane 7.5mg film-coated tablets contain zopiclone,oral tablet,,brand name
+eszopiclone,eszopiclone,eszopiclone,Z-drug,comparator,false,FDA/DailyMed/RxNorm,true,regulatory_label_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Eszopiclone is identified as active ingredient,oral tablet,,generic active ingredient
+lunesta,lunesta,eszopiclone,Z-drug,comparator,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed,Lunesta tablets contain eszopiclone,oral tablet,,brand name
+zaleplon,zaleplon,zaleplon,Z-drug,comparator,false,FDA/DailyMed/RxNorm,true,regulatory_label_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Zaleplon is identified as active ingredient,oral capsule,,generic active ingredient
+sonata,sonata,zaleplon,Z-drug,comparator,true,FDA/DailyMed,true,regulatory_label_confirmed,FDA DailyMed,Sonata capsules contain zaleplon,oral capsule,,brand name
+zerene,zerene,zaleplon,Z-drug,comparator,true,EMA,true,regulatory_label_confirmed,EMA EPAR,Zerene active substance is zaleplon,oral capsule,,brand name; withdrawn in EU for commercial reasons

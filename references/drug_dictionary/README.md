@@ -19,10 +19,14 @@ Important columns:
 - `exclude_reason`: reason to keep a term out of automatic matching
 - `dosage_form`: optional route/form note for formulations such as CR, sublingual, or spray
 
-Maintenance rule:
+Main analysis rule:
 
-For the main analysis, keep `include=true` only for terms supported by FDA/DailyMed
-labels or NLM RxNorm/RxNav. FAERS-only spelling variants, regional brands, and
-ambiguous mixed phrases should not be added to the main dictionary unless the
-study protocol is updated to include a separate manually reviewed expanded
-dictionary.
+Z-drugs are defined as `zolpidem`, `zopiclone`, `eszopiclone`, and `zaleplon`.
+Keep `include=true` only for names supported by regulatory labels / official
+drug information, or by standard drug vocabularies. Accepted sources include
+FDA/DailyMed, NICE, TGA/Australian Medicine Finder, UK eMC, EMA, Health Canada,
+NLM RxNorm/RxNav, DrugBank, and PubChem.
+
+FAERS-only spelling variants and ambiguous mixed phrases should not be added to
+the main dictionary unless the study protocol is updated to include a separate
+manually reviewed expanded dictionary.
