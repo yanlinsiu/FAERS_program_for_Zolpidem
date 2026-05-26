@@ -2,27 +2,11 @@ import re
 import pandas as pd
 from pathlib import Path
 
+from drug_dictionary import build_zdrug_exposure_terms, normalize_dictionary_term
 from drug_processor import process_drug
 
 
-ZOLPIDEM_TERMS = [
-    "ZOLPIDEM",
-    "AMBIEN",
-    "STILNOX",
-    "EDLUAR",
-    "INTERMEZZO",
-    "ZOLPIMIST",
-]
-
-OTHER_ZDRUG_TERMS = [
-    "ZALEPLON",
-    "SONATA",
-    "ZOPICLONE",
-    "IMOVANE",
-    "ZIMOVANE",
-    "ESZOPICLONE",
-    "LUNESTA",
-]
+ZOLPIDEM_TERMS, OTHER_ZDRUG_TERMS = build_zdrug_exposure_terms()
 
 SUSPECT_ROLES = {"PS", "SS"}
 PS_ONLY_ROLES = {"PS"}
@@ -57,6 +41,7 @@ def _normalize_drug_text(series):
         .astype(str)
         .str.strip()
         .str.upper()
+        .map(normalize_dictionary_term)
         .str.replace(r"\s+", " ", regex=True)
     )
 

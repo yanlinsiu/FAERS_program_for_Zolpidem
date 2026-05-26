@@ -3,21 +3,13 @@ from pathlib import Path
 
 import pandas as pd
 
+from drug_dictionary import build_zdrug_feature_terms, normalize_dictionary_term
 from drug_processor import process_drug
 
 
-DRUG_FEATURE_TERMS = {
-    "is_zolpidem": [
-        "ZOLPIDEM",
-        "AMBIEN",
-        "STILNOX",
-        "EDLUAR",
-        "INTERMEZZO",
-        "ZOLPIMIST",
-    ],
-    "is_zaleplon": ["ZALEPLON", "SONATA"],
-    "is_zopiclone": ["ZOPICLONE", "IMOVANE", "ZIMOVANE"],
-    "is_eszopiclone": ["ESZOPICLONE", "LUNESTA"],
+ZDRUG_FEATURE_TERMS = build_zdrug_feature_terms()
+
+OTHER_DRUG_FEATURE_TERMS = {
     "is_benzo": [
         "ALPRAZOLAM",
         "DIAZEPAM",
@@ -60,6 +52,8 @@ DRUG_FEATURE_TERMS = {
     ],
 }
 
+DRUG_FEATURE_TERMS = {**ZDRUG_FEATURE_TERMS, **OTHER_DRUG_FEATURE_TERMS}
+
 
 def _normalize_drug_text(series: pd.Series) -> pd.Series:
     return (
@@ -67,6 +61,7 @@ def _normalize_drug_text(series: pd.Series) -> pd.Series:
         .astype(str)
         .str.strip()
         .str.upper()
+        .map(normalize_dictionary_term)
         .str.replace(r"\s+", " ", regex=True)
     )
 
