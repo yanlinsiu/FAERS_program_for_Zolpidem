@@ -1,96 +1,13 @@
-raw_name,clean_name,standard_name,drug_class,role_in_study,is_brand,country_or_source,include,exclude_reason,dosage_form,note
-zolpidem,zolpidem,zolpidem,Z-drug,target,false,INN/RxNorm,true,,oral,generic name
-zolpidem tartrate,zolpidem tartrate,zolpidem,Z-drug,target,false,RxNorm/DailyMed,true,,oral,salt form mapped to zolpidem
-zolpidem hemitartrate,zolpidem hemitartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,salt form mapped to zolpidem
-zolpidem hemi-tartrat,zolpidem hemi-tartrat,zolpidem,Z-drug,target,false,FAERS,true,,oral,FAERS spelling variant of hemitartrate
-tartrate of zolpidem,tartrate of zolpidem,zolpidem,Z-drug,target,false,FAERS,true,,oral,salt phrase mapped to zolpidem
-ambien,ambien,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,,oral,brand name
-ambien cr,ambien cr,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,,extended release oral,brand name controlled release
-ambien er,ambien er,zolpidem,Z-drug,target,true,FAERS,true,,extended release oral,FAERS variant likely Ambien CR/ER
-ambien sr,ambien sr,zolpidem,Z-drug,target,true,FAERS,true,,extended release oral,FAERS variant likely sustained release
-generic ambien,generic ambien,zolpidem,Z-drug,target,false,FAERS,true,,oral,generic Ambien phrase
-ambien generic,ambien generic,zolpidem,Z-drug,target,false,FAERS,true,,oral,generic Ambien phrase
-stilnox,stilnox,zolpidem,Z-drug,target,true,RxNorm/FAERS,true,,oral,brand name
-stilnox cr,stilnox cr,zolpidem,Z-drug,target,true,FAERS,true,,extended release oral,controlled-release brand variant
-stilnox mr,stilnox mr,zolpidem,Z-drug,target,true,FAERS,true,,modified release oral,modified-release brand variant
-stilnox tc,stilnox tc,zolpidem,Z-drug,target,true,FAERS,true,,oral,FAERS brand variant
-stilnoct,stilnoct,zolpidem,Z-drug,target,true,FAERS,true,,oral,brand/spelling variant appearing with zolpidem tartrate
-stillnox,stillnox,zolpidem,Z-drug,target,true,FAERS,true,,oral,typo/variant of Stilnox
-edluar,edluar,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,,sublingual,brand name
-intermezzo,intermezzo,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,,sublingual,brand name
-zolpimist,zolpimist,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,,oral spray,brand name
-myslee,myslee,zolpidem,Z-drug,target,true,FAERS,true,,oral,brand name seen in FAERS
-hypnogen,hypnogen,zolpidem,Z-drug,target,true,FAERS,true,,oral,brand name seen in FAERS
-zoldem,zoldem,zolpidem,Z-drug,target,true,FAERS,true,,oral,brand name seen in FAERS
-adco-zolpidem,adco-zolpidem,zolpidem,Z-drug,target,true,FAERS,true,,oral,brand/generic product name
-zolpidem winthrop,zolpidem winthrop,zolpidem,Z-drug,target,true,FAERS,true,,oral,manufacturer product name
-zolpidem beta,zolpidem beta,zolpidem,Z-drug,target,true,FAERS,true,,oral,manufacturer product name
-zolpidem irex,zolpidem irex,zolpidem,Z-drug,target,true,FAERS,true,,oral,manufacturer product name
-zolpidem hexal,zolpidem hexal,zolpidem,Z-drug,target,true,FAERS,true,,oral,manufacturer product name
-zolpidem g gam,zolpidem g gam,zolpidem,Z-drug,target,true,FAERS,true,,oral,manufacturer product name
-zolpidem generic,zolpidem generic,zolpidem,Z-drug,target,false,FAERS,true,,oral,generic product phrase
-zolpidem cr,zolpidem cr,zolpidem,Z-drug,target,false,FAERS,true,,extended release oral,controlled-release generic phrase
-zolpidem nos,zolpidem nos,zolpidem,Z-drug,target,false,FAERS,true,,unknown,NOS phrase mapped to zolpidem
-zolpidem tablets,zolpidem tablets,zolpidem,Z-drug,target,false,FAERS,true,,oral tablet,generic form phrase
-zolpidem tartrate tablets,zolpidem tartrate tablets,zolpidem,Z-drug,target,false,FAERS,true,,oral tablet,salt plus form
-fk199b/zolpidem tartrate,fk199b/zolpidem tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,product code plus salt
-zolpiden,zolpiden,zolpidem,Z-drug,target,false,FAERS,true,,unknown,probable typo of zolpidem
-zolpidiem,zolpidiem,zolpidem,Z-drug,target,false,FAERS,true,,unknown,probable typo of zolpidem
-zolpitem,zolpitem,zolpidem,Z-drug,target,false,FAERS,true,,unknown,probable typo of zolpidem
-zolpedem,zolpedem,zolpidem,Z-drug,target,false,FAERS,true,,unknown,probable typo of zolpidem
-zolpidem tatrate,zolpidem tatrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zolpidem tartate,zolpidem tartate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zolpidemtartrat,zolpidemtartrat,zolpidem,Z-drug,target,false,FAERS,true,,oral,compressed spelling of zolpidem tartrate
-zolipidem tartrate,zolipidem tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zolipdem tartrate,zolipdem tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zolpiden tartrate,zolpiden tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zolpiem tartrate,zolpiem tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-zopidem tartrate,zopidem tartrate,zolpidem,Z-drug,target,false,FAERS,true,,oral,typo of zolpidem tartrate
-ambient,ambient,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-ambien t,ambien t,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien if present
-ambein,ambein,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-amien,amien,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-anbien,anbien,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-abien,abien,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-ambian,ambian,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-amiben,amiben,zolpidem,Z-drug,target,true,FAERS,true,,oral,probable typo of Ambien
-zopiclone,zopiclone,zopiclone,Z-drug,comparator,false,INN/RxNorm,true,,oral,generic name
-imovane,imovane,zopiclone,Z-drug,comparator,true,RxNorm/FAERS,true,,oral,brand name
-zimovane,zimovane,zopiclone,Z-drug,comparator,true,RxNorm/FAERS,true,,oral,brand name
-amoban,amoban,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand name seen in FAERS
-apo-zopiclone,apo-zopiclone,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-pms-zopiclone,pms-zopiclone,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-novo-zopiclone,novo-zopiclone,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-dom-zopiclone,dom-zopiclone,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-ran-zopiclone,ran-zopiclone,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-zopiclone actavis,zopiclone actavis,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-zopiklon nm pharma,zopiklon nm pharma,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-zopiclone rpg,zopiclone rpg,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,manufacturer product name
-ximovan,ximovan,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-limovan,limovan,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-rhovane,rhovane,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-somnosan,somnosan,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-imozop,imozop,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-zopicool,zopicool,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-zopinox,zopinox,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-zopiclodura,zopiclodura,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-zoplicone,zoplicone,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,probable typo of zopiclone
-zopiclon,zopiclon,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,spelling variant of zopiclone
-zopiklon,zopiklon,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,spelling variant of zopiclone
-zopliclone,zopliclone,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,probable typo of zopiclone
-zipiclone,zipiclone,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,probable typo of zopiclone
-imoclone,imoclone,zopiclone,Z-drug,comparator,false,FAERS,true,,unknown,FAERS variant appearing with zopiclone
-immovane,immovane,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,probable typo of Imovane
-amobran,amobran,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,probable typo of Amoban
-amoan,amoan,zopiclone,Z-drug,comparator,true,FAERS,true,,oral,probable typo of Amoban
-eszopiclone,eszopiclone,eszopiclone,Z-drug,comparator,false,INN/RxNorm,true,,oral,generic name
-lunesta,lunesta,eszopiclone,Z-drug,comparator,true,DailyMed/RxNorm,true,,oral,brand name
-ezopiclone,ezopiclone,eszopiclone,Z-drug,comparator,false,FAERS,true,,oral,probable typo of eszopiclone
-zaleplon,zaleplon,zaleplon,Z-drug,comparator,false,INN/RxNorm,true,,oral,generic name
-sonata,sonata,zaleplon,Z-drug,comparator,true,DailyMed/RxNorm,true,,oral,brand name
-starnoc,starnoc,zaleplon,Z-drug,comparator,true,FAERS,true,,oral,brand/variant seen in FAERS
-zeleplon,zeleplon,zaleplon,Z-drug,comparator,false,FAERS,true,,oral,probable typo of zaleplon
-ambien or sonata,ambien or sonata,,Z-drug,review,false,FAERS,false,ambiguous mixed target/comparator phrase,unknown,do not map automatically
-sonata carisoprodol,sonata carisoprodol,,Z-drug,review,false,FAERS,false,ambiguous because field also names carisoprodol,unknown,manual review
-codeine phosphate zopiclone,codeine phosphate zopiclone,,Z-drug,review,false,FAERS,false,ambiguous because field also names codeine,unknown,manual review
-zolpiclone,zolpiclone,,Z-drug,review,false,FAERS,false,ambiguous typo could mean zolpidem or zopiclone,unknown,manual review
+raw_name,clean_name,standard_name,drug_class,role_in_study,is_brand,country_or_source,include,evidence_level,evidence_source,evidence_note,dosage_form,exclude_reason,note
+zolpidem,zolpidem,zolpidem,Z-drug,target,false,INN/RxNorm,true,rxnorm_confirmed,NLM RxNorm/RxNav,RxNorm ingredient concept for zolpidem,oral,,generic active ingredient
+zolpidem tartrate,zolpidem tartrate,zolpidem,Z-drug,target,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US product labels list zolpidem tartrate as active ingredient/active moiety zolpidem,oral,,salt form mapped to zolpidem
+ambien,ambien,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Ambien label lists active ingredient zolpidem tartrate,oral tablet,,brand name
+ambien cr,ambien cr,zolpidem,Z-drug,target,true,DailyMed,true,label_confirmed,FDA DailyMed,Ambien CR label lists active ingredient zolpidem tartrate,extended release oral tablet,,brand name controlled release
+edluar,edluar,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Edluar label lists zolpidem tartrate sublingual tablets,sublingual tablet,,brand name
+intermezzo,intermezzo,zolpidem,Z-drug,target,true,DailyMed/FDA,true,label_confirmed,FDA DailyMed/FDA safety information,FDA zolpidem safety materials identify Intermezzo as zolpidem,sublingual tablet,,brand name
+zolpimist,zolpimist,zolpidem,Z-drug,target,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Zolpimist label lists zolpidem tartrate oral spray,oral spray,,brand name
+zopiclone,zopiclone,zopiclone,Z-drug,comparator,false,RxNorm,true,rxnorm_confirmed,NLM RxNorm/RxNav,RxNorm ingredient concept for zopiclone,oral,,generic active ingredient
+eszopiclone,eszopiclone,eszopiclone,Z-drug,comparator,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US labels and RxNorm identify eszopiclone active ingredient,oral tablet,,generic active ingredient
+lunesta,lunesta,eszopiclone,Z-drug,comparator,true,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,Lunesta label identifies eszopiclone active ingredient,oral tablet,,brand name
+zaleplon,zaleplon,zaleplon,Z-drug,comparator,false,DailyMed/RxNorm,true,label_and_rxnorm_confirmed,FDA DailyMed; NLM RxNorm/RxNav,US labels and RxNorm identify zaleplon active ingredient,oral capsule,,generic active ingredient
+sonata,sonata,zaleplon,Z-drug,comparator,true,DailyMed/FDA,true,label_confirmed,FDA DailyMed/FDA safety information,FDA Z-drug safety materials identify Sonata as zaleplon,oral capsule,,brand name
