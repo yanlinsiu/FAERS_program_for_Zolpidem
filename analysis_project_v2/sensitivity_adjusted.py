@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable
@@ -28,7 +28,7 @@ except ImportError:
     )
 
 
-OUTCOME_COLUMN = "is_fall_narrow"
+OUTCOME_COLUMN = "is_fall"
 OUTCOME_NAME = "fall_event"
 OUTCOME_DEFINITION = "Fall event"
 PRIMARY_EXPOSURE = "is_zolpidem_suspect"
@@ -461,3 +461,4 @@ def build_sensitivity_adjusted_analysis(
         "sensitivity_all_summary": all_summary,
     }
     return tables, all_summary, qc
+

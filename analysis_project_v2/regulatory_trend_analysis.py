@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import math
@@ -60,8 +60,8 @@ TREND_SPECS: tuple[TrendSpec, ...] = (
         suspect_column="suspect_role_any",
         group_column="target_drug_group",
         outcome_name="strict_fall",
-        outcome_column="is_fall_narrow",
-        outcome_definition="OCMQ-compatible narrow fall event",
+        outcome_column="is_fall",
+        outcome_definition="strict PT-defined fall event (FALL or DROP ATTACKS)",
         comparison="zolpidem_suspect_vs_all_other_suspect_drugs_excluding_mixed_zdrug_cases",
     ),
     TrendSpec(
@@ -70,8 +70,8 @@ TREND_SPECS: tuple[TrendSpec, ...] = (
         suspect_column="suspect_role_any_ps",
         group_column="target_drug_group_ps",
         outcome_name="strict_fall",
-        outcome_column="is_fall_narrow",
-        outcome_definition="OCMQ-compatible narrow fall event",
+        outcome_column="is_fall",
+        outcome_definition="strict PT-defined fall event (FALL or DROP ATTACKS)",
         comparison="zolpidem_primary_suspect_vs_all_other_primary_suspect_drugs_excluding_mixed_zdrug_cases",
     ),
 )
@@ -703,7 +703,7 @@ def write_figures(annual_df: pd.DataFrame, output_dir: Path) -> dict[str, Path]:
             [
                 "# Figure notes",
                 "",
-                "- Blue line: annual primary analysis estimate for narrow fall reports.",
+                "- Blue line: annual primary analysis estimate for strict PT-defined fall reports.",
                 "- Red vertical lines: 2013 FDA zolpidem dose reduction, 2019 FDA boxed warning for Z-drugs, and 2023 AGS Beers Criteria update.",
                 "- Light blue vertical intervals in annual_ror.png: 95% CI for annual ROR.",
                 "- Event lines are interpretive reference points and should not be read as causal effects.",
@@ -771,3 +771,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

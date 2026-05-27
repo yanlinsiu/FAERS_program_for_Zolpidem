@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 from pathlib import Path
@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from analysis_project_v2.config import FEATURE_SPECS, OUTCOME_SPECS
 from analysis_project_v2.signal_metrics import feature_mask, signal_metrics, two_by_two_counts
+from common.schema_checks import validate_feature_schema, validate_signal_schema
 
 
 DEFAULT_SIGNAL_ROOT = Path(r"D:\program_FAERS\OUTPUT")
@@ -91,8 +92,7 @@ def load_signal_dataset(
     combined = pd.concat(frames, ignore_index=True)
     combined["caseid"] = combined["caseid"].astype(str).str.strip()
     combined = combined[combined["caseid"] != ""].copy()
-    if "is_fall_narrow" not in combined.columns and "is_fall" in combined.columns:
-        combined["is_fall_narrow"] = combined["is_fall"].fillna(False).astype(bool)
+    validate_signal_schema(combined)
     if "serious" in combined.columns:
         combined["serious"] = combined["serious"].fillna(False).astype(bool)
     return combined
@@ -114,7 +114,9 @@ def load_feature_dataset(
 
     combined = pd.concat(frames, ignore_index=True)
     combined["caseid"] = combined["caseid"].astype(str).str.strip()
-    return combined[combined["caseid"] != ""].copy()
+    combined = combined[combined["caseid"] != ""].copy()
+    validate_feature_schema(combined)
+    return combined
 
 
 def merge_signal_and_feature(
@@ -140,7 +142,7 @@ def merge_signal_and_feature(
         "polypharmacy_5",
         "polypharmacy",
         "serious",
-        "is_fall_narrow",
+        "is_fall",
     ]
     for col in bool_cols:
         if col in merged.columns:
@@ -584,3 +586,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -250,7 +250,7 @@ def _build_year_trend_row(year: int, analysis_root: Path) -> pd.DataFrame:
     if "outcome_name" not in df.columns:
         df["outcome_name"] = "strict_fall"
     if "outcome_definition" not in df.columns:
-        df["outcome_definition"] = "OCMQ-compatible narrow fall event"
+        df["outcome_definition"] = "strict PT-defined fall event (FALL or DROP ATTACKS)"
     if "conclusion" not in df.columns:
         signal_flag_ror = df["signal_flag_ror"].fillna(False) if "signal_flag_ror" in df.columns else pd.Series(False, index=df.index)
         signal_flag_mhra = df["signal_flag_mhra"].fillna(False) if "signal_flag_mhra" in df.columns else pd.Series(False, index=df.index)
@@ -377,8 +377,8 @@ def process_year(
                 "year": year,
                 "quarter": quarter,
                 "n_cases": int(len(signal_df)),
-                "n_fall_narrow": int(
-                    signal_df["is_fall_narrow"].fillna(False).astype(bool).sum()
+                "n_fall": int(
+                    signal_df["is_fall"].fillna(False).astype(bool).sum()
                 ),
                 "n_zolpidem_any": int(
                     signal_df["is_zolpidem_any"].fillna(False).astype(bool).sum()
@@ -393,7 +393,7 @@ def process_year(
         )
         print(
             f"{year} {quarter}: cases={quarter_summary_rows[-1]['n_cases']}, "
-            f"fall_narrow={quarter_summary_rows[-1]['n_fall_narrow']}, "
+            f"fall={quarter_summary_rows[-1]['n_fall']}, "
             f"zolpidem_any={quarter_summary_rows[-1]['n_zolpidem_any']}, "
             f"zolpidem_suspect={quarter_summary_rows[-1]['n_zolpidem_suspect']}"
         )

@@ -10,6 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from common.datasets import DatasetBundle, resolve_signal_feature_bundle
+from common.schema_checks import validate_feature_schema, validate_signal_schema
 
 try:
     from .config import BOOL_COLUMNS, CATEGORICAL_ADJUSTMENT_COLUMNS, GLOBAL_DATASET_DIR
@@ -40,8 +41,6 @@ def _normalize_caseid(df: pd.DataFrame, label: str) -> pd.DataFrame:
 
 def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     normalized = df.copy()
-    if "polypharmacy_5" not in normalized.columns and "polypharmacy" in normalized.columns:
-        normalized["polypharmacy_5"] = normalized["polypharmacy"]
     if "polypharmacy" not in normalized.columns and "polypharmacy_5" in normalized.columns:
         normalized["polypharmacy"] = normalized["polypharmacy_5"]
 
@@ -84,6 +83,8 @@ def _resolve_ml_feature_v2_file(period_token: str) -> Path | None:
 def load_analysis_frame(bundle: DatasetBundle) -> pd.DataFrame:
     signal_df = _normalize_caseid(pd.read_parquet(bundle.signal_file), "signal dataset")
     feature_df = _normalize_caseid(pd.read_parquet(bundle.feature_file), "feature dataset")
+    validate_signal_schema(signal_df)
+    validate_feature_schema(feature_df)
 
     merged = signal_df.merge(
         feature_df,

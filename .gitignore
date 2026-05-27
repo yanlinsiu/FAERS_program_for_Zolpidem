@@ -114,7 +114,8 @@ OUTPUT_ML/
 analysis_reports/
 docs_or_reports/
 presentation_output/
-tools/
+tools/*
+!tools/audit_analysis_fields.py
 # Run folders are reproducible output snapshots.
 runs/*/OUTPUT/
 runs/*/OUTPUT_COUNTRY/

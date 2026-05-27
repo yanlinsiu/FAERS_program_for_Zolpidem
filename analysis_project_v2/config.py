@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -58,7 +58,7 @@ class AdjustmentModelSpec:
 
 
 OUTCOME_SPECS: tuple[OutcomeSpec, ...] = (
-    OutcomeSpec("strict_fall", "is_fall_narrow", "OCMQ-compatible narrow fall event"),
+    OutcomeSpec("strict_fall", "is_fall", "strict PT-defined fall event (FALL or DROP ATTACKS)"),
 )
 
 OUTCOMES_BY_NAME = {spec.name: spec for spec in OUTCOME_SPECS}
@@ -201,7 +201,7 @@ NUMERIC_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
 )
 
 BOOL_COLUMNS: tuple[str, ...] = (
-    "is_fall_narrow",
+    "is_fall",
     "is_zolpidem_any",
     "is_zolpidem_suspect",
     "is_zolpidem_suspect_ps",
@@ -228,3 +228,4 @@ BOOL_COLUMNS: tuple[str, ...] = (
     "indi_epilepsy",
     "indi_dizziness_vertigo",
 )
+

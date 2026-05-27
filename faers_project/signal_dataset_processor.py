@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ OPTIONAL_CASE_BASE_COLS = [
 
 REQUIRED_REAC_COLS = [
     "caseid",
-    "is_fall_narrow",
+    "is_fall",
 ]
 
 REQUIRED_DRUG_EXPOSURE_COLS = [
@@ -36,7 +36,7 @@ REQUIRED_DRUG_EXPOSURE_COLS = [
 ]
 
 BOOL_COLS = [
-    "is_fall_narrow",
+    "is_fall",
     "is_zolpidem_any",
     "suspect_role_any",
     "suspect_role_any_ps",
@@ -47,7 +47,7 @@ BOOL_COLS = [
 ]
 
 OPTIONAL_FALL_COLS = [
-    "fall_narrow_pt_count",
+    "fall_pt_count",
     "fall_pt_list",
 ]
 
@@ -153,23 +153,6 @@ def process_signal_dataset(year, quarter, output_root):
     drug_feature_df = pd.read_parquet(drug_feature_file)
     outc_case_df = pd.read_parquet(outc_case_file)
 
-    if "suspect_role_any_ps" not in drug_exposure_df.columns and "suspect_role_any" in drug_exposure_df.columns:
-        drug_exposure_df["suspect_role_any_ps"] = drug_exposure_df["suspect_role_any"]
-    if (
-        "is_zolpidem_suspect_ps" not in drug_exposure_df.columns
-        and "is_zolpidem_suspect" in drug_exposure_df.columns
-    ):
-        drug_exposure_df["is_zolpidem_suspect_ps"] = drug_exposure_df["is_zolpidem_suspect"]
-    if (
-        "is_other_zdrug_suspect_ps" not in drug_exposure_df.columns
-        and "is_other_zdrug_suspect" in drug_exposure_df.columns
-    ):
-        drug_exposure_df["is_other_zdrug_suspect_ps"] = drug_exposure_df["is_other_zdrug_suspect"]
-    if "target_drug_group_ps" not in drug_exposure_df.columns and "target_drug_group" in drug_exposure_df.columns:
-        drug_exposure_df["target_drug_group_ps"] = drug_exposure_df["target_drug_group"]
-    if "is_zolpidem_any" not in drug_feature_df.columns and "is_zolpidem" in drug_feature_df.columns:
-        drug_feature_df["is_zolpidem_any"] = drug_feature_df["is_zolpidem"]
-
     _assert_has_columns(case_base_df, REQUIRED_CASE_BASE_COLS, "case_base_dataset")
     _assert_has_columns(reac_case_df, REQUIRED_REAC_COLS, "reac_case")
     _assert_has_columns(
@@ -270,9 +253,9 @@ def process_signal_dataset(year, quarter, output_root):
         signal_df["fall_pt_list"] = (
             signal_df["fall_pt_list"].where(signal_df["fall_pt_list"].notna(), "")
         )
-    if "fall_narrow_pt_count" in signal_df.columns:
-        signal_df["fall_narrow_pt_count"] = (
-            pd.to_numeric(signal_df["fall_narrow_pt_count"], errors="coerce")
+    if "fall_pt_count" in signal_df.columns:
+        signal_df["fall_pt_count"] = (
+            pd.to_numeric(signal_df["fall_pt_count"], errors="coerce")
             .fillna(0)
             .astype(int)
         )
@@ -287,7 +270,7 @@ def process_signal_dataset(year, quarter, output_root):
 
     final_cols = [
         "caseid",
-        "is_fall_narrow",
+        "is_fall",
         "is_zolpidem_any",
         "is_zolpidem_suspect",
         "is_zolpidem_suspect_ps",
@@ -308,8 +291,8 @@ def process_signal_dataset(year, quarter, output_root):
 
     if "serious" in signal_df.columns:
         final_cols.append("serious")
-    if "fall_narrow_pt_count" in signal_df.columns:
-        final_cols.append("fall_narrow_pt_count")
+    if "fall_pt_count" in signal_df.columns:
+        final_cols.append("fall_pt_count")
     if "fall_pt_list" in signal_df.columns:
         final_cols.append("fall_pt_list")
 
@@ -321,10 +304,11 @@ def process_signal_dataset(year, quarter, output_root):
     signal_df.to_parquet(output_file, index=False)
 
     print("signal_dataset rows:", len(signal_df))
-    print("fall cases (definite):", int(signal_df["is_fall_narrow"].sum()))
+    print("fall cases (definite):", int(signal_df["is_fall"].sum()))
     print("zolpidem any-exposure cases:", int(signal_df["is_zolpidem_any"].sum()))
     print("zolpidem suspect cases:", int(signal_df["is_zolpidem_suspect"].sum()))
     print("other z-drug suspect cases:", int(signal_df["is_other_zdrug_suspect"].sum()))
     print(f"saved: {output_file}")
 
     return signal_df
+

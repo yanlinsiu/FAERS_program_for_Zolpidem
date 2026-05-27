@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 from pathlib import Path
 
 from utils import (
@@ -11,7 +11,7 @@ from utils import (
 from config import RAW_ROOT
 
 
-NARROW_FALL_TERMS = {
+FALL_TERMS = {
     "FALL",
     "DROP ATTACKS",
 }
@@ -60,16 +60,16 @@ def process_reac(year, quarter, output_root):
     df[["caseid", "primaryid", "pt"]].to_parquet(event_output_file, index=False)
     print(f"Saved event-level REAC: {event_output_file}")
 
-    df["is_fall_narrow_row"] = df["pt"].isin(NARROW_FALL_TERMS)
+    df["is_fall_row"] = df["pt"].isin(FALL_TERMS)
 
     case_level_df = df.groupby("caseid", as_index=False).agg(
-        is_fall_narrow=("is_fall_narrow_row", "max"),
-        fall_narrow_pt_count=("is_fall_narrow_row", "sum"),
+        is_fall=("is_fall_row", "max"),
+        fall_pt_count=("is_fall_row", "sum"),
         all_reac_n=("pt", "size"),
     )
 
     fall_pt_list_df = (
-        df.loc[df["is_fall_narrow_row"], ["caseid", "pt"]]
+        df.loc[df["is_fall_row"], ["caseid", "pt"]]
         .drop_duplicates()
         .groupby("caseid")["pt"]
         .apply(lambda s: "|".join(sorted(s)))
@@ -81,19 +81,20 @@ def process_reac(year, quarter, output_root):
         case_level_df["fall_pt_list"].where(case_level_df["fall_pt_list"].notna(), "")
     )
 
-    case_level_df["is_fall_narrow"] = case_level_df["is_fall_narrow"].astype(bool)
-    case_level_df["fall_narrow_pt_count"] = case_level_df[
-        "fall_narrow_pt_count"
+    case_level_df["is_fall"] = case_level_df["is_fall"].astype(bool)
+    case_level_df["fall_pt_count"] = case_level_df[
+        "fall_pt_count"
     ].astype(int)
     case_level_df["all_reac_n"] = case_level_df["all_reac_n"].astype(int)
 
     print("Case-level REAC rows:", len(case_level_df))
     print(
         "Fall cases (definite PT definition):",
-        int(case_level_df["is_fall_narrow"].sum()),
+        int(case_level_df["is_fall"].sum()),
     )
 
     output_file = output_root / f"reac_{year}{quarter.lower()}_case.parquet"
     case_level_df.to_parquet(output_file, index=False)
 
     print(f"Saved: {output_file}")
+

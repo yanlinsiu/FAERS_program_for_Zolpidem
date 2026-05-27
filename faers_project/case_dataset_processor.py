@@ -56,7 +56,7 @@ def process_case_dataset(year, quarter, output_root):
     输出数据结构:
         - caseid: 病例 ID（主键）
         - DEMO 表的所有字段（如 primaryid, fda_dt, caseversion 等）
-        - is_fall_narrow: 明确跌倒事件标识（FALL 或 DROP ATTACKS，True/False）
+        - is_fall: 明确跌倒事件标识（FALL 或 DROP ATTACKS，True/False）
         - is_zolpidem 等药物类别标识
         - drug_n: 病例内去重后的药物数
         - polypharmacy_5: 是否满足多药并用（distinct_drug_n >= 5）
@@ -166,7 +166,7 @@ def process_case_dataset(year, quarter, output_root):
         raise ValueError(f"DEMO 缺少必要字段：{missing_demo_cols}")
 
     # 定义 REAC 病例级数据必需的字段
-    required_reac_cols = ["caseid", "is_fall_narrow"]
+    required_reac_cols = ["caseid", "is_fall"]
     # 检查 REAC 数据是否有缺失的必需列
     missing_reac_cols = [
         col for col in required_reac_cols if col not in reac_case_df.columns
@@ -188,9 +188,8 @@ def process_case_dataset(year, quarter, output_root):
         "is_antiepileptic",
         "drug_n",
         "distinct_drug_n",
+        "polypharmacy_5",
     ]
-    if "is_zolpidem_any" not in drug_feature_df.columns and "is_zolpidem" in drug_feature_df.columns:
-        drug_feature_df["is_zolpidem_any"] = drug_feature_df["is_zolpidem"]
 
     missing_drug_feature_cols = [
         col for col in required_drug_feature_cols if col not in drug_feature_df.columns
@@ -201,29 +200,12 @@ def process_case_dataset(year, quarter, output_root):
         raise ValueError(
             f"DRUG 病例级特征结果缺少必要字段：{missing_drug_feature_cols}"
         )
-    if "polypharmacy_5" not in drug_feature_df.columns and "polypharmacy" not in drug_feature_df.columns:
-        raise ValueError("DRUG 病例级特征结果缺少必要字段：['polypharmacy_5']")
 
     # ========== 步骤 4: 数据清洗 ==========
     # 清洗 DEMO 表的 caseid 字段：
     # 1. 将 NaN 替换为空字符串
     # 2. 转换为字符串类型
     # 3. 去除首尾空格
-    if "suspect_role_any_ps" not in drug_exposure_df.columns and "suspect_role_any" in drug_exposure_df.columns:
-        drug_exposure_df["suspect_role_any_ps"] = drug_exposure_df["suspect_role_any"]
-    if (
-        "is_zolpidem_suspect_ps" not in drug_exposure_df.columns
-        and "is_zolpidem_suspect" in drug_exposure_df.columns
-    ):
-        drug_exposure_df["is_zolpidem_suspect_ps"] = drug_exposure_df["is_zolpidem_suspect"]
-    if (
-        "is_other_zdrug_suspect_ps" not in drug_exposure_df.columns
-        and "is_other_zdrug_suspect" in drug_exposure_df.columns
-    ):
-        drug_exposure_df["is_other_zdrug_suspect_ps"] = drug_exposure_df["is_other_zdrug_suspect"]
-    if "target_drug_group_ps" not in drug_exposure_df.columns and "target_drug_group" in drug_exposure_df.columns:
-        drug_exposure_df["target_drug_group_ps"] = drug_exposure_df["target_drug_group"]
-
     required_drug_exposure_cols = [
         "caseid",
         "suspect_role_any",
@@ -279,14 +261,14 @@ def process_case_dataset(year, quarter, output_root):
     # 1. 将 NaN 值填充为 False（未报告跌倒）
     # 2. 转换为布尔类型
     reac_bool_cols = [
-        "is_fall_narrow",
+        "is_fall",
     ]
     for col in reac_bool_cols:
         if col in reac_case_df.columns:
             reac_case_df[col] = reac_case_df[col].fillna(False).astype(bool)
-    if "fall_narrow_pt_count" in reac_case_df.columns:
-        reac_case_df["fall_narrow_pt_count"] = (
-            pd.to_numeric(reac_case_df["fall_narrow_pt_count"], errors="coerce")
+    if "fall_pt_count" in reac_case_df.columns:
+        reac_case_df["fall_pt_count"] = (
+            pd.to_numeric(reac_case_df["fall_pt_count"], errors="coerce")
             .fillna(0)
             .astype(int)
         )
@@ -295,8 +277,6 @@ def process_case_dataset(year, quarter, output_root):
             reac_case_df["fall_pt_list"].where(reac_case_df["fall_pt_list"].notna(), "")
         )
 
-    if "polypharmacy_5" not in drug_feature_df.columns and "polypharmacy" in drug_feature_df.columns:
-        drug_feature_df["polypharmacy_5"] = drug_feature_df["polypharmacy"]
     if "polypharmacy" not in drug_feature_df.columns and "polypharmacy_5" in drug_feature_df.columns:
         # Keep legacy alias for downstream compatibility.
         drug_feature_df["polypharmacy"] = drug_feature_df["polypharmacy_5"]
@@ -409,9 +389,9 @@ def process_case_dataset(year, quarter, output_root):
     for col in reac_bool_cols:
         if col in case_df.columns:
             case_df[col] = case_df[col].fillna(False).astype(bool)
-    if "fall_narrow_pt_count" in case_df.columns:
-        case_df["fall_narrow_pt_count"] = (
-            pd.to_numeric(case_df["fall_narrow_pt_count"], errors="coerce")
+    if "fall_pt_count" in case_df.columns:
+        case_df["fall_pt_count"] = (
+            pd.to_numeric(case_df["fall_pt_count"], errors="coerce")
             .fillna(0)
             .astype(int)
         )
@@ -465,9 +445,10 @@ def process_case_dataset(year, quarter, output_root):
 
     # 打印统计信息
     print("病例级分析数据行数:", len(case_df))
-    print("明确跌倒事件病例数:", int(case_df["is_fall_narrow"].sum()))
+    print("明确跌倒事件病例数:", int(case_df["is_fall"].sum()))
     print("多药并用病例数(polypharmacy_5):", int(case_df["polypharmacy_5"].sum()))
     print(f"已保存：{output_file}")
 
     # 返回合并后的 DataFrame，供后续分析使用
     return case_df
+

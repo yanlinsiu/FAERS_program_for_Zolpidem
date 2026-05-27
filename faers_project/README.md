@@ -102,7 +102,7 @@ $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
 
 5. `reac_processor.py`
    - 从 `REAC` 构建病例级跌倒结局
-   - 使用 OCMQ 兼容的狭义跌倒定义
+   - 使用严格 PT 定义的跌倒结局：`FALL` 或 `DROP ATTACKS`
    - 生成 `reac_YYYYqN_case.parquet`
 
 6. `outc_processor.py`
@@ -293,7 +293,7 @@ python year_batch_runner.py --start-year 2019 --end-year 2024
 - 主分析暴露口径为 `PS + SS`
 - 敏感性分析暴露口径为 `PS only`
 - 多药并用定义为 `distinct_drug_n >= 5`
-- `REAC` 中构建 OCMQ 兼容的 `is_fall_narrow`
+- `REAC` 中构建严格 PT 定义的 `is_fall`
 - `signal_dataset` 中保留年龄组、性别、严重结局和暴露分组字段
 
 这些设定都属于研究口径的一部分，后续如果改代码，建议优先同步更新文档。

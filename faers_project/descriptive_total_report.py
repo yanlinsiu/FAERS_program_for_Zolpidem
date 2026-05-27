@@ -169,7 +169,7 @@ def _missingness(df: pd.DataFrame) -> pd.DataFrame:
         "sex_clean",
         "serious",
         "is_serious_any",
-        "is_fall_narrow",
+        "is_fall",
         "fall_pt_list",
         "is_zolpidem",
         "is_zolpidem_suspect",
@@ -292,7 +292,7 @@ def _top_fall_pt(df: pd.DataFrame, total_n: int, top_n: int = 20) -> pd.DataFram
     if "fall_pt_list" not in df.columns:
         return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
-    fall_mask = _coerce_bool(df["is_fall_narrow"]) if "is_fall_narrow" in df.columns else None
+    fall_mask = _coerce_bool(df["is_fall"]) if "is_fall" in df.columns else None
     if fall_mask is None or int(fall_mask.sum()) == 0:
         return pd.DataFrame(columns=["PT", "涉及病例数", "占总体百分比", "占 fall 百分比"])
 
@@ -352,7 +352,7 @@ def _build_markdown_report(
 
     if not outcome_df.empty:
         for _, row in outcome_df.iterrows():
-            if row["变量"] == "is_fall_narrow":
+            if row["变量"] == "is_fall":
                 strict_fall_n = int(row["例数"])
 
     if not exposure_df.empty:
@@ -561,7 +561,7 @@ def build_descriptive_report(case_file: Path, output_dir: Path | None = None) ->
     age_group_df = _series_distribution(df, "age_group", len(df))
     sex_df = _series_distribution(df, "sex_clean", len(df))
     serious_df = _available_bool_distribution(df, ["serious", "is_serious_any"], len(df))
-    outcome_df = _bool_distribution(df, ["is_fall_narrow"], len(df))
+    outcome_df = _bool_distribution(df, ["is_fall"], len(df))
     exposure_df = _bool_distribution(
         df,
         [
@@ -591,16 +591,16 @@ def build_descriptive_report(case_file: Path, output_dir: Path | None = None) ->
     )
     crosstab_df = pd.concat(
         [
-            _exposure_outcome_crosstab(df, "is_zolpidem", ["is_fall_narrow"]),
+            _exposure_outcome_crosstab(df, "is_zolpidem", ["is_fall"]),
             _exposure_outcome_crosstab(
                 df,
                 "is_zolpidem_suspect",
-                ["is_fall_narrow"],
+                ["is_fall"],
             ),
             _exposure_outcome_crosstab(
                 df,
                 "is_zolpidem_suspect_ps",
-                ["is_fall_narrow"],
+                ["is_fall"],
             ),
         ],
         ignore_index=True,

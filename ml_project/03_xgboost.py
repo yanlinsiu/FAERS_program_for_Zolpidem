@@ -10,7 +10,9 @@ from ml_common import (
     add_common_arguments,
     config_from_args,
     get_feature_names,
+    print_run_summary,
     run_model_experiment,
+    save_interpretation_summary,
     save_model_card,
     summarize_importance_highlights,
 )
@@ -104,20 +106,36 @@ def main() -> None:
         result.run_dir / "feature_importance.csv", index=False, encoding="utf-8-sig"
     )
 
+    feature_highlights = summarize_importance_highlights(
+        importances_df,
+        feature_col="feature",
+        score_col="importance",
+    )
     save_model_card(
         output_path=result.run_dir / "model_card.md",
         display_name=DISPLAY_NAME,
         model_name=MODEL_NAME,
         result=result,
-        feature_highlights=summarize_importance_highlights(
-            importances_df,
-            feature_col="feature",
-            score_col="importance",
-        ),
+        feature_highlights=feature_highlights,
         notes=[
             "XGBoost is the strongest nonlinear benchmark in this repository, but it remains an auxiliary model.",
             "The positive-class weight is derived from the training period only, so tuning stays leakage-safe.",
         ],
+    )
+    save_interpretation_summary(
+        output_path=result.run_dir / "interpretation_summary.md",
+        display_name=DISPLAY_NAME,
+        model_name=MODEL_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
+        notes=[
+            "XGBoost importance is a model-internal ranking and should be checked alongside the Logistic Regression coefficients.",
+        ],
+    )
+    print_run_summary(
+        display_name=DISPLAY_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
     )
 
     print(f"Saved XGBoost outputs to: {result.run_dir}")

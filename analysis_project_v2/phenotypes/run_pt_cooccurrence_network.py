@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import itertools
@@ -59,7 +59,7 @@ def _load_signal_cohort(signal_file: Path, cohort: str) -> pd.DataFrame:
         "is_zolpidem_suspect_ps",
         "suspect_role_any",
         "suspect_role_any_ps",
-        "is_fall_narrow",
+        "is_fall",
     ]:
         if col in signal.columns:
             signal[col] = signal[col].fillna(False).astype(bool)
@@ -69,7 +69,7 @@ def _load_signal_cohort(signal_file: Path, cohort: str) -> pd.DataFrame:
             signal["is_zolpidem_suspect"]
             & signal["suspect_role_any"]
             & signal["target_drug_group"].ne("both_zolpidem_and_other_zdrug")
-            & signal["is_fall_narrow"]
+            & signal["is_fall"]
         )
     elif cohort == "zolpidem_ps_ss_all":
         mask = (
@@ -82,7 +82,7 @@ def _load_signal_cohort(signal_file: Path, cohort: str) -> pd.DataFrame:
             signal["is_zolpidem_suspect_ps"]
             & signal["suspect_role_any_ps"]
             & signal["target_drug_group_ps"].ne("both_zolpidem_and_other_zdrug")
-            & signal["is_fall_narrow"]
+            & signal["is_fall"]
         )
     else:
         raise ValueError(f"Unsupported cohort: {cohort}")
@@ -764,3 +764,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

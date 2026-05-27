@@ -268,7 +268,7 @@ def build_country_fall_distribution(
     end_year: int = 2025,
     min_age: float = 65,
     age_operator: str = ">=",
-    fall_column: str = "is_fall_narrow",
+    fall_column: str = "is_fall",
     country_column: str = "reporter_country",
     top_n: int = 10,
     include_other: bool = True,
@@ -362,8 +362,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--age-operator", choices=[">", ">="], default=">=")
     parser.add_argument(
         "--fall-column",
-        choices=["is_fall_narrow"],
-        default="is_fall_narrow",
+        choices=["is_fall"],
+        default="is_fall",
     )
     parser.add_argument(
         "--country-column",

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 from pathlib import Path
@@ -23,7 +23,7 @@ from feature_v2_common import (
 )
 
 
-LEAKAGE_COLUMNS = {"fall_pt_list", "fall_narrow_pt_count"}
+LEAKAGE_COLUMNS = {"fall_pt_list", "fall_pt_count"}
 
 
 def _feature_paths(prefix: str, start_year: int, end_year: int) -> list[Path]:
@@ -52,7 +52,14 @@ def build_ml_feature_v2(start_year: int, end_year: int) -> pd.DataFrame:
 
     signal_df = pd.read_parquet(signal_file)
     signal_df["caseid"] = clean_caseid(signal_df["caseid"])
-    signal_df = signal_df.drop(columns=[col for col in LEAKAGE_COLUMNS if col in signal_df.columns])
+    stale_fall_cols = {
+        col
+        for col in signal_df.columns
+        if col.startswith("is_fall_") or (col.startswith("fall_") and col not in LEAKAGE_COLUMNS)
+    }
+    signal_df = signal_df.drop(
+        columns=[col for col in LEAKAGE_COLUMNS | stale_fall_cols if col in signal_df.columns]
+    )
     signal_df = signal_df.drop_duplicates(subset="caseid", keep="last")
 
     drug_feature_df = pd.read_parquet(drug_feature_file)
@@ -127,3 +134,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -1,11 +1,13 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import os
 import sys
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Callable, Literal
 
 import numpy as np
@@ -52,7 +54,7 @@ GLOBAL_DATASET_DIR = Path(
 OUTPUT_ML_ROOT = Path(os.environ.get("FAERS_ML_OUTPUT_ROOT", PROJECT_ROOT / "OUTPUT_ML"))
 FEATURE_V2_DATASET_DIR = OUTPUT_ML_ROOT / "features_v2" / "datasets"
 
-TARGET_OPTIONS = ("is_fall_narrow", "serious")
+TARGET_OPTIONS = ("is_fall", "serious")
 SEARCH_MODES = ("none", "fast", "full")
 COHORT_OPTIONS = ("all", "zolpidem", "zdrug")
 FEATURE_VERSION_OPTIONS = ("v1", "v2")
@@ -209,6 +211,58 @@ def log_step(message: str) -> None:
     print(f"[ml] {message}", flush=True)
 
 
+def format_duration(seconds: float) -> str:
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    minutes, remaining_seconds = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{int(minutes)}m {remaining_seconds:.1f}s"
+    hours, remaining_minutes = divmod(minutes, 60)
+    return f"{int(hours)}h {int(remaining_minutes)}m {remaining_seconds:.1f}s"
+
+
+@contextmanager
+def timed_step(message: str):
+    start = perf_counter()
+    log_step(f"{message} ...")
+    try:
+        yield
+    except Exception:
+        log_step(f"{message} failed after {format_duration(perf_counter() - start)}")
+        raise
+    else:
+        log_step(f"{message} done in {format_duration(perf_counter() - start)}")
+
+
+def format_metric(value: Any, digits: int = 4) -> str:
+    if value is None:
+        return "NA"
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if not np.isfinite(numeric_value):
+        return "NA"
+    return f"{numeric_value:.{digits}f}"
+
+
+def _positive_summary(df: pd.DataFrame, target_col: str) -> tuple[int, float]:
+    positives = int(df[target_col].astype(int).sum())
+    rate = float(df[target_col].astype(int).mean()) if len(df) else 0.0
+    return positives, rate
+
+
+def log_frame_summary(label: str, df: pd.DataFrame, target_col: str) -> None:
+    positives, rate = _positive_summary(df, target_col)
+    year_text = ""
+    if "year" in df.columns and not df.empty:
+        year_text = f", years={int(df['year'].min())}-{int(df['year'].max())}"
+    log_step(
+        f"{label}: rows={len(df):,}, positives={positives:,}, "
+        f"positive_rate={rate:.4%}{year_text}"
+    )
+
+
 def add_common_arguments(
     parser: Any,
     *,
@@ -222,9 +276,11 @@ def add_common_arguments(
     )
     parser.add_argument(
         "--target-col",
-        default="is_fall_narrow",
+        default="is_fall",
         choices=TARGET_OPTIONS,
-        help="Target column to predict.",
+        help=(
+            "Target column to predict. is_fall means FAERS PT is FALL or DROP ATTACKS."
+        ),
     )
     parser.add_argument(
         "--feature-version",
@@ -468,7 +524,7 @@ def load_modeling_frame_v2(bundle: DatasetBundle, target_col: str, cohort: str) 
     if target_col not in df.columns:
         raise ValueError(f"ML-v2 feature dataset missing target column: {target_col}")
 
-    leakage_cols = {"fall_pt_list", "fall_narrow_pt_count"}
+    leakage_cols = {"fall_pt_list", "fall_pt_count"}
     present_leakage = sorted(leakage_cols & set(df.columns))
     if present_leakage:
         raise ValueError(f"ML-v2 feature dataset contains leakage columns: {present_leakage}")
@@ -1248,84 +1304,102 @@ def run_model_experiment(
     estimator_factory: Callable[[pd.DataFrame, ExperimentConfig], BaseEstimator],
     search_spec: SearchSpec,
 ) -> ExperimentResult:
+    experiment_start = perf_counter()
     log_step(
-        "Resolving dataset bundle for "
-        f"period token: {config.period_token or 'latest'}, feature_version={config.feature_version}"
+        "Experiment config: "
+        f"model={display_name}, target={config.target_col}, "
+        f"feature_version={config.feature_version}, cohort={config.cohort}, "
+        f"train<= {config.train_end_year}, valid={config.valid_year}, "
+        f"test={config.test_year}, search={config.search_mode}, "
+        f"train_sample_n={config.train_sample_n}"
     )
-    bundle = resolve_dataset_bundle(
-        period_token=config.period_token,
-        feature_version=config.feature_version,
-    )
-    modeling_df = load_modeling_frame(
-        bundle=bundle,
-        target_col=config.target_col,
-        cohort=config.cohort,
-    )
-    splits = temporal_split(
-        modeling_df,
-        train_end_year=config.train_end_year,
-        valid_year=config.valid_year,
-        test_year=config.test_year,
-    )
+    with timed_step("Resolve dataset bundle"):
+        bundle = resolve_dataset_bundle(
+            period_token=config.period_token,
+            feature_version=config.feature_version,
+        )
+    with timed_step("Load modeling frame"):
+        modeling_df = load_modeling_frame(
+            bundle=bundle,
+            target_col=config.target_col,
+            cohort=config.cohort,
+        )
+    log_frame_summary("Modeling frame", modeling_df, config.target_col)
+    with timed_step("Temporal split"):
+        splits = temporal_split(
+            modeling_df,
+            train_end_year=config.train_end_year,
+            valid_year=config.valid_year,
+            test_year=config.test_year,
+        )
 
     train_full_df = splits["train"]
-    train_df = sample_training_frame(
-        train_full_df,
-        target_col=config.target_col,
-        sample_n=config.train_sample_n,
-        random_state=config.random_state,
-    )
     valid_df = splits["valid"]
     test_df = splits["test"]
+    log_frame_summary("Train full", train_full_df, config.target_col)
+    log_frame_summary("Validation", valid_df, config.target_col)
+    log_frame_summary("Test", test_df, config.target_col)
+
+    with timed_step("Sample training frame"):
+        train_df = sample_training_frame(
+            train_full_df,
+            target_col=config.target_col,
+            sample_n=config.train_sample_n,
+            random_state=config.random_state,
+        )
+    log_frame_summary("Train used", train_df, config.target_col)
 
     pipeline = build_pipeline(estimator_factory(train_df, config))
-    fitted_pipeline, search_summary, search_results_df = _fit_search(
-        pipeline=pipeline,
-        train_df=train_df,
-        target_col=config.target_col,
-        search_spec=search_spec,
-        search_mode=config.search_mode,
-        cv_folds=config.cv_folds,
-        random_state=config.random_state,
-    )
+    with timed_step("Fit model and tune hyperparameters"):
+        fitted_pipeline, search_summary, search_results_df = _fit_search(
+            pipeline=pipeline,
+            train_df=train_df,
+            target_col=config.target_col,
+            search_spec=search_spec,
+            search_mode=config.search_mode,
+            cv_folds=config.cv_folds,
+            random_state=config.random_state,
+        )
 
-    cv_metrics_df = run_cross_validation_pipeline(
-        pipeline=fitted_pipeline,
-        train_df=train_df,
-        target_col=config.target_col,
-        n_splits=config.cv_folds,
-        random_state=config.random_state,
-    )
+    with timed_step("Run post-search cross-validation"):
+        cv_metrics_df = run_cross_validation_pipeline(
+            pipeline=fitted_pipeline,
+            train_df=train_df,
+            target_col=config.target_col,
+            n_splits=config.cv_folds,
+            random_state=config.random_state,
+        )
     cv_summary = summarize_cv_metrics(cv_metrics_df)
 
-    valid_raw_scores = fitted_pipeline.predict_proba(valid_df[MODEL_FEATURES])[:, 1]
-    test_raw_scores = fitted_pipeline.predict_proba(test_df[MODEL_FEATURES])[:, 1]
-    log_step("Validation and test probabilities generated")
+    with timed_step("Generate validation and test probabilities"):
+        valid_raw_scores = fitted_pipeline.predict_proba(valid_df[MODEL_FEATURES])[:, 1]
+        test_raw_scores = fitted_pipeline.predict_proba(test_df[MODEL_FEATURES])[:, 1]
 
-    calibrator = fit_platt_calibrator(
-        valid_df[config.target_col], valid_raw_scores, config.random_state
-    )
-    valid_scores = apply_platt_calibrator(calibrator, valid_raw_scores)
-    test_scores = apply_platt_calibrator(calibrator, test_raw_scores)
-    log_step("Probability calibration completed with Platt scaling")
+    with timed_step("Calibrate probabilities with Platt scaling"):
+        calibrator = fit_platt_calibrator(
+            valid_df[config.target_col], valid_raw_scores, config.random_state
+        )
+        valid_scores = apply_platt_calibrator(calibrator, valid_raw_scores)
+        test_scores = apply_platt_calibrator(calibrator, test_raw_scores)
 
-    threshold_selection = select_threshold_by_youden(
-        valid_df[config.target_col], valid_scores
-    )
-    threshold = threshold_selection["threshold"]
+    with timed_step("Select threshold and evaluate metrics"):
+        threshold_selection = select_threshold_by_youden(
+            valid_df[config.target_col], valid_scores
+        )
+        threshold = threshold_selection["threshold"]
 
-    validation_metrics = evaluate_predictions(
-        valid_df[config.target_col], valid_scores, threshold=threshold
-    )
-    test_metrics = evaluate_predictions(
-        test_df[config.target_col], test_scores, threshold=threshold
-    )
-    validation_metrics_raw = evaluate_predictions(
-        valid_df[config.target_col], valid_raw_scores, threshold=0.5
-    )
-    test_metrics_raw = evaluate_predictions(
-        test_df[config.target_col], test_raw_scores, threshold=0.5
-    )
+        validation_metrics = evaluate_predictions(
+            valid_df[config.target_col], valid_scores, threshold=threshold
+        )
+        test_metrics = evaluate_predictions(
+            test_df[config.target_col], test_scores, threshold=threshold
+        )
+        validation_metrics_raw = evaluate_predictions(
+            valid_df[config.target_col], valid_raw_scores, threshold=0.5
+        )
+        test_metrics_raw = evaluate_predictions(
+            test_df[config.target_col], test_raw_scores, threshold=0.5
+        )
 
     run_dir = make_run_dir(
         model_name=model_name,
@@ -1336,21 +1410,22 @@ def run_model_experiment(
     )
     log_step(f"Writing outputs to {run_dir}")
 
-    valid_roc_df = build_roc_table(valid_df[config.target_col], valid_scores)
-    test_roc_df = build_roc_table(test_df[config.target_col], test_scores)
-    valid_calibration_df = build_calibration_table(
-        valid_df[config.target_col], valid_scores
-    )
-    test_calibration_df = build_calibration_table(
-        test_df[config.target_col], test_scores
-    )
-    bootstrap_df = bootstrap_metric_intervals(
-        test_df[config.target_col],
-        test_scores,
-        threshold=threshold,
-        n_bootstrap=config.bootstrap_iterations,
-        random_state=config.random_state,
-    )
+    with timed_step("Build ROC, calibration, and bootstrap tables"):
+        valid_roc_df = build_roc_table(valid_df[config.target_col], valid_scores)
+        test_roc_df = build_roc_table(test_df[config.target_col], test_scores)
+        valid_calibration_df = build_calibration_table(
+            valid_df[config.target_col], valid_scores
+        )
+        test_calibration_df = build_calibration_table(
+            test_df[config.target_col], test_scores
+        )
+        bootstrap_df = bootstrap_metric_intervals(
+            test_df[config.target_col],
+            test_scores,
+            threshold=threshold,
+            n_bootstrap=config.bootstrap_iterations,
+            random_state=config.random_state,
+        )
 
     result = ExperimentResult(
         config=config,
@@ -1376,63 +1451,68 @@ def run_model_experiment(
         test_scores=test_scores,
     )
 
-    cv_metrics_df.to_csv(run_dir / "cv_metrics.csv", index=False, encoding="utf-8-sig")
-    if search_results_df is not None:
-        search_results_df.to_csv(
-            run_dir / "search_results.csv", index=False, encoding="utf-8-sig"
+    with timed_step("Save core output files"):
+        cv_metrics_df.to_csv(
+            run_dir / "cv_metrics.csv", index=False, encoding="utf-8-sig"
         )
-    save_json(
-        run_dir / "best_params.json",
-        _build_search_payload(result, model_name=model_name, display_name=display_name),
-    )
-    save_json(
-        run_dir / "metrics.json",
-        _build_metrics_payload(result, model_name=model_name, display_name=display_name),
-    )
-    save_split_summary(
-        {
-            "train_full": train_full_df,
-            "train_sampled": train_df,
-            "valid": valid_df,
-            "test": test_df,
-        },
-        target_col=config.target_col,
-        output_path=run_dir / "split_summary.csv",
-    )
-    save_prediction_table(
-        valid_df,
-        config.target_col,
-        valid_raw_scores,
-        valid_scores,
-        threshold,
-        run_dir / "validation_predictions.csv",
-    )
-    save_prediction_table(
-        test_df,
-        config.target_col,
-        test_raw_scores,
-        test_scores,
-        threshold,
-        run_dir / "test_predictions.csv",
-    )
-    valid_roc_df.to_csv(
-        run_dir / "validation_roc_curve.csv", index=False, encoding="utf-8-sig"
-    )
-    test_roc_df.to_csv(
-        run_dir / "test_roc_curve.csv", index=False, encoding="utf-8-sig"
-    )
-    valid_calibration_df.to_csv(
-        run_dir / "validation_calibration_curve.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
-    test_calibration_df.to_csv(
-        run_dir / "test_calibration_curve.csv", index=False, encoding="utf-8-sig"
-    )
-    bootstrap_df.to_csv(
-        run_dir / "test_bootstrap_metrics.csv", index=False, encoding="utf-8-sig"
-    )
-    log_step("All outputs saved")
+        if search_results_df is not None:
+            search_results_df.to_csv(
+                run_dir / "search_results.csv", index=False, encoding="utf-8-sig"
+            )
+        save_json(
+            run_dir / "best_params.json",
+            _build_search_payload(result, model_name=model_name, display_name=display_name),
+        )
+        save_json(
+            run_dir / "metrics.json",
+            _build_metrics_payload(
+                result, model_name=model_name, display_name=display_name
+            ),
+        )
+        save_split_summary(
+            {
+                "train_full": train_full_df,
+                "train_sampled": train_df,
+                "valid": valid_df,
+                "test": test_df,
+            },
+            target_col=config.target_col,
+            output_path=run_dir / "split_summary.csv",
+        )
+        save_prediction_table(
+            valid_df,
+            config.target_col,
+            valid_raw_scores,
+            valid_scores,
+            threshold,
+            run_dir / "validation_predictions.csv",
+        )
+        save_prediction_table(
+            test_df,
+            config.target_col,
+            test_raw_scores,
+            test_scores,
+            threshold,
+            run_dir / "test_predictions.csv",
+        )
+        valid_roc_df.to_csv(
+            run_dir / "validation_roc_curve.csv", index=False, encoding="utf-8-sig"
+        )
+        test_roc_df.to_csv(
+            run_dir / "test_roc_curve.csv", index=False, encoding="utf-8-sig"
+        )
+        valid_calibration_df.to_csv(
+            run_dir / "validation_calibration_curve.csv",
+            index=False,
+            encoding="utf-8-sig",
+        )
+        test_calibration_df.to_csv(
+            run_dir / "test_calibration_curve.csv", index=False, encoding="utf-8-sig"
+        )
+        bootstrap_df.to_csv(
+            run_dir / "test_bootstrap_metrics.csv", index=False, encoding="utf-8-sig"
+        )
+    log_step(f"Core outputs saved; experiment runtime={format_duration(perf_counter() - experiment_start)}")
     return result
 
 
@@ -1463,6 +1543,105 @@ def summarize_logistic_highlights(coefficients_df: pd.DataFrame, top_n: int = 5)
             f"Negative association: {row['feature']} coefficient={row['coefficient']:.4f}, odds_ratio={row['odds_ratio']:.4f}"
         )
     return highlights
+
+
+def _compact_metrics(metrics: dict[str, Any]) -> str:
+    return (
+        f"AP={format_metric(metrics.get('average_precision'))}, "
+        f"ROC-AUC={format_metric(metrics.get('roc_auc'))}, "
+        f"Brier={format_metric(metrics.get('brier_score'))}, "
+        f"Recall={format_metric(metrics.get('recall'))}, "
+        f"Precision={format_metric(metrics.get('precision'))}"
+    )
+
+
+def save_interpretation_summary(
+    *,
+    output_path: Path,
+    display_name: str,
+    model_name: str,
+    result: ExperimentResult,
+    feature_highlights: list[str],
+    notes: list[str] | None = None,
+) -> None:
+    notes = notes or []
+    best_params = result.search_summary.get("best_params", {})
+    best_params_lines = json.dumps(best_params, ensure_ascii=False, indent=2)
+    lines = [
+        f"# {display_name} interpretation summary",
+        "",
+        "## Run snapshot",
+        f"- Model: `{model_name}`",
+        f"- Target: `{result.config.target_col}`",
+        f"- Feature version: `{result.config.feature_version}`",
+        f"- Cohort: `{result.config.cohort}`",
+        f"- Period token: `{result.bundle.period_token}`",
+        f"- Output directory: `{result.run_dir}`",
+        "",
+        "## Data split",
+        f"- Train used: `{len(result.train_df):,}` rows",
+        f"- Validation: `{len(result.valid_df):,}` rows",
+        f"- Test: `{len(result.test_df):,}` rows",
+        "",
+        "## Selected threshold",
+        f"- Threshold: `{format_metric(result.threshold_selection['threshold'])}`",
+        f"- Validation Youden index: `{format_metric(result.threshold_selection['youden_index'])}`",
+        "",
+        "## Final metrics",
+        f"- Validation: {_compact_metrics(result.validation_metrics)}",
+        f"- Test: {_compact_metrics(result.test_metrics)}",
+        "",
+        "## Best tuning parameters",
+        "```json",
+        best_params_lines,
+        "```",
+        "",
+        "## Main feature signals",
+    ]
+    lines.extend(f"- {highlight}" for highlight in feature_highlights)
+    lines.extend(
+        [
+            "",
+            "## Plain-language caution",
+            "- These are prediction signals from FAERS reporting patterns, not causal effects.",
+            "- Use them as a ranking and explanation layer, then interpret with the main signal analysis.",
+        ]
+    )
+    if notes:
+        lines.extend(["", "## Notes"])
+        lines.extend(f"- {note}" for note in notes)
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def print_run_summary(
+    *,
+    display_name: str,
+    result: ExperimentResult,
+    feature_highlights: list[str],
+    top_n: int = 6,
+) -> None:
+    print("", flush=True)
+    print("=== ML run summary ===", flush=True)
+    print(
+        f"Model: {display_name} | target={result.config.target_col} | "
+        f"features={result.config.feature_version} | cohort={result.config.cohort}",
+        flush=True,
+    )
+    print(f"Output: {result.run_dir}", flush=True)
+    print(f"Train used: {len(result.train_df):,} rows", flush=True)
+    print(f"Validation: {_compact_metrics(result.validation_metrics)}", flush=True)
+    print(f"Test: {_compact_metrics(result.test_metrics)}", flush=True)
+    print(
+        "Threshold: "
+        f"{format_metric(result.threshold_selection['threshold'])} "
+        f"(validation Youden={format_metric(result.threshold_selection['youden_index'])})",
+        flush=True,
+    )
+    print("Main feature signals:", flush=True)
+    for highlight in feature_highlights[:top_n]:
+        print(f"- {highlight}", flush=True)
+    print("Files: metrics.json, model_card.md, interpretation_summary.md", flush=True)
+    print("======================", flush=True)
 
 
 def save_model_card(
@@ -1535,3 +1714,4 @@ def save_model_card(
         lines.extend(f"- {note}" for note in notes)
 
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+

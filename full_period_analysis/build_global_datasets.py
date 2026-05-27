@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import re
@@ -238,7 +238,7 @@ def write_outputs(
             UNION ALL
             SELECT 'feature_dataset_cases', COUNT(*)::BIGINT FROM feature_global
             UNION ALL
-            SELECT 'strict_fall_cases', SUM(CASE WHEN is_fall_narrow THEN 1 ELSE 0 END)::BIGINT FROM signal_global
+            SELECT 'strict_fall_cases', SUM(CASE WHEN is_fall THEN 1 ELSE 0 END)::BIGINT FROM signal_global
             UNION ALL
             SELECT 'suspect_any_cases_ps_ss', SUM(CASE WHEN suspect_role_any THEN 1 ELSE 0 END)::BIGINT FROM signal_global
             UNION ALL
@@ -375,3 +375,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

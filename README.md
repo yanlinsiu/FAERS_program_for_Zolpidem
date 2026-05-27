@@ -182,7 +182,7 @@ python run_all.py --period-token 2004_2025
 4. `drug_exposure_processor.py`
    基于 `role_cod` 定义研究暴露，区分 `PS + SS` 与 `PS only`。
 5. `reac_processor.py`
-   从 `REAC` 构建 OCMQ 兼容的狭义跌倒结局。
+   从 `REAC` 构建严格 PT 定义的跌倒结局：`FALL` 或 `DROP ATTACKS`。
 6. `outc_processor.py`
    从 `OUTC` 构建死亡、住院、危及生命等严重结局变量。
 7. `case_dataset_processor.py`
@@ -267,7 +267,7 @@ python run_all.py --period-token 2004_2025
 - 默认保留性别为 `M / F` 的病例
 - 主分析暴露定义为 `PS + SS`
 - 敏感性分析暴露定义为 `PS only`
-- 正式分析默认使用 OCMQ 兼容的狭义跌倒结局 `is_fall_narrow`
+- 正式分析默认使用严格 PT 定义的跌倒结局 `is_fall`，仅命中 `FALL` 或 `DROP ATTACKS`
 - 多重用药常用阈值为 `distinct_drug_n >= 5`
 
 这些属于研究口径的一部分，若后续调整代码逻辑，建议同步更新文档与分析解释。

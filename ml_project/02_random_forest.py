@@ -11,7 +11,9 @@ from ml_common import (
     add_common_arguments,
     config_from_args,
     get_feature_names,
+    print_run_summary,
     run_model_experiment,
+    save_interpretation_summary,
     save_model_card,
     summarize_importance_highlights,
 )
@@ -25,17 +27,17 @@ SEARCH_SPEC = SearchSpec(
     param_space_by_mode={
         "fast": {
             "model__n_estimators": [200],
-            "model__max_depth": [8, 12],
+            "model__max_depth": [8, 12, 16],
             "model__min_samples_leaf": [20, 50],
             "model__max_features": ["sqrt"],
             "model__class_weight": ["balanced_subsample"],
         },
         "full": {
-            "model__n_estimators": [200, 400],
-            "model__max_depth": [None, 8, 12],
+            "model__n_estimators": [200, 300],
+            "model__max_depth": [8, 12, 16],
             "model__min_samples_leaf": [10, 20, 50],
             "model__max_features": ["sqrt", 0.5],
-            "model__class_weight": ["balanced", "balanced_subsample"],
+            "model__class_weight": ["balanced_subsample"],
         },
     },
 )
@@ -43,6 +45,11 @@ SEARCH_SPEC = SearchSpec(
 
 def build_estimator(_: pd.DataFrame, config: ExperimentConfig) -> RandomForestClassifier:
     return RandomForestClassifier(
+        n_estimators=200,
+        max_depth=12,
+        min_samples_leaf=20,
+        max_features="sqrt",
+        class_weight="balanced_subsample",
         n_jobs=-1,
         random_state=config.random_state,
     )
@@ -78,20 +85,36 @@ def main() -> None:
         result.run_dir / "feature_importance.csv", index=False, encoding="utf-8-sig"
     )
 
+    feature_highlights = summarize_importance_highlights(
+        importances_df,
+        feature_col="feature",
+        score_col="importance",
+    )
     save_model_card(
         output_path=result.run_dir / "model_card.md",
         display_name=DISPLAY_NAME,
         model_name=MODEL_NAME,
         result=result,
-        feature_highlights=summarize_importance_highlights(
-            importances_df,
-            feature_col="feature",
-            score_col="importance",
-        ),
+        feature_highlights=feature_highlights,
         notes=[
             "Random Forest is used as a nonlinear benchmark against the main logistic regression model.",
             "Feature importance here is impurity-based and should be read as a rough ranking, not a causal explanation.",
         ],
+    )
+    save_interpretation_summary(
+        output_path=result.run_dir / "interpretation_summary.md",
+        display_name=DISPLAY_NAME,
+        model_name=MODEL_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
+        notes=[
+            "Random Forest importance is useful for rough ranking, but correlated features can split importance between each other.",
+        ],
+    )
+    print_run_summary(
+        display_name=DISPLAY_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
     )
 
     print(f"Saved Random Forest outputs to: {result.run_dir}")

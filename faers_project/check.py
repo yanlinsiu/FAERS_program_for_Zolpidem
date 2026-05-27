@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 from pathlib import Path
@@ -34,7 +34,7 @@ def inspect_case_dataset(case_file: Path, head: int = 5) -> dict[str, object]:
         "rows": int(len(df)),
         "columns": list(df.columns),
         "head": df.head(int(head)),
-        "n_fall_narrow": _bool_count(df, "is_fall_narrow"),
+        "n_fall": _bool_count(df, "is_fall"),
         "n_zolpidem_any": _bool_count(df, "is_zolpidem"),
         "n_zolpidem_suspect": _bool_count(df, "is_zolpidem_suspect"),
         "n_polypharmacy": _bool_count(df, "polypharmacy"),
@@ -69,7 +69,7 @@ def main() -> None:
     print("")
     print("Key counts:")
     for key in [
-        "n_fall_narrow",
+        "n_fall",
         "n_zolpidem_any",
         "n_zolpidem_suspect",
         "n_polypharmacy",
@@ -79,3 +79,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 from pathlib import Path
@@ -47,7 +47,7 @@ def _load_analysis_frame(period_token: str) -> tuple[pd.DataFrame, pd.DataFrame]
     df = signal.merge(phenotype, on="caseid", how="left")
     for col in PHENOTYPE_COLUMNS:
         df[col] = df[col].fillna(False).astype(bool)
-    for col in ["is_fall_narrow", "is_zolpidem_suspect", "suspect_role_any"]:
+    for col in ["is_fall", "is_zolpidem_suspect", "suspect_role_any"]:
         df[col] = df[col].fillna(False).astype(bool)
     return df, dictionary
 
@@ -58,7 +58,7 @@ def build_descriptive_spectrum(df: pd.DataFrame, dictionary: pd.DataFrame) -> pd
         & df["suspect_role_any"]
         & df["target_drug_group"].ne("both_zolpidem_and_other_zdrug")
     ].copy()
-    zolpidem_fall = zolpidem[zolpidem["is_fall_narrow"]].copy()
+    zolpidem_fall = zolpidem[zolpidem["is_fall"]].copy()
     cohorts = (
         ("zolpidem_ps_ss_all", zolpidem),
         ("zolpidem_ps_ss_strict_fall", zolpidem_fall),
@@ -91,7 +91,7 @@ def build_within_zolpidem_fall_comparison(
         & df["target_drug_group"].ne("both_zolpidem_and_other_zdrug")
     ].copy()
     rows: list[dict[str, Any]] = []
-    outcome = zolpidem["is_fall_narrow"]
+    outcome = zolpidem["is_fall"]
     for col in PHENOTYPE_COLUMNS:
         if col == "pheno_fall_event":
             continue
@@ -157,3 +157,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -12,7 +12,9 @@ from ml_common import (
     add_common_arguments,
     config_from_args,
     get_feature_names,
+    print_run_summary,
     run_model_experiment,
+    save_interpretation_summary,
     save_model_card,
     summarize_logistic_highlights,
 )
@@ -26,6 +28,7 @@ SEARCH_SPEC = SearchSpec(
     param_space_by_mode={
         "fast": [
             {
+                "model__l1_ratio": [0.0],
                 "model__C": [0.03, 0.1, 0.3, 1.0, 3.0, 10.0],
                 "model__class_weight": [None],
             },
@@ -86,16 +89,33 @@ def main() -> None:
         "odds_ratio", ascending=False
     ).to_csv(result.run_dir / "odds_ratios.csv", index=False, encoding="utf-8-sig")
 
+    feature_highlights = summarize_logistic_highlights(coefficients_df)
     save_model_card(
         output_path=result.run_dir / "model_card.md",
         display_name=DISPLAY_NAME,
         model_name=MODEL_NAME,
         result=result,
-        feature_highlights=summarize_logistic_highlights(coefficients_df),
+        feature_highlights=feature_highlights,
         notes=[
             "Logistic regression is the main narrative model because it is easier to explain in a research report.",
             "Odds ratios here come from model coefficients and should be interpreted as predictive associations only.",
         ],
+    )
+    save_interpretation_summary(
+        output_path=result.run_dir / "interpretation_summary.md",
+        display_name=DISPLAY_NAME,
+        model_name=MODEL_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
+        notes=[
+            "Positive coefficients mean the model gives higher predicted probability when that encoded feature is present or larger.",
+            "Negative coefficients mean the model gives lower predicted probability in the same predictive sense.",
+        ],
+    )
+    print_run_summary(
+        display_name=DISPLAY_NAME,
+        result=result,
+        feature_highlights=feature_highlights,
     )
 
     print(f"Saved Logistic Regression outputs to: {result.run_dir}")

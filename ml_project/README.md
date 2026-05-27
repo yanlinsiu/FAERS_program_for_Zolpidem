@@ -51,7 +51,7 @@ v1 使用固定的结构化特征：
 明确不纳入：
 
 - `fall_pt_list`
-- `fall_narrow_pt_count`
+- `fall_pt_count`
 - 任何直接 outcome 派生字段
 
 ## 时间切分
