@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -35,6 +36,16 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from common.datasets import (
+    DatasetBundle,
+    extract_token,
+    resolve_signal_feature_bundle,
+    token_sort_key,
+)
+
 GLOBAL_DATASET_DIR = Path(
     os.environ.get("FAERS_GLOBAL_DATASET_DIR", PROJECT_ROOT / "OUTPUT_GLOBAL" / "datasets")
 )
@@ -144,14 +155,6 @@ EVALUATION_METRICS = [
     "f1",
     "specificity",
 ]
-
-
-@dataclass(frozen=True)
-class DatasetBundle:
-    period_token: str
-    signal_file: Path
-    feature_file: Path
-    feature_version: str = "v1"
 
 
 @dataclass(frozen=True)
@@ -305,27 +308,6 @@ def config_from_args(args: Any) -> ExperimentConfig:
     )
 
 
-def _extract_token(path: Path, prefix: str, suffix: str = "") -> str:
-    stem = path.stem
-    if not stem.startswith(prefix):
-        raise ValueError(f"Unexpected dataset file name: {path.name}")
-    token = stem[len(prefix) :]
-    if suffix:
-        if not token.endswith(suffix):
-            raise ValueError(f"Unexpected dataset file name: {path.name}")
-        token = token[: -len(suffix)]
-    return token
-
-
-def _token_sort_key(token: str) -> tuple[int, int, int, str]:
-    parts = token.split("_")
-    if len(parts) == 2 and all(part.isdigit() for part in parts):
-        start_year = int(parts[0])
-        end_year = int(parts[1])
-        return (end_year - start_year, end_year, -start_year, token)
-    return (0, 0, 0, token)
-
-
 def resolve_dataset_bundle(
     dataset_dir: Path = GLOBAL_DATASET_DIR,
     period_token: str | None = None,
@@ -339,9 +321,9 @@ def resolve_dataset_bundle(
                 "Run ml_project/features_v2/07_build_ml_feature_v2.py first."
             )
         feature_by_token = {
-            _extract_token(path, "ml_feature_v2_"): path for path in feature_files
+            extract_token(path, "ml_feature_v2_"): path for path in feature_files
         }
-        selected_token = period_token or max(feature_by_token, key=_token_sort_key)
+        selected_token = period_token or max(feature_by_token, key=token_sort_key)
         if selected_token not in feature_by_token:
             raise FileNotFoundError(
                 f"ML-v2 period token not found in {FEATURE_V2_DATASET_DIR}: {selected_token}"
@@ -354,35 +336,9 @@ def resolve_dataset_bundle(
             feature_version="v2",
         )
 
-    signal_files = sorted(dataset_dir.glob("signal_dataset_*.parquet"))
-    feature_files = sorted(dataset_dir.glob("drug_feature_*_case.parquet"))
-
-    if not signal_files:
-        raise FileNotFoundError(f"No signal dataset found in {dataset_dir}")
-    if not feature_files:
-        raise FileNotFoundError(f"No feature dataset found in {dataset_dir}")
-
-    signal_by_token = {
-        _extract_token(path, "signal_dataset_"): path for path in signal_files
-    }
-    feature_by_token = {
-        _extract_token(path, "drug_feature_", "_case"): path for path in feature_files
-    }
-    shared_tokens = sorted(set(signal_by_token) & set(feature_by_token))
-    if not shared_tokens:
-        raise RuntimeError(f"No matching signal/feature bundle found in {dataset_dir}")
-
-    selected_token = period_token or max(shared_tokens, key=_token_sort_key)
-    if selected_token not in signal_by_token or selected_token not in feature_by_token:
-        raise FileNotFoundError(
-            f"Period token not found in {dataset_dir}: {selected_token}"
-        )
-
-    return DatasetBundle(
-        period_token=selected_token,
-        signal_file=signal_by_token[selected_token],
-        feature_file=feature_by_token[selected_token],
-        feature_version="v1",
+    return resolve_signal_feature_bundle(
+        dataset_dir=dataset_dir,
+        period_token=period_token,
     )
 
 

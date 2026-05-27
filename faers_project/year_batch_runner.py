@@ -4,40 +4,31 @@ import argparse
 import contextlib
 from functools import lru_cache
 import io
-import importlib.util
 from pathlib import Path
 import sys
 
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ANALYSIS_ROOT = PROJECT_ROOT / "analysis_project"
-if str(ANALYSIS_ROOT) not in sys.path:
-    sys.path.insert(0, str(ANALYSIS_ROOT))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import DEFAULT_OUTPUT_ROOT, RAW_ROOT
 from pipeline import PROCESSING_STEPS
 from utils import build_file_path
-
-
-def _load_analysis_function(file_name: str, function_name: str):
-    module_path = ANALYSIS_ROOT / file_name
-    spec = importlib.util.spec_from_file_location(function_name, module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load analysis module: {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return getattr(module, function_name)
+from analysis_project_v2.annual_analysis import (
+    build_comparative_analysis,
+    build_feature_analysis,
+    build_signal_analysis,
+)
 
 
 @lru_cache(maxsize=1)
 def _analysis_functions():
     return {
-        "signal": _load_analysis_function("01_signal_analysis.py", "build_signal_analysis"),
-        "comparative": _load_analysis_function(
-            "02_comparative_analysis.py", "build_comparative_analysis"
-        ),
-        "feature": _load_analysis_function("03_feature_analysis.py", "build_feature_analysis"),
+        "signal": build_signal_analysis,
+        "comparative": build_comparative_analysis,
+        "feature": build_feature_analysis,
     }
 
 

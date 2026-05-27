@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
@@ -9,16 +10,17 @@ from scipy.optimize import minimize
 from scipy.special import expit
 from scipy.stats import chi2_contingency, norm, spearmanr
 
-from analysis_common import OUTCOME_SPECS, ensure_output_dir, merge_signal_and_feature
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from analysis_project_v2.annual_analysis import ensure_output_dir, merge_signal_and_feature
+from analysis_project_v2.config import GLOBAL_DATASET_DIR, GLOBAL_OUTPUT_DIR, OUTCOME_SPECS
 
 
-DEFAULT_SIGNAL_FILE = Path(
-    r"D:\program_FAERS\OUTPUT_GLOBAL\datasets\signal_dataset_2004_2025.parquet"
-)
-DEFAULT_FEATURE_FILE = Path(
-    r"D:\program_FAERS\OUTPUT_GLOBAL\datasets\drug_feature_2004_2025_case.parquet"
-)
-DEFAULT_OUTPUT_DIR = Path(r"D:\program_FAERS\OUTPUT_GLOBAL\analysis")
+DEFAULT_SIGNAL_FILE = GLOBAL_DATASET_DIR / "signal_dataset_2004_2025.parquet"
+DEFAULT_FEATURE_FILE = GLOBAL_DATASET_DIR / "drug_feature_2004_2025_case.parquet"
+DEFAULT_OUTPUT_DIR = GLOBAL_OUTPUT_DIR
 
 AGE_GROUP_ORDER = ["65-74", "75-84", ">=85"]
 AGE_GROUP_TO_SCORE = {label: idx for idx, label in enumerate(AGE_GROUP_ORDER)}
@@ -37,9 +39,7 @@ BOOL_COVARIATES = [
 ]
 
 
-def _prepare_subset(
-    df: pd.DataFrame, exposure_col: str, outcome_col: str
-) -> pd.DataFrame:
+def _prepare_subset(df: pd.DataFrame, exposure_col: str, outcome_col: str) -> pd.DataFrame:
     subset = df[df[exposure_col].fillna(False).astype(bool)].copy()
     subset = subset[subset["age_group"].isin(AGE_GROUP_ORDER)].copy()
 
@@ -66,14 +66,13 @@ def _prepare_subset(
 
 
 def _build_age_rate_rows(
-    subset: pd.DataFrame, analysis_name: str, outcome_name: str
+    subset: pd.DataFrame,
+    analysis_name: str,
+    outcome_name: str,
 ) -> pd.DataFrame:
     grouped = (
         subset.groupby("age_group", observed=True)
-        .agg(
-            n_cases=("caseid", "size"),
-            n_outcome=(outcome_name, "sum"),
-        )
+        .agg(n_cases=("caseid", "size"), n_outcome=(outcome_name, "sum"))
         .reindex(AGE_GROUP_ORDER)
         .fillna(0)
         .reset_index()
@@ -84,9 +83,7 @@ def _build_age_rate_rows(
     return grouped
 
 
-def _cochran_armitage_test(
-    n_cases: np.ndarray, n_outcome: np.ndarray
-) -> dict[str, float]:
+def _cochran_armitage_test(n_cases: np.ndarray, n_outcome: np.ndarray) -> dict[str, float]:
     scores = np.arange(len(n_cases), dtype=float)
     total_n = float(n_cases.sum())
     total_outcome = float(n_outcome.sum())
@@ -122,7 +119,8 @@ def _build_test_row(
     exposure_col: str,
 ) -> dict[str, object]:
     contingency = pd.crosstab(
-        subset["age_group"], subset[outcome_name].astype(int)
+        subset["age_group"],
+        subset[outcome_name].astype(int),
     ).reindex(AGE_GROUP_ORDER, fill_value=0)
     contingency = contingency.reindex(columns=[0, 1], fill_value=0)
     chi2_stat, chi2_p_value, dof, _ = chi2_contingency(contingency.to_numpy())
@@ -166,7 +164,8 @@ def _build_logistic_design_matrix(subset: pd.DataFrame) -> pd.DataFrame:
 
 
 def _fit_logistic_with_inference(
-    X: pd.DataFrame, y: pd.Series
+    X: pd.DataFrame,
+    y: pd.Series,
 ) -> tuple[pd.DataFrame, dict[str, object]]:
     X_matrix = np.column_stack([np.ones(len(X), dtype=float), X.to_numpy(dtype=float)])
     y_array = y.astype(int).to_numpy(dtype=float)
@@ -175,10 +174,7 @@ def _fit_logistic_with_inference(
     def objective(beta: np.ndarray) -> float:
         probabilities = np.clip(expit(X_matrix @ beta), 1e-9, 1.0 - 1e-9)
         return float(
-            -np.sum(
-                y_array * np.log(probabilities)
-                + (1.0 - y_array) * np.log(1.0 - probabilities)
-            )
+            -np.sum(y_array * np.log(probabilities) + (1.0 - y_array) * np.log(1.0 - probabilities))
         )
 
     def gradient(beta: np.ndarray) -> np.ndarray:
@@ -205,7 +201,10 @@ def _fit_logistic_with_inference(
     covariance = np.linalg.pinv(hessian)
     standard_errors = np.sqrt(np.clip(np.diag(covariance), a_min=0.0, a_max=None))
     z_values = np.divide(
-        beta, standard_errors, out=np.zeros_like(beta), where=standard_errors > 0
+        beta,
+        standard_errors,
+        out=np.zeros_like(beta),
+        where=standard_errors > 0,
     )
     p_values = 2.0 * norm.sf(np.abs(z_values))
 
@@ -224,7 +223,6 @@ def _fit_logistic_with_inference(
             "ci_high": safe_exp(beta + 1.96 * standard_errors),
         }
     )
-
     diagnostics = {
         "optimization_success": bool(
             result.success or np.max(np.abs(gradient_at_optimum)) < 1e-5
@@ -242,20 +240,16 @@ def build_age_trend_analysis(
     feature_file: str | Path = DEFAULT_FEATURE_FILE,
     output_dir: str | Path = DEFAULT_OUTPUT_DIR,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    merged_df = merge_signal_and_feature(
-        signal_file=signal_file,
-        feature_file=feature_file,
-    )
-
+    merged_df = merge_signal_and_feature(signal_file=signal_file, feature_file=feature_file)
     rate_frames: list[pd.DataFrame] = []
     test_rows: list[dict[str, object]] = []
     logistic_frames: list[pd.DataFrame] = []
     qc_rows: list[dict[str, object]] = []
 
     for outcome_spec in OUTCOME_SPECS:
-        outcome_name = outcome_spec["outcome_name"]
-        outcome_col = outcome_spec["outcome_col"]
-        outcome_label = outcome_spec["outcome_label"]
+        outcome_name = outcome_spec.name
+        outcome_col = outcome_spec.column
+        outcome_label = outcome_spec.label
         if outcome_col not in merged_df.columns:
             continue
 
@@ -263,18 +257,13 @@ def build_age_trend_analysis(
             if exposure_col not in merged_df.columns:
                 continue
 
-            exposed_df = merged_df[
-                merged_df[exposure_col].fillna(False).astype(bool)
-            ].copy()
+            exposed_df = merged_df[merged_df[exposure_col].fillna(False).astype(bool)].copy()
             subset = _prepare_subset(merged_df, exposure_col, outcome_col)
             if subset.empty:
                 continue
 
             analysis_df = subset.rename(columns={outcome_col: outcome_name}).copy()
-
-            rate_frames.append(
-                _build_age_rate_rows(analysis_df, analysis_name, outcome_name)
-            )
+            rate_frames.append(_build_age_rate_rows(analysis_df, analysis_name, outcome_name))
             test_rows.append(
                 _build_test_row(
                     analysis_df,
@@ -297,9 +286,7 @@ def build_age_trend_analysis(
             logistic_df["optimization_success"] = diagnostics["optimization_success"]
             logistic_df["optimization_message"] = diagnostics["optimization_message"]
             logistic_df["n_iterations"] = diagnostics["n_iterations"]
-            logistic_df["negative_log_likelihood"] = diagnostics[
-                "negative_log_likelihood"
-            ]
+            logistic_df["negative_log_likelihood"] = diagnostics["negative_log_likelihood"]
             logistic_df["gradient_inf_norm"] = diagnostics["gradient_inf_norm"]
             logistic_frames.append(logistic_df)
 
@@ -316,9 +303,7 @@ def build_age_trend_analysis(
                     "outcome_definition": outcome_label,
                     "n_exposed_total": int(len(exposed_df)),
                     "n_in_age_analysis": int(len(analysis_df)),
-                    "n_excluded_non_target_age": int(
-                        len(exposed_df) - len(analysis_df)
-                    ),
+                    "n_excluded_non_target_age": int(len(exposed_df) - len(analysis_df)),
                     "n_outcome": int(analysis_df[outcome_name].sum()),
                     "n_age_65_74": int(age_counts.get("65-74", 0)),
                     "n_age_75_84": int(age_counts.get("75-84", 0)),
@@ -326,59 +311,28 @@ def build_age_trend_analysis(
                 }
             )
 
-    rates_df = (
-        pd.concat(rate_frames, ignore_index=True) if rate_frames else pd.DataFrame()
-    )
+    rates_df = pd.concat(rate_frames, ignore_index=True) if rate_frames else pd.DataFrame()
     tests_df = pd.DataFrame(test_rows)
     logistic_df = (
-        pd.concat(logistic_frames, ignore_index=True)
-        if logistic_frames
-        else pd.DataFrame()
+        pd.concat(logistic_frames, ignore_index=True) if logistic_frames else pd.DataFrame()
     )
     qc_df = pd.DataFrame(qc_rows)
 
     output_root = ensure_output_dir(output_dir)
-    rates_df.to_csv(
-        output_root / "04_age_trend_analysis_rates.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
-    tests_df.to_csv(
-        output_root / "04_age_trend_analysis_tests.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
-    logistic_df.to_csv(
-        output_root / "04_age_trend_analysis_logistic.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
-    qc_df.to_csv(
-        output_root / "04_age_trend_analysis_qc.csv", index=False, encoding="utf-8-sig"
-    )
-
+    rates_df.to_csv(output_root / "04_age_trend_analysis_rates.csv", index=False, encoding="utf-8-sig")
+    tests_df.to_csv(output_root / "04_age_trend_analysis_tests.csv", index=False, encoding="utf-8-sig")
+    logistic_df.to_csv(output_root / "04_age_trend_analysis_logistic.csv", index=False, encoding="utf-8-sig")
+    qc_df.to_csv(output_root / "04_age_trend_analysis_qc.csv", index=False, encoding="utf-8-sig")
     return rates_df, tests_df, logistic_df, qc_df
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Age trend analysis for fall outcomes among zolpidem-exposed cases."
     )
-    parser.add_argument(
-        "--signal-file",
-        default=str(DEFAULT_SIGNAL_FILE),
-        help="Signal dataset parquet file.",
-    )
-    parser.add_argument(
-        "--feature-file",
-        default=str(DEFAULT_FEATURE_FILE),
-        help="Feature dataset parquet file.",
-    )
-    parser.add_argument(
-        "--output-dir",
-        default=str(DEFAULT_OUTPUT_DIR),
-        help="Directory to save age trend outputs.",
-    )
+    parser.add_argument("--signal-file", default=str(DEFAULT_SIGNAL_FILE))
+    parser.add_argument("--feature-file", default=str(DEFAULT_FEATURE_FILE))
+    parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     args = parser.parse_args()
 
     rates, tests, logistic_results, qc = build_age_trend_analysis(
@@ -390,3 +344,7 @@ if __name__ == "__main__":
     print("saved age test rows:", len(tests))
     print("saved logistic rows:", len(logistic_results))
     print("saved QC rows:", len(qc))
+
+
+if __name__ == "__main__":
+    main()

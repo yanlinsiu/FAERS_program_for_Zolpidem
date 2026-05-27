@@ -10,7 +10,7 @@
 
 1. `faers_project/`
    按季度处理原始 `DEMO / DRUG / REAC / OUTC` 文本，生成病例级分析数据。
-2. `analysis_project/`
+2. `analysis_project_v2/`
    对季度或年度数据执行信号分析、比较分析和特征分析。
 3. `full_period_analysis/`
    将多个年份的季度产物汇总成全周期去重数据集，并运行全周期分析。
@@ -23,8 +23,8 @@
 program_FAERS/
 |-- data/                      # 原始 FAERS 数据，按年份/季度存放
 |-- faers_project/             # 季度级清洗与数据集构建
-|-- analysis_project/          # 年度/季度分析脚本
-|-- full_period_analysis/      # 全周期汇总与分析
+|-- analysis_project_v2/       # 年度分析 + Global 全周期分析
+|-- full_period_analysis/      # 全周期数据集构建
 |-- ml_project/                # 机器学习建模
 |-- OUTPUT/                    # 季度与年度输出
 |-- OUTPUT_GLOBAL/             # 全周期输出
@@ -150,14 +150,14 @@ cd D:\program_FAERS\full_period_analysis
 python build_global_datasets.py --start-year 2004 --end-year 2025
 ```
 
-### 4. 运行全周期分析
+### 4. 运行新版全周期分析
 
 ```powershell
-cd D:\program_FAERS\full_period_analysis
-python run_global_analysis.py --period-token 2004_2025
+cd D:\program_FAERS\analysis_project_v2
+python run_all.py --period-token 2004_2025
 ```
 
-如果 `OUTPUT_GLOBAL/datasets/` 下只有一套数据，也可以省略 `--period-token`。
+这一步读取 `OUTPUT_GLOBAL/datasets/` 中的全周期中间数据，并把新版正式分析结果写入 `OUTPUT_GLOBAL/analysis_v2/`。
 
 ### 5. 运行机器学习建模
 
@@ -182,7 +182,7 @@ python run_global_analysis.py --period-token 2004_2025
 4. `drug_exposure_processor.py`
    基于 `role_cod` 定义研究暴露，区分 `PS + SS` 与 `PS only`。
 5. `reac_processor.py`
-   从 `REAC` 构建狭义和广义跌倒相关结局。
+   从 `REAC` 构建 OCMQ 兼容的狭义跌倒结局。
 6. `outc_processor.py`
    从 `OUTC` 构建死亡、住院、危及生命等严重结局变量。
 7. `case_dataset_processor.py`
@@ -233,7 +233,8 @@ python run_global_analysis.py --period-token 2004_2025
 - `datasets/drug_feature_<start>_<end>_case.parquet`
 - `qc/global_dataset_qc_<start>_<end>.csv`
 - `qc/global_signal_summary_<start>_<end>.csv`
-- `analysis/` 下的全周期分析结果
+- `datasets/` 是给后续分析和机器学习读取的全周期中间数据
+- `analysis_v2/` 下的新版正式全周期分析结果
 
 ### 机器学习输出
 
@@ -245,15 +246,17 @@ python run_global_analysis.py --period-token 2004_2025
 
 ## 分析内容
 
-[analysis_project/](/D:/program_FAERS/analysis_project) 当前主要包含：
+[analysis_project_v2/](/D:/program_FAERS/analysis_project_v2) 现在统一承接年度分析和 Global 全周期分析：
 
-- [01_signal_analysis.py](/D:/program_FAERS/analysis_project/01_signal_analysis.py)
+- [age_trend_analysis.py](/D:/program_FAERS/analysis_project_v2/age_trend_analysis.py)
+  年龄趋势分析，承接旧版 `04_age_trend_analysis.py`。
+- [annual_analysis.py](/D:/program_FAERS/analysis_project_v2/annual_analysis.py)
   计算 ROR、PRR，并补充 IC、EBGM 等信号指标。
-- [02_comparative_analysis.py](/D:/program_FAERS/analysis_project/02_comparative_analysis.py)
+- [run_all.py](/D:/program_FAERS/analysis_project_v2/run_all.py)
   比较 `zolpidem_only` 与 `other_zdrug_only`。
-- [03_feature_analysis.py](/D:/program_FAERS/analysis_project/03_feature_analysis.py)
+- [regulatory_trend_analysis.py](/D:/program_FAERS/analysis_project_v2/regulatory_trend_analysis.py)
   在暴露病例中做分层或特征层面的比较分析。
-- [04_age_trend_analysis.py](/D:/program_FAERS/analysis_project/04_age_trend_analysis.py)
+- `country/` 和 `phenotypes/`
   进行年龄趋势相关分析。
 
 ## 当前研究口径
@@ -297,7 +300,7 @@ FAERS 历史文本结构并不完全统一。项目已在 [faers_project/utils.p
 `year_batch_runner.py` 依赖：
 
 - 原始数据目录可读
-- `analysis_project/` 中的分析脚本存在
+- `analysis_project_v2/annual_analysis.py` 中的年度分析脚本可以导入
 - 季度产物可以正常写入 `OUTPUT/<year>/quarterly/`
 
 如果此前已有损坏的 parquet 文件，也可能在年度合并时报错。
@@ -311,7 +314,7 @@ FAERS 历史文本结构并不完全统一。项目已在 [faers_project/utils.p
 3. [faers_project/utils.py](/D:/program_FAERS/faers_project/utils.py)
 4. `faers_project/*_processor.py`
 5. [faers_project/year_batch_runner.py](/D:/program_FAERS/faers_project/year_batch_runner.py)
-6. [analysis_project/analysis_common.py](/D:/program_FAERS/analysis_project/analysis_common.py)
+6. [analysis_project_v2/annual_analysis.py](/D:/program_FAERS/analysis_project_v2/annual_analysis.py)
 7. [full_period_analysis/build_global_datasets.py](/D:/program_FAERS/full_period_analysis/build_global_datasets.py)
 8. `ml_project/*.py`
 

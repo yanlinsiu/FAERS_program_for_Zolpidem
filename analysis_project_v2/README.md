@@ -4,6 +4,15 @@
 
 ## 主要入口
 
+年度分析（由 `faers_project/year_batch_runner.py` 自动调用）：
+
+```powershell
+cd D:\program_FAERS
+uv run python analysis_project_v2\annual_analysis.py --signal-root OUTPUT\2024\quarterly --output-dir OUTPUT\2024\analysis
+```
+
+Global 全周期分析：
+
 ```powershell
 cd D:\program_FAERS\analysis_project_v2
 uv run python run_all.py --period-token 2004_2025
@@ -24,6 +33,8 @@ uv run python run_all.py --period-token 2004_2025 --skip-main
 ## 现在的代码分工
 
 - `run_all.py`：总入口，负责串起主分析和趋势分析。
+- `annual_analysis.py`：年度分析入口，承接旧版年度信号分析、对比分析和特征分析。
+- `age_trend_analysis.py`：年龄趋势分析，承接旧版 `04_age_trend_analysis.py`。
 - `run_analysis.py`：主分析，包括信号分析、敏感性分析、探索性分析和校正模型。
 - `regulatory_trend_analysis.py`：监管事件前后和年度趋势分析。
 - `config.py`：分析定义、结局定义、分层定义和阈值。

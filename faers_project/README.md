@@ -26,10 +26,10 @@ program_FAERS/
 |   |   |   |   |-- REAC24Q1.txt
 |   |   |   |   `-- OUTC24Q1.txt
 |-- OUTPUT/
-|-- analysis_project/
-|   |-- 01_signal_analysis.py
-|   |-- 02_comparative_analysis.py
-|   `-- 03_feature_analysis.py
+|-- analysis_project_v2/
+|   |-- annual_analysis.py
+|   |-- run_all.py
+|   `-- regulatory_trend_analysis.py
 `-- faers_project/
     |-- main.py
     |-- year_batch_runner.py
@@ -41,7 +41,7 @@ program_FAERS/
 - 原始数据根目录：优先读取环境变量 `FAERS_RAW_ROOT`
 - 如果未设置环境变量，则优先尝试项目根目录下的 `data/`
 - 默认输出目录：项目根目录下的 `OUTPUT/`
-- 年度分析脚本目录：项目根目录下的 `analysis_project/`
+- 年度分析脚本目录：项目根目录下的 `analysis_project_v2/annual_analysis.py`
 
 如需显式指定原始数据目录，可以在 PowerShell 中设置：
 
@@ -102,7 +102,7 @@ $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
 
 5. `reac_processor.py`
    - 从 `REAC` 构建病例级跌倒结局
-   - 包含狭义跌倒和广义跌倒相关定义
+   - 使用 OCMQ 兼容的狭义跌倒定义
    - 生成 `reac_YYYYqN_case.parquet`
 
 6. `outc_processor.py`
@@ -123,7 +123,7 @@ $env:FAERS_RAW_ROOT="D:\program_FAERS\data"
 说明：
 
 - `case` 和 `signal` 两个步骤支持自动补跑前置依赖
-- `year_batch_runner.py` 会按年顺序执行季度处理，并调用 `analysis_project` 中的年度分析脚本
+- `year_batch_runner.py` 会按年顺序执行季度处理，并调用 `analysis_project_v2.annual_analysis` 中的年度分析函数
 
 ## 主要产物
 
@@ -269,17 +269,17 @@ python year_batch_runner.py --start-year 2019 --end-year 2024
 
 1. 自动识别该年可用季度
 2. 为每个季度跑完整处理流程
-3. 汇总季度结果，并调用 `analysis_project` 中的年度分析脚本
+3. 汇总季度结果，并调用 `analysis_project_v2.annual_analysis` 中的年度分析函数
 
 ## 年度分析内容
 
-[year_batch_runner.py](D:/program_FAERS/faers_project/year_batch_runner.py) 会在季度产物完成后继续调用 [analysis_project](D:/program_FAERS/analysis_project) 中的分析脚本：
+[year_batch_runner.py](D:/program_FAERS/faers_project/year_batch_runner.py) 会在季度产物完成后继续调用 [analysis_project_v2/annual_analysis.py](D:/program_FAERS/analysis_project_v2/annual_analysis.py) 中的年度分析函数：
 
-- [01_signal_analysis.py](D:/program_FAERS/analysis_project/01_signal_analysis.py)
+- `build_signal_analysis`
   - 比较 `zolpidem suspect` 与其他病例之间的信号强度
-- [02_comparative_analysis.py](D:/program_FAERS/analysis_project/02_comparative_analysis.py)
+- `build_comparative_analysis`
   - 比较 `zolpidem_only` 与 `other_zdrug_only`
-- [03_feature_analysis.py](D:/program_FAERS/analysis_project/03_feature_analysis.py)
+- `build_feature_analysis`
   - 在 `zolpidem` 暴露病例内部做分层特征分析
 
 当前代码里，信号分析结果会写出 ROR、PRR，以及部分 IC / EBGM 相关字段。
@@ -293,7 +293,7 @@ python year_batch_runner.py --start-year 2019 --end-year 2024
 - 主分析暴露口径为 `PS + SS`
 - 敏感性分析暴露口径为 `PS only`
 - 多药并用定义为 `distinct_drug_n >= 5`
-- `REAC` 中同时构建 `is_fall_narrow` 和 `is_fall_broad`
+- `REAC` 中构建 OCMQ 兼容的 `is_fall_narrow`
 - `signal_dataset` 中保留年龄组、性别、严重结局和暴露分组字段
 
 这些设定都属于研究口径的一部分，后续如果改代码，建议优先同步更新文档。
@@ -331,9 +331,9 @@ FAERS 历史文件结构并不完全一致。这个项目已经在 [utils.py](D:
 
 - `D:\program_FAERS\data`
 - `D:\program_FAERS\OUTPUT`
-- `D:\program_FAERS\analysis_project`
+- `D:\program_FAERS\analysis_project_v2`
 
-尤其是 `year_batch_runner.py` 依赖 `analysis_project` 中的 3 个年度分析脚本，不能只复制 `faers_project` 单独运行。
+尤其是 `year_batch_runner.py` 依赖 `analysis_project_v2.annual_analysis`，不能只复制 `faers_project` 单独运行。
 
 ## 建议阅读顺序
 
