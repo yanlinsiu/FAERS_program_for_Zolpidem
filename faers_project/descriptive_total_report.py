@@ -378,7 +378,7 @@ def _build_markdown_report(
         f"- zolpidem 任意暴露：{_fmt_n_pct(zolpidem_any_n, _safe_pct(zolpidem_any_n, total_n))}",
         f"- zolpidem suspect（PS+SS）：{_fmt_n_pct(zolpidem_suspect_n, _safe_pct(zolpidem_suspect_n, total_n))}",
         f"- zolpidem suspect（PS only）：{_fmt_n_pct(zolpidem_suspect_ps_n, _safe_pct(zolpidem_suspect_ps_n, total_n))}",
-        f"- 狭义跌倒：{_fmt_n_pct(strict_fall_n, _safe_pct(strict_fall_n, total_n))}",
+        f"- Strict PT fall: {_fmt_n_pct(strict_fall_n, _safe_pct(strict_fall_n, total_n))}",
         "",
         "## 3. 数据完整性",
     ]
