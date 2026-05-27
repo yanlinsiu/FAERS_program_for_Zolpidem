@@ -19,6 +19,7 @@ try:
     )
     from .data import load_analysis_frame, resolve_dataset_bundle
     from .report_tables import build_exploratory_summary, build_primary_summary
+    from .sensitivity_adjusted import build_sensitivity_adjusted_analysis
     from .signal_metrics import (
         add_signal_classification,
         apply_bh_fdr,
@@ -39,6 +40,7 @@ except ImportError:
     )
     from data import load_analysis_frame, resolve_dataset_bundle
     from report_tables import build_exploratory_summary, build_primary_summary
+    from sensitivity_adjusted import build_sensitivity_adjusted_analysis
     from signal_metrics import (
         add_signal_classification,
         apply_bh_fdr,
@@ -189,6 +191,7 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
     primary_df, sensitivity_df, all_signal_df, signal_qc = build_signal_tables(df)
     exploratory_df, exploratory_qc = build_exploratory_table(df)
     adjusted_df, adjusted_qc = build_adjusted_analysis(df)
+    sensitivity_tables, sensitivity_all_summary, sensitivity_qc = build_sensitivity_adjusted_analysis(df)
 
     adjusted_primary = adjusted_df[adjusted_df["analysis_tier"].eq("primary")].copy()
     adjusted_sensitivity = adjusted_df[adjusted_df["analysis_tier"].eq("sensitivity")].copy()
@@ -200,6 +203,7 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
             signal_qc,
             exploratory_qc,
             adjusted_qc,
+            sensitivity_qc,
             pd.DataFrame(
                 [
                     {
@@ -225,6 +229,11 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
         "adjusted_sensitivity": output_dir / "adjusted_sensitivity.csv",
         "summary_primary": output_dir / "summary_primary.csv",
         "summary_exploratory": output_dir / "summary_exploratory.csv",
+        "sensitivity_exposure": output_dir / "sensitivity_exposure.csv",
+        "sensitivity_indication": output_dir / "sensitivity_indication.csv",
+        "sensitivity_reporting_country_time": output_dir / "sensitivity_reporting_country_time.csv",
+        "sensitivity_age_comedication": output_dir / "sensitivity_age_comedication.csv",
+        "sensitivity_all_summary": output_dir / "sensitivity_all_summary.csv",
         "qc": output_dir / "qc.csv",
     }
     _write_csv(primary_df, outputs["signal_primary"])
@@ -234,6 +243,8 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
     _write_csv(adjusted_sensitivity, outputs["adjusted_sensitivity"])
     _write_csv(summary_primary, outputs["summary_primary"])
     _write_csv(summary_exploratory, outputs["summary_exploratory"])
+    for name, table in sensitivity_tables.items():
+        _write_csv(table, outputs[name])
     _write_csv(qc_df, outputs["qc"])
 
     assert not primary_df[
@@ -251,7 +262,12 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
         & adjusted_df["analysis"].eq("primary_ps_ss")
         & adjusted_df["outcome_name"].eq("strict_fall")
     ]
-    assert {"model_a_base", "model_b_with_serious"}.issubset(set(exposure_terms["model"]))
+    assert {"core_clinical_adjusted", "extended_report_indication_adjusted"}.issubset(
+        set(exposure_terms["model"])
+    )
+    assert not sensitivity_all_summary.empty
+    assert "is_fall_broad" not in set(sensitivity_all_summary.get("outcome_name", []))
+    assert "sensitivity_exposure_outcome" not in outputs
     return outputs
 
 

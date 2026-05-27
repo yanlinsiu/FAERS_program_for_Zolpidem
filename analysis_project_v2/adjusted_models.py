@@ -8,28 +8,44 @@ import statsmodels.api as sm
 
 try:
     from .config import (
-        BASE_ADJUSTMENT_COLUMNS,
+        ADJUSTMENT_MODEL_SPECS,
+        CATEGORICAL_ADJUSTMENT_COLUMNS,
+        NUMERIC_ADJUSTMENT_COLUMNS,
         OUTCOMES_BY_NAME,
-        SERIOUS_ADJUSTMENT_COLUMNS,
         SIGNAL_SPECS,
+        AdjustmentModelSpec,
         SignalSpec,
     )
 except ImportError:
     from config import (
-        BASE_ADJUSTMENT_COLUMNS,
+        ADJUSTMENT_MODEL_SPECS,
+        CATEGORICAL_ADJUSTMENT_COLUMNS,
+        NUMERIC_ADJUSTMENT_COLUMNS,
         OUTCOMES_BY_NAME,
-        SERIOUS_ADJUSTMENT_COLUMNS,
         SIGNAL_SPECS,
+        AdjustmentModelSpec,
         SignalSpec,
     )
+
+
+MAX_CATEGORICAL_LEVELS = 25
+
+
+def _prepare_categorical_series(series: pd.Series) -> pd.Series:
+    values = series.where(series.notna(), "unknown").astype(str).str.strip().replace("", "unknown")
+    counts = values.value_counts(dropna=False)
+    if len(counts) <= MAX_CATEGORICAL_LEVELS:
+        return values
+    keep = set(counts.head(MAX_CATEGORICAL_LEVELS - 1).index)
+    return values.where(values.isin(keep), "OTHER")
 
 
 def _prepare_model_frame(
     df: pd.DataFrame,
     spec: SignalSpec,
     outcome_col: str,
-    covariates: tuple[str, ...],
-) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+    model_spec: AdjustmentModelSpec,
+) -> tuple[pd.DataFrame, pd.Series, pd.Series, tuple[str, ...]]:
     subset = df[df[spec.suspect_column].fillna(False).astype(bool)].copy()
     if spec.exclude_group:
         subset = subset[subset[spec.group_column] != spec.exclude_group].copy()
@@ -40,38 +56,52 @@ def _prepare_model_frame(
     design = pd.DataFrame(index=subset.index)
     design[spec.exposure_column] = exposure.astype(float)
 
-    if "year" in covariates:
-        design["year_centered"] = pd.to_numeric(subset["year"], errors="coerce").fillna(subset["year"].median()) - float(
-            pd.to_numeric(subset["year"], errors="coerce").median()
-        )
-
-    for col in covariates:
-        if col == "year":
+    used_covariates: list[str] = []
+    for col in model_spec.covariates:
+        if col not in subset.columns:
             continue
-        if col in ["age_group", "sex_clean", "quarter"]:
-            dummies = pd.get_dummies(
-                subset[col].where(subset[col].notna(), "unknown").astype(str),
-                prefix=col,
-                drop_first=True,
-                dtype=float,
-            )
+        if col in CATEGORICAL_ADJUSTMENT_COLUMNS:
+            values = _prepare_categorical_series(subset[col])
+            if values.nunique(dropna=False) <= 1:
+                continue
+            dummies = pd.get_dummies(values, prefix=col, drop_first=True, dtype=float)
             design = pd.concat([design, dummies], axis=1)
+            used_covariates.append(col)
+        elif col in NUMERIC_ADJUSTMENT_COLUMNS:
+            values = pd.to_numeric(subset[col], errors="coerce")
+            median = values.median()
+            if pd.isna(median):
+                continue
+            filled = values.fillna(median).astype(float)
+            std = float(filled.std())
+            if std == 0 or np.isnan(std):
+                continue
+            design[f"{col}_standardized"] = (filled - float(filled.mean())) / std
+            used_covariates.append(col)
         else:
-            design[col] = subset[col].fillna(False).astype(bool).astype(float)
+            values = subset[col].fillna(False).astype(bool).astype(float)
+            if values.nunique(dropna=False) <= 1:
+                continue
+            design[col] = values
+            used_covariates.append(col)
 
     non_constant_cols = [col for col in design.columns if design[col].nunique(dropna=False) > 1]
     design = design[non_constant_cols].copy()
     if spec.exposure_column not in design.columns:
         raise ValueError(f"Exposure column is constant in adjusted model: {spec.exposure_column}")
     design = sm.add_constant(design, has_constant="add")
-    return design, y, subset["caseid"].astype(str)
+    return design, y, subset["caseid"].astype(str), tuple(used_covariates)
 
 
 def _fit_logit(design: pd.DataFrame, y: pd.Series) -> tuple[pd.DataFrame, dict[str, Any]]:
-    model = sm.Logit(y.to_numpy(dtype=float), design.to_numpy(dtype=float))
+    model = sm.GLM(
+        y.to_numpy(dtype=float),
+        design.to_numpy(dtype=float),
+        family=sm.families.Binomial(),
+    )
     try:
-        result = model.fit(disp=False, maxiter=200)
-        converged = bool(result.mle_retvals.get("converged", False))
+        result = model.fit(maxiter=200, disp=False)
+        converged = bool(result.converged)
         message = "converged" if converged else "did_not_converge"
         params = result.params
         conf = result.conf_int(alpha=0.05)
@@ -108,26 +138,26 @@ def build_adjusted_analysis(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
     result_frames: list[pd.DataFrame] = []
     qc_rows: list[dict[str, Any]] = []
 
-    model_sets = (
-        ("model_a_base", BASE_ADJUSTMENT_COLUMNS),
-        ("model_b_with_serious", SERIOUS_ADJUSTMENT_COLUMNS),
-    )
     for spec in SIGNAL_SPECS:
         for outcome_name in spec.outcome_names:
             outcome = OUTCOMES_BY_NAME[outcome_name]
-            for model_name, covariates in model_sets:
-                design, y, caseids = _prepare_model_frame(df, spec, outcome.column, covariates)
+            for model_spec in ADJUSTMENT_MODEL_SPECS:
+                design, y, caseids, used_covariates = _prepare_model_frame(
+                    df, spec, outcome.column, model_spec
+                )
                 model_df, diagnostics = _fit_logit(design, y)
                 model_df.insert(0, "analysis_tier", spec.tier)
                 model_df.insert(1, "analysis", spec.analysis)
                 model_df.insert(2, "comparison", spec.comparison)
                 model_df.insert(3, "outcome_name", outcome.name)
                 model_df.insert(4, "outcome_definition", outcome.label)
-                model_df.insert(5, "model", model_name)
+                model_df.insert(5, "model", model_spec.name)
+                model_df.insert(6, "model_label", model_spec.label)
                 model_df["exposure_term"] = spec.exposure_column
                 model_df["is_exposure_term"] = model_df["term"].eq(spec.exposure_column)
                 model_df["n_cases"] = int(len(caseids))
                 model_df["n_outcome"] = int(y.sum())
+                model_df["used_covariates"] = ";".join(used_covariates)
                 model_df["optimization_success"] = diagnostics["optimization_success"]
                 model_df["optimization_message"] = diagnostics["optimization_message"]
                 result_frames.append(model_df)
@@ -137,11 +167,14 @@ def build_adjusted_analysis(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
                         "analysis_tier": spec.tier,
                         "analysis": spec.analysis,
                         "outcome_name": outcome.name,
-                        "model": model_name,
+                        "model": model_spec.name,
+                        "model_label": model_spec.label,
                         "n_cases": int(len(caseids)),
                         "n_outcome": int(y.sum()),
                         "n_exposed": int(design[spec.exposure_column].sum()),
                         "n_terms": int(design.shape[1]),
+                        "requested_covariates": ";".join(model_spec.covariates),
+                        "used_covariates": ";".join(used_covariates),
                         **diagnostics,
                     }
                 )

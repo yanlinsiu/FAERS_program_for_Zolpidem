@@ -50,6 +50,13 @@ class FeatureSpec:
     label: str
 
 
+@dataclass(frozen=True)
+class AdjustmentModelSpec:
+    name: str
+    label: str
+    covariates: tuple[str, ...]
+
+
 OUTCOME_SPECS: tuple[OutcomeSpec, ...] = (
     OutcomeSpec("strict_fall", "is_fall_narrow", "OCMQ-compatible narrow fall event"),
 )
@@ -133,12 +140,13 @@ FEATURE_SPECS: tuple[FeatureSpec, ...] = (
     FeatureSpec("is_antiepileptic", True, "co_medication", "Antiepileptic co-report"),
 )
 
-BASE_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
+CORE_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
     "age_group",
     "sex_clean",
     "year",
     "quarter",
     "polypharmacy_5",
+    "distinct_drug_n",
     "is_benzo",
     "is_antidepressant",
     "is_antipsychotic",
@@ -146,10 +154,55 @@ BASE_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
     "is_antiepileptic",
 )
 
-SERIOUS_ADJUSTMENT_COLUMNS: tuple[str, ...] = (*BASE_ADJUSTMENT_COLUMNS, "serious")
+EXTENDED_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
+    *CORE_ADJUSTMENT_COLUMNS,
+    "reporter_country",
+    "rept_cod",
+    "e_sub",
+    "indi_insomnia",
+    "indi_anxiety",
+    "indi_depression",
+    "indi_pain",
+    "indi_epilepsy",
+    "indi_dizziness_vertigo",
+)
+
+ADJUSTMENT_MODEL_SPECS: tuple[AdjustmentModelSpec, ...] = (
+    AdjustmentModelSpec(
+        name="core_clinical_adjusted",
+        label="Core clinical adjustment model",
+        covariates=CORE_ADJUSTMENT_COLUMNS,
+    ),
+    AdjustmentModelSpec(
+        name="extended_report_indication_adjusted",
+        label="Extended report-indication adjustment model",
+        covariates=EXTENDED_ADJUSTMENT_COLUMNS,
+    ),
+)
+
+CATEGORICAL_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
+    "age_group",
+    "sex_clean",
+    "quarter",
+    "reporter_country",
+    "occr_country",
+    "rept_cod",
+    "e_sub",
+    "rpsr_cod",
+)
+
+NUMERIC_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
+    "year",
+    "age_years",
+    "drug_n",
+    "distinct_drug_n",
+    "indi_n",
+    "distinct_indi_n",
+)
 
 BOOL_COLUMNS: tuple[str, ...] = (
     "is_fall_narrow",
+    "is_fall_broad",
     "is_zolpidem_any",
     "is_zolpidem_suspect",
     "is_zolpidem_suspect_ps",
@@ -169,4 +222,10 @@ BOOL_COLUMNS: tuple[str, ...] = (
     "is_antiepileptic",
     "polypharmacy_5",
     "polypharmacy",
+    "indi_insomnia",
+    "indi_anxiety",
+    "indi_depression",
+    "indi_pain",
+    "indi_epilepsy",
+    "indi_dizziness_vertigo",
 )

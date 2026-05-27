@@ -12,9 +12,9 @@ if str(PROJECT_ROOT) not in sys.path:
 from common.datasets import DatasetBundle, resolve_signal_feature_bundle
 
 try:
-    from .config import BOOL_COLUMNS, GLOBAL_DATASET_DIR
+    from .config import BOOL_COLUMNS, CATEGORICAL_ADJUSTMENT_COLUMNS, GLOBAL_DATASET_DIR
 except ImportError:
-    from config import BOOL_COLUMNS, GLOBAL_DATASET_DIR
+    from config import BOOL_COLUMNS, CATEGORICAL_ADJUSTMENT_COLUMNS, GLOBAL_DATASET_DIR
 
 
 def resolve_dataset_bundle(
@@ -49,11 +49,16 @@ def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         if col in normalized.columns:
             normalized[col] = normalized[col].fillna(False).astype(bool)
 
-    for col in ["year", "drug_n", "distinct_drug_n"]:
+    for col in ["year", "age_years", "drug_n", "distinct_drug_n", "indi_n", "distinct_indi_n"]:
         if col in normalized.columns:
             normalized[col] = pd.to_numeric(normalized[col], errors="coerce")
 
-    for col in ["age_group", "sex_clean", "quarter", "target_drug_group", "target_drug_group_ps"]:
+    categorical_cols = {
+        "target_drug_group",
+        "target_drug_group_ps",
+        *CATEGORICAL_ADJUSTMENT_COLUMNS,
+    }
+    for col in categorical_cols:
         if col in normalized.columns:
             normalized[col] = (
                 normalized[col]
@@ -63,6 +68,17 @@ def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
                 .replace("", "unknown")
             )
     return normalized
+
+
+def _resolve_ml_feature_v2_file(period_token: str) -> Path | None:
+    feature_v2_file = (
+        PROJECT_ROOT
+        / "OUTPUT_ML"
+        / "features_v2"
+        / "datasets"
+        / f"ml_feature_v2_{period_token}.parquet"
+    )
+    return feature_v2_file if feature_v2_file.exists() else None
 
 
 def load_analysis_frame(bundle: DatasetBundle) -> pd.DataFrame:
@@ -80,5 +96,24 @@ def load_analysis_frame(bundle: DatasetBundle) -> pd.DataFrame:
     if missing_feature_rows:
         raise ValueError(f"Merged dataset has missing feature rows: {missing_feature_rows}")
     merged = merged.drop(columns=["_merge"])
+
+    feature_v2_file = _resolve_ml_feature_v2_file(bundle.period_token)
+    if feature_v2_file is not None:
+        feature_v2_df = _normalize_caseid(pd.read_parquet(feature_v2_file), "ML feature v2 dataset")
+        extra_cols = [col for col in feature_v2_df.columns if col == "caseid" or col not in merged.columns]
+        if len(extra_cols) > 1:
+            merged = merged.merge(
+                feature_v2_df[extra_cols],
+                on="caseid",
+                how="left",
+                indicator="_feature_v2_merge",
+            )
+            missing_feature_v2_rows = int(merged["_feature_v2_merge"].eq("left_only").sum())
+            if missing_feature_v2_rows:
+                raise ValueError(
+                    f"Merged dataset has missing ML feature v2 rows: {missing_feature_v2_rows}"
+                )
+            merged = merged.drop(columns=["_feature_v2_merge"])
+
     merged = _normalize_columns(merged)
     return merged
