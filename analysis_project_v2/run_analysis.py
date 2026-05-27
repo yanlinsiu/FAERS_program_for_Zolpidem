@@ -266,7 +266,9 @@ def run(period_token: str | None, dataset_dir: Path, output_dir: Path) -> dict[s
         set(exposure_terms["model"])
     )
     assert not sensitivity_all_summary.empty
-    assert "is_fall_broad" not in set(sensitivity_all_summary.get("outcome_name", []))
+    assert not sensitivity_all_summary.astype(str).apply(
+        lambda col: col.str.contains("is_fall_broad", na=False)
+    ).any().any()
     assert "sensitivity_exposure_outcome" not in outputs
     return outputs
 

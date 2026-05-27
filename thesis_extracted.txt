@@ -2,15 +2,15 @@
 硕士学位论文初稿
 摘要
 目的：唑吡坦是临床常用的非苯二氮卓类镇静催眠药，广泛用于失眠治疗。老年患者本身跌倒风险较高，且常合并多重用药和中枢神经系统相关药物使用，使用唑吡坦后可能进一步增加跌倒、骨折和损伤风险。本研究基于美国 FDA 不良事件报告系统（FAERS），分析老年人群中唑吡坦相关跌倒事件的上市后药物警戒信号，并探索机器学习方法在跌倒相关报告辅助识别中的应用价值。
-方法：下载并整理 2004-2025 年 FAERS 季度数据，以 65 岁及以上老年病例为研究对象，构建病例级分析数据集。通过 DEMO 表进行病例去重和基本信息整理，通过 DRUG 表识别唑吡坦、其他 Z-drugs、多重用药和中枢神经系统相关合并用药，通过 REAC 表构建狭义跌倒和广义跌倒相关事件结局，通过 OUTC 表提取严重结局。主分析以唑吡坦被报告为 primary suspect 或 secondary suspect 作为暴露定义，采用报告比值比（ROR）、比例报告比（PRR）、信息成分（IC）和经验贝叶斯几何均数（EBGM）进行不成比例分析；同时开展 PS only 敏感性分析、广义跌倒相关事件分析、与其他 Z-drugs 比较分析和多因素校正分析。进一步构建逻辑回归、随机森林和 XGBoost 模型，对老年 FAERS 病例中的狭义跌倒事件进行辅助识别和风险排序。
-结果：2004-2025 年 FAERS 全周期去重后共纳入老年病例 4,155,023 例，其中狭义跌倒事件 132,266 例，广义跌倒相关事件 298,906 例。唑吡坦 suspect 暴露病例为 8,011 例，排除混合 Z-drug 暴露后主分析暴露组为 7,798 例。主分析显示，唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.38%，参照组为 3.16%；ROR 为 4.73（95%CI：4.43-5.05），PRR 为 4.23（95%CI：3.99-4.47），IC 为 2.07，EBGM 为 4.19，四种方法均提示阳性信号。广义跌倒相关事件分析和 PS only 敏感性分析结果方向一致。多因素校正分析显示，在控制年龄、性别、年份、季度、多重用药及常见中枢神经系统合并用药后，唑吡坦 suspect 暴露与狭义跌倒事件仍保持较高的报告优势。探索性分层结果提示，高龄、多重用药、合并抗抑郁药、阿片类药物和抗癫痫药等背景下跌倒事件报告比例较高。机器学习分析中，XGBoost 在 2025 年测试集中的 ROC-AUC 为 0.772，average precision 为 0.119，前 5% 高风险病例中的狭义跌倒事件比例为 14.79%，约为测试集总体阳性比例的 4.70 倍。
-结论：FAERS 老年病例中，唑吡坦相关报告存在较明显的跌倒相关不良事件信号。该信号在不同结局定义、暴露定义和统计方法下方向一致，并与既往指南、FDA 安全警示以及 Z-drugs 跌倒/骨折风险研究相互印证。临床使用唑吡坦时，应重点关注高龄、多重用药及合并中枢神经系统药物使用患者的跌倒风险。机器学习模型可作为药物警戒研究中的辅助筛选和风险排序工具，但不能替代传统信号挖掘方法，也不能直接解释为临床因果预测。本研究结果仍需在医保数据库、电子病历数据库或前瞻性研究中进一步验证。
+方法：下载并整理 2004-2025 年 FAERS 季度数据，以 65 岁及以上老年病例为研究对象，构建病例级分析数据集。通过 DEMO 表进行病例去重和基本信息整理，通过 DRUG 表识别唑吡坦、其他 Z-drugs、多重用药和中枢神经系统相关合并用药，通过 REAC 表构建狭义跌倒结局，通过 OUTC 表提取严重结局。主分析以唑吡坦被报告为 primary suspect 或 secondary suspect 作为暴露定义，采用报告比值比（ROR）、比例报告比（PRR）、信息成分（IC）和经验贝叶斯几何均数（EBGM）进行不成比例分析；同时开展 PS only 敏感性分析、与其他 Z-drugs 比较分析和多因素校正分析。进一步构建逻辑回归、随机森林和 XGBoost 模型，对老年 FAERS 病例中的狭义跌倒事件进行辅助识别和风险排序。
+结果：2004-2025 年 FAERS 全周期去重后共纳入老年病例 4,155,023 例，其中狭义跌倒事件 132,456 例。唑吡坦 suspect 暴露病例为 8,011 例，排除混合 Z-drug 暴露后主分析暴露组为 7,798 例。主分析显示，唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.57%，参照组为 3.19%；ROR 为 4.80，PRR 为 4.28，IC 为 2.09，EBGM 为 4.24，四种方法均提示阳性信号。多因素校正分析显示，在控制年龄、性别、年份、季度、多重用药、去重药物数及常见中枢神经系统合并用药后，唑吡坦 suspect 暴露与狭义跌倒事件仍保持较高的报告优势；进一步加入报告来源和适应证变量后，结果方向仍然稳定。探索性分层结果提示，高龄、多重用药、合并抗抑郁药、阿片类药物和抗癫痫药等背景下跌倒事件报告比例较高。机器学习分析中，XGBoost 在 2025 年测试集中的 ROC-AUC 为 0.772，average precision 为 0.119，前 5% 高风险病例中的狭义跌倒事件比例为 14.79%，约为测试集总体阳性比例的 4.70 倍。
+结论：FAERS 老年病例中，唑吡坦相关报告存在较明显的跌倒相关不良事件信号。该信号在不同暴露定义和统计方法下方向一致，并与既往指南、FDA 安全警示以及 Z-drugs 跌倒/骨折风险研究相互印证。临床使用唑吡坦时，应重点关注高龄、多重用药及合并中枢神经系统药物使用患者的跌倒风险。机器学习模型可作为药物警戒研究中的辅助筛选和风险排序工具，但不能替代传统信号挖掘方法，也不能直接解释为临床因果预测。本研究结果仍需在医保数据库、电子病历数据库或前瞻性研究中进一步验证。
 关键词：唑吡坦；老年人；跌倒；FAERS；药物警戒；机器学习
 Abstract
 Objective: Zolpidem is a commonly used non-benzodiazepine hypnotic for the treatment of insomnia. Older adults have an intrinsically higher risk of falls and frequently experience polypharmacy and concomitant use of central nervous system medications. These factors may amplify fall-related safety concerns associated with zolpidem. This study aimed to evaluate post-marketing pharmacovigilance signals of zolpidem-associated fall events among older adults using the FDA Adverse Event Reporting System (FAERS), and to explore the utility of machine learning for auxiliary identification and prioritization of fall-related reports.
-Methods: Quarterly FAERS data from 2004 to 2025 were downloaded and processed. Cases aged 65 years or older were included. A case-level analytical dataset was constructed by deduplicating DEMO records, identifying zolpidem, other Z-drugs, polypharmacy, and concomitant central nervous system medications from DRUG records, defining narrow and broad fall-related outcomes from REAC records, and extracting serious outcomes from OUTC records. The primary exposure was zolpidem reported as either primary suspect or secondary suspect. Disproportionality analyses were performed using the reporting odds ratio (ROR), proportional reporting ratio (PRR), information component (IC), and empirical Bayes geometric mean (EBGM). Sensitivity analyses included a primary-suspect-only exposure definition, broad fall-related outcomes, comparison with other Z-drugs, and multivariable adjustment. Logistic regression, random forest, and XGBoost models were further developed to support auxiliary identification and risk ranking of narrow fall reports among older FAERS cases.
-Results: After full-period deduplication, 4,155,023 older adult FAERS cases were included from 2004 to 2025, including 132,266 narrow fall cases and 298,906 broad fall-related cases. There were 8,011 zolpidem suspect exposure cases, and 7,798 cases remained in the primary analysis after excluding mixed Z-drug exposure. In the primary analysis, the reporting proportion of narrow fall events was 13.38% in the zolpidem suspect group and 3.16% in the reference group. The ROR was 4.73 (95% CI: 4.43-5.05), the PRR was 4.23 (95% CI: 3.99-4.47), the IC was 2.07, and the EBGM was 4.19; all four methods indicated a positive signal. Analyses using broad fall-related outcomes and the primary-suspect-only definition showed consistent directions. Multivariable models indicated that zolpidem suspect exposure remained associated with a higher reporting odds of narrow fall events after adjustment for age, sex, reporting year, quarter, polypharmacy, and common concomitant central nervous system medications. Exploratory stratified analyses suggested higher fall-reporting proportions among cases with advanced age, polypharmacy, antidepressant use, opioid use, or antiepileptic drug use. In the machine learning analysis, XGBoost achieved a test ROC-AUC of 0.772 and an average precision of 0.119 in 2025 data. The top 5% highest-risk cases identified by XGBoost had a narrow fall event proportion of 14.79%, approximately 4.70 times the overall positive proportion in the test set.
-Conclusion: A notable pharmacovigilance signal for fall-related adverse event reports was observed for zolpidem among older adults in FAERS. The signal was consistent across outcome definitions, exposure definitions, and statistical methods, and was aligned with existing clinical guidelines, FDA safety communications, and prior evidence on fall and fracture risks associated with Z-drugs. In clinical practice, fall risk should be carefully assessed when zolpidem is used in older adults, especially in those with advanced age, polypharmacy, or concomitant central nervous system medications. Machine learning may serve as an auxiliary tool for case prioritization and risk ranking in pharmacovigilance research, but it should not replace traditional signal detection methods or be interpreted as a causal clinical prediction model. Further validation using claims databases, electronic health records, or prospective studies is warranted.
+Methods: Quarterly FAERS data from 2004 to 2025 were downloaded and processed. Cases aged 65 years or older were included. A case-level analytical dataset was constructed by deduplicating DEMO records, identifying zolpidem, other Z-drugs, polypharmacy, and concomitant central nervous system medications from DRUG records, defining narrow fall outcomes from REAC records, and extracting serious outcomes from OUTC records. The primary exposure was zolpidem reported as either primary suspect or secondary suspect. Disproportionality analyses were performed using the reporting odds ratio (ROR), proportional reporting ratio (PRR), information component (IC), and empirical Bayes geometric mean (EBGM). Sensitivity analyses included a primary-suspect-only exposure definition, comparison with other Z-drugs, and multivariable adjustment. Logistic regression, random forest, and XGBoost models were further developed to support auxiliary identification and risk ranking of narrow fall reports among older FAERS cases.
+Results: After full-period deduplication, 4,155,023 older adult FAERS cases were included from 2004 to 2025, including 132,456 narrow fall cases. There were 8,011 zolpidem suspect exposure cases, and 7,798 cases remained in the primary analysis after excluding mixed Z-drug exposure. In the primary analysis, the reporting proportion of narrow fall events was 13.57% in the zolpidem suspect group and 3.19% in the reference group. The ROR was 4.80, the PRR was 4.28, the IC was 2.09, and the EBGM was 4.24; all four methods indicated a positive signal. Multivariable models indicated that zolpidem suspect exposure remained associated with a higher reporting odds of narrow fall events after adjustment for age, sex, reporting year, quarter, polypharmacy, distinct drug count, and common concomitant central nervous system medications; the association remained stable after further adjustment for report-source and indication variables. Exploratory stratified analyses suggested higher fall-reporting proportions among cases with advanced age, polypharmacy, antidepressant use, opioid use, or antiepileptic drug use. In the machine learning analysis, XGBoost achieved a test ROC-AUC of 0.772 and an average precision of 0.119 in 2025 data. The top 5% highest-risk cases identified by XGBoost had a narrow fall event proportion of 14.79%, approximately 4.70 times the overall positive proportion in the test set.
+Conclusion: A notable pharmacovigilance signal for fall-related adverse event reports was observed for zolpidem among older adults in FAERS. The signal was consistent across exposure definitions and statistical methods, and was aligned with existing clinical guidelines, FDA safety communications, and prior evidence on fall and fracture risks associated with Z-drugs. In clinical practice, fall risk should be carefully assessed when zolpidem is used in older adults, especially in those with advanced age, polypharmacy, or concomitant central nervous system medications. Machine learning may serve as an auxiliary tool for case prioritization and risk ranking in pharmacovigilance research, but it should not replace traditional signal detection methods or be interpreted as a causal clinical prediction model. Further validation using claims databases, electronic health records, or prospective studies is warranted.
 Key words: zolpidem; older adults; falls; FAERS; pharmacovigilance; machine learning
 目  录
 第一章 绪论	1
@@ -74,7 +74,6 @@ Key words: zolpidem; older adults; falls; FAERS; pharmacovigilance; machine lear
 3.8 本章小结	20
 第四章 唑吡坦相关跌倒事件信号挖掘结果	22
 4.1 主分析：唑吡坦 suspect 暴露与狭义跌倒事件	22
-4.2 广义跌倒相关事件补充分析	23
 4.3 PS only 敏感性分析	24
 4.4 与其他 Z-drugs 的比较分析	24
 4.5 探索性分层分析	25
@@ -152,8 +151,8 @@ FAERS 的优势在于覆盖时间长、数据量大、包含真实世界中多�
 1.5.1 研究目的
 本研究拟基于 2004-2025 年 FAERS 数据库，系统分析老年人群中唑吡坦相关跌倒事件报告信号。具体目的包括：
 第一，构建 2004-2025 年 FAERS 老年病例级分析数据集，提取唑吡坦、其他 Z-drugs、合并用药和跌倒相关不良事件变量。
-第二，使用 ROR、PRR、IC 和 EBGM 等不成比例分析方法，评价唑吡坦 suspect 暴露与狭义跌倒及广义跌倒相关事件之间是否存在报告信号。
-第三，通过 PS only 暴露定义、广义跌倒结局和其他 Z-drugs 比较分析，评价研究结果的稳定性。
+第二，使用 ROR、PRR、IC 和 EBGM 等不成比例分析方法，评价唑吡坦 suspect 暴露与狭义跌倒事件之间是否存在报告信号。
+第三，通过 PS only 暴露定义和其他 Z-drugs 比较分析，评价研究结果的稳定性。
 第四，使用多因素校正模型控制年龄、性别、年份、季度、多重用药和中枢神经系统相关合并用药等可获得协变量。
 第五，构建逻辑回归、随机森林和 XGBoost 模型，探索 FAERS 老年病例中跌倒事件报告的多维特征组合和风险排序能力。
 1.5.2 研究意义
@@ -165,15 +164,15 @@ FAERS 的优势在于覆盖时间长、数据量大、包含真实世界中多�
 本研究的创新点主要包括以下方面。
 第一，研究时间跨度较长。本研究整合 2004-2025 年 FAERS 数据，构建全周期病例级数据集，覆盖唑吡坦长期上市后不良事件报告情况。
 第二，研究对象聚焦老年人群。老年人是跌倒高风险人群，也是镇静催眠药安全性管理重点人群，研究对象具有较强临床药学意义。
-第三，暴露和结局定义较完整。本研究同时设置 PS+SS 主分析和 PS only 敏感性分析，同时设置狭义跌倒和广义跌倒相关事件两类结局。
+第三，暴露定义较完整。本研究同时设置 PS+SS 主分析和 PS only 敏感性分析，并以狭义跌倒事件作为正式分析结局。
 第四，使用多种药物警戒信号检测方法。本研究同时计算 ROR、PRR、IC 和 EBGM，避免完全依赖单一算法。
 第五，引入机器学习辅助识别模型。本研究将逻辑回归、随机森林和 XGBoost 用于 FAERS 老年病例跌倒事件辅助排序，但严格限定其解释边界，不将其夸大为临床因果模型或个体预测工具。
 1.7 技术路线
 本研究技术路线包括以下步骤：
 第一，下载并整理 2004-2025 年 FAERS 季度数据，读取 DEMO、DRUG、REAC 和 OUTC 等原始表。
-第二，对季度数据进行清洗和病例级整理。DEMO 表用于病例基础信息和去重；DRUG 表用于构建唑吡坦、其他 Z-drugs 和合并用药变量；REAC 表用于识别狭义跌倒和广义跌倒相关事件；OUTC 表用于构建严重结局变量。
+第二，对季度数据进行清洗和病例级整理。DEMO 表用于病例基础信息和去重；DRUG 表用于构建唑吡坦、其他 Z-drugs 和合并用药变量；REAC 表用于识别狭义跌倒事件；OUTC 表用于构建严重结局变量。
 第三，合并季度数据，构建 2004-2025 年全周期病例级数据集，并进行描述性统计分析。
-第四，采用 ROR、PRR、IC 和 EBGM 进行不成比例信号检测，并进行 PS only、广义跌倒和其他 Z-drugs 比较等敏感性分析。
+第四，采用 ROR、PRR、IC 和 EBGM 进行不成比例信号检测，并进行 PS only 和其他 Z-drugs 比较等敏感性分析。
 第五，构建多因素校正模型，控制年龄、性别、年份、季度、多重用药和常见中枢神经系统合并用药等变量。
 第六，构建机器学习特征表，按时间划分训练集、验证集和测试集，训练逻辑回归、随机森林和 XGBoost 模型，评价其辅助识别和风险排序能力。
 第七，结合药物警戒结果、机器学习结果、既往文献和老年药学理论，对唑吡坦相关跌倒事件信号进行综合讨论。
@@ -203,11 +202,10 @@ FAERS 中 DRUG 表包含药物角色字段。通常 PS 表示 primary suspect，
 在目标药物分组方面，本研究将病例划分为无目标 Z-drug suspect、zolpidem only、other zdrug only 以及同时包含 zolpidem 和其他 Z-drug 的混合暴露组。主分析中，为了减少混合暴露解释困难，比较时排除同时包含 zolpidem 和其他 Z-drug 的病例。
 2.3.5 REAC 表处理与跌倒结局定义
 REAC 表用于识别不良事件结局。处理时首先将不良事件首选语统一转换为大写并去除多余空格。然后根据预设的首选语集合构建病例级跌倒结局变量。
-本研究设置两类跌倒结局。第一类为狭义跌倒结局，主要包括 FALL、FALLING 和 FALLING DOWN 等直接表示跌倒的不良事件术语。第二类为广义跌倒相关结局，除狭义跌倒术语外，还包括步态异常、平衡障碍、眩晕、前庭障碍、视觉障碍、低血压和体位性低血压等可能与跌倒风险相关的术语。这样设置主要是为了兼顾结局特异性和敏感性：狭义结局更适合作为主分析，广义结局更适合作为补充分析，用于观察跌倒相关临床表现是否也呈现同向信号[25,28-33]。
-狭义跌倒结局用于主分析，因为它特异性较强，解释更直接。广义跌倒相关结局用于补充分析和敏感性分析，因为它能覆盖跌倒发生前后可能相关的临床表现，但特异性相对较低。
+本研究正式分析使用狭义跌倒结局，主要包括 FALL、FALLING 和 FALLING DOWN 等直接表示跌倒的不良事件术语。选择狭义跌倒结局作为主结局，是为了提高结局特异性，使信号解释更加直接、清楚。
 2.3.6 OUTC 表处理与严重结局定义
 OUTC 表用于识别严重结局。本研究从 OUTC 表中构建死亡、危及生命、住院、需要干预、残疾、先天异常和其他严重结局等变量，并进一步生成总体严重结局变量。若病例存在任一严重结局标识，则定义为严重病例。
-严重结局变量一方面用于描述研究人群特征，另一方面也作为扩展校正模型中的协变量。需要说明的是，严重结局可能既反映病例本身严重程度，也可能与报告倾向有关，因此在解释时应保持谨慎。
+严重结局变量主要用于描述研究人群特征。
 2.3.7 病例级主分析表构建
 病例级主分析表以 DEMO 表保留病例为基础，通过病例编号连接 REAC 衍生的跌倒结局、DRUG 衍生的药物特征、DRUG 暴露定义以及 OUTC 衍生的严重结局变量。连接方式以左连接为主，目的是保留 DEMO 表中的有效病例。
 对于未在 REAC 表中命中跌倒术语的病例，跌倒结局变量标记为 False。对于未在 DRUG 表中出现相应药物的病例，药物暴露变量标记为 False。对于缺失的药物计数变量，按 0 处理。通过这种方式，每个有效病例最终形成一条病例级记录。
@@ -219,14 +217,13 @@ OUTC 表用于识别严重结局。本研究从 OUTC 表中构建死亡、危及
 本研究主要暴露变量为唑吡坦 suspect 暴露。主分析采用 PS+SS 口径，即唑吡坦被报告为 primary suspect 或 secondary suspect 均视为暴露。敏感性分析采用 PS only 口径，即仅 primary suspect 视为暴露。
 其他 Z-drugs 作为比较和扩展分析对象，主要包括 zaleplon、zopiclone 和 eszopiclone。研究同时构建 zolpidem only、other zdrug only 和混合暴露组，用于比较唑吡坦与其他 Z-drugs 相关跌倒信号的差异。
 2.5.2 结局变量
-主要结局为狭义跌倒事件，对应 REAC 表中明确表示跌倒的首选语。次要结局为广义跌倒相关事件，包括跌倒、步态异常、平衡障碍、眩晕、前庭障碍、视觉障碍、低血压和体位性低血压等相关术语。
-主分析选择狭义跌倒事件，是为了保证结果解释清楚。广义结局用于补充分析，帮助观察唑吡坦相关报告是否也集中于跌倒相关临床表现。
+主要结局为狭义跌倒事件，对应 REAC 表中明确表示跌倒的首选语。主分析选择狭义跌倒事件，是为了保证结果解释清楚。
 2.5.3 协变量
-本研究纳入的协变量包括年龄组、性别、报告年份、报告季度、多重用药、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物、抗癫痫药和严重结局等。年龄组主要划分为 65-74 岁、75-84 岁和 85 岁及以上。多重用药定义为病例中去重药物数大于或等于 5。上述变量选择主要参考老年跌倒危险因素、药物相关跌倒、老年潜在不适当用药和中枢神经系统用药风险相关文献[1,31-43]。
+本研究核心校正模型纳入年龄组、性别、报告年份、报告季度、多重用药、去重药物数、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药等协变量。扩展模型进一步纳入报告国家、报告类型、电子提交标记以及失眠、焦虑、抑郁、疼痛、癫痫、眩晕/眩晕样症状等适应证相关变量。年龄组主要划分为 65-74 岁、75-84 岁和 85 岁及以上。多重用药定义为病例中去重药物数大于或等于 5。上述变量选择主要参考老年跌倒危险因素、药物相关跌倒、老年潜在不适当用药和中枢神经系统用药风险相关文献[1,31-43]。
 这些协变量的纳入主要基于两点考虑：第一，它们可能与老年跌倒风险有关；第二，它们在 FAERS 数据中相对容易获得，适合用于病例级分析。
 2.6 描述性统计方法
 描述性分析用于展示研究人群、药物暴露和跌倒结局的基本分布。连续变量根据分布情况使用均数、标准差、中位数和四分位数进行描述。分类变量使用频数和百分比进行描述。
-本研究重点描述老年病例的年龄、性别、严重结局、多重用药、合并用药、唑吡坦暴露、其他 Z-drugs 暴露、狭义跌倒和广义跌倒相关事件分布。同时，针对报告国家进行描述，以观察不同国家报告来源构成。
+本研究重点描述老年病例的年龄、性别、严重结局、多重用药、合并用药、唑吡坦暴露、其他 Z-drugs 暴露和狭义跌倒事件分布。同时，针对报告国家进行描述，以观察不同国家报告来源构成。
 2.7 不成比例分析方法
 2.7.1 四格表构建
 本研究使用不成比例分析评估唑吡坦相关报告与跌倒事件之间是否存在不良事件信号。对于每一个暴露-结局组合，构建如下四格表：
@@ -248,7 +245,7 @@ PRR = [a / (a + b)] / [c / (c + d)]
 需要强调的是，不成比例分析发现的是“报告信号”，不是因果关系。也就是说，结果可以提示唑吡坦相关报告中跌倒事件相对更多，但不能直接证明唑吡坦一定导致跌倒。FDA 和方法学文献均强调，FAERS 信号需要结合临床合理性、既往研究和其他真实世界数据进一步验证[45-53]。
 2.8 多因素校正分析方法
 为了进一步控制部分可获得混杂因素，本研究采用多因素模型评估唑吡坦 suspect 暴露与跌倒事件之间的关系。基础校正模型纳入年龄组、性别、年份、季度、多重用药、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药等变量。
-扩展模型在基础模型基础上进一步加入严重结局变量。这样设计的目的，是观察加入病例严重程度相关变量后，唑吡坦暴露项的方向和大小是否发生明显变化。
+扩展模型在核心临床模型基础上进一步加入报告来源和适应证相关变量。这样设计的目的，是观察控制报告结构和基础适应证信息后，唑吡坦暴露项的方向和大小是否发生明显变化。
 模型结果主要报告暴露变量的回归系数、标准误、P 值和相应效应量。解释时以方向、稳定性和与不成比例分析结果的一致性为重点，而不将其解释为严格因果效应。
 2.9 机器学习辅助分析方法
 2.9.1 建模目的
@@ -278,15 +275,15 @@ PRR = [a / (a + b)] / [c / (c + d)]
 表 3-1 2004-2025 年全周期数据集构建结果
 从数据处理流程看，原始数据经清洗和去重后，约保留 415 万例唯一病例用于后续分析。由于 FAERS 为自发报告数据库，同一病例可能存在补充报告或版本更新，因此病例级去重是保证结果不被重复病例放大的关键步骤。
 3.2 全周期主要变量总体分布
-在 2004-2025 年全周期病例中，狭义跌倒事件共 132,266 例，广义跌倒相关事件共 298,906 例。狭义跌倒主要用于后续主分析，广义跌倒相关事件用于补充分析和敏感性分析。
+在 2004-2025 年全周期病例中，狭义跌倒事件共 132,456 例。狭义跌倒用于后续正式信号分析、敏感性分析和校正分析。
 药物暴露方面，唑吡坦任意暴露病例为 38,709 例；唑吡坦 suspect 暴露病例为 8,011 例；其中以 primary suspect 口径定义的唑吡坦暴露病例为 4,314 例。其他 Z-drugs suspect 暴露病例为 7,012 例；其中 primary suspect 口径下为 2,925 例。
 表 3-2 显示 2004-2025 年全周期核心变量分布。
 表 3-2 2004-2025 年全周期核心变量分布
 在目标药物分组中，PS+SS 口径下 zolpidem only 病例为 7,798 例，other zdrug only 病例为 6,799 例，同时包含 zolpidem 和其他 Z-drug 的混合暴露病例为 213 例。主分析排除混合暴露病例后，将 zolpidem only 作为目标暴露组，并将其他非目标可疑药物报告作为参照。
 PS only 口径下，zolpidem only 病例为 4,314 例，other zdrug only 病例为 2,925 例，未观察到同时包含 zolpidem 和其他 Z-drug 的混合暴露病例。该口径主要用于敏感性分析。
 3.3 主分析人群与暴露-结局粗分布
-在主分析中，本研究比较唑吡坦 suspect 暴露病例与其他可疑药物病例中的狭义跌倒事件报告比例。排除混合 Z-drug 暴露病例后，主分析数据集中唑吡坦 suspect 暴露组共有 7,798 例，其中发生狭义跌倒事件 1,043 例，未发生狭义跌倒事件 6,755 例。参照组中发生狭义跌倒事件 131,211 例，未发生狭义跌倒事件 4,015,664 例。
-从粗报告比例看，唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.38%，高于参照组。广义跌倒相关事件分析中，唑吡坦 suspect 暴露组共有 1,448 例发生广义跌倒相关事件，报告比例为 18.57%。
+在主分析中，本研究比较唑吡坦 suspect 暴露病例与其他可疑药物病例中的狭义跌倒事件报告比例。排除混合 Z-drug 暴露病例后，主分析数据集中唑吡坦 suspect 暴露组共有 7,798 例，其中发生狭义跌倒事件 1,058 例，未发生狭义跌倒事件 6,740 例。参照组中发生狭义跌倒事件 131,398 例，未发生狭义跌倒事件 4,015,477 例。
+从粗报告比例看，唑吡坦 suspect 暴露组狭义跌倒事件报告比例高于参照组。
 表 3-3 显示主分析和敏感性分析中的暴露-结局粗分布。
 表 3-3 唑吡坦暴露与跌倒结局的粗分布
 可以看到，无论采用 PS+SS 口径还是 PS only 口径，唑吡坦暴露组中跌倒相关事件均占有一定比例。PS+SS 口径的暴露病例数更多，适合作为主分析；PS only 口径更严格，适合用于检验结果方向是否稳定。
@@ -307,69 +304,55 @@ PS only 口径下，zolpidem only 病例为 4,314 例，other zdrug only 病例�
 表 3-6 2025 年多重用药和合并用药分布
 这些合并用药变量在老年跌倒研究中具有重要意义。苯二氮卓类、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药均可能影响中枢神经系统功能或运动协调能力，因此后续校正分析将其纳入协变量。
 3.6 2025 年跌倒相关事件分布
-2025 年病例中，狭义跌倒事件 11,980 例，占 3.33%；广义跌倒相关事件 25,729 例，占 7.16%。广义跌倒相关事件中，最常见的 PT 为 FALL，共 10,377 例，占全部病例的 2.89%，占广义跌倒相关事件的 40.33%。其次为 HYPOTENSION、GAIT DISTURBANCE、VISUAL IMPAIRMENT 和 BALANCE DISORDER。
-表 3-7 显示 2025 年广义跌倒相关事件中常见 PT 分布。
-表 3-7 2025 年广义跌倒相关事件常见 PT 分布
-从 PT 构成看，广义跌倒相关事件并非单纯扩大为所有非特异性不良事件，而是主要集中在跌倒、低血压、步态异常、视觉障碍、平衡障碍和眩晕等与跌倒机制相关的临床表现。这为后续将广义跌倒作为补充结局提供了一定合理性。
 3.7 报告国家分布
 本研究进一步分析了 2004-2025 年老年跌倒病例的报告国家分布。以狭义跌倒事件为例，65-74 岁年龄段共纳入 54,217 例狭义跌倒病例，其中美国报告 32,941 例，占 60.76%；加拿大报告 4,772 例，占 8.80%；报告国家未知 3,052 例，占 5.63%；日本、法国、英国和德国也位居前列。
-广义跌倒相关事件中，65-74 岁年龄段共纳入 141,597 例病例，其中美国报告 83,769 例，占 59.16%；加拿大报告 9,937 例，占 7.02%；报告国家未知 7,024 例，占 4.96%；英国、法国、德国和日本报告数较多。
 表 3-8 显示 65-74 岁年龄段跌倒病例主要报告国家分布。
 表 3-8 2004-2025 年 65-74 岁跌倒病例主要报告国家分布
 报告国家分布显示，美国报告占比较高，这与 FAERS 作为美国 FDA 数据库的属性一致。不同国家报告比例不能直接解释为不同国家真实风险差异，因为报告制度、用药习惯、监管要求和报告积极性均会影响报告数量。
 3.8 本章小结
-本章对 2004-2025 年 FAERS 数据处理结果和主要变量分布进行了描述。全周期去重后共获得 4,155,023 例病例，其中狭义跌倒事件 132,266 例，广义跌倒相关事件 298,906 例。唑吡坦任意暴露病例为 38,709 例，唑吡坦 suspect 暴露病例为 8,011 例。
-在主分析口径下，排除混合 Z-drug 暴露病例后，唑吡坦 suspect 暴露组共有 7,798 例，其中狭义跌倒事件 1,043 例，粗报告比例为 13.38%；广义跌倒相关事件 1,448 例，粗报告比例为 18.57%。这些结果提示，唑吡坦相关报告中跌倒事件具有较高的报告比例，但仍需通过不成比例分析和多因素校正分析进一步评价其信号强度和稳定性。
-2025 年度描述性分析显示，病例主要集中在 65-84 岁，女性略多于男性，严重病例占比较高，多重用药和中枢神经系统相关合并用药较为常见。广义跌倒相关事件主要由 FALL、HYPOTENSION、GAIT DISTURBANCE、VISUAL IMPAIRMENT 和 BALANCE DISORDER 等 PT 构成，符合跌倒相关临床表现的基本特征。
+本章对 2004-2025 年 FAERS 数据处理结果和主要变量分布进行了描述。全周期去重后共获得 4,155,023 例病例，其中狭义跌倒事件 132,456 例。唑吡坦任意暴露病例为 38,709 例，唑吡坦 suspect 暴露病例为 8,011 例。
+在主分析口径下，排除混合 Z-drug 暴露病例后，唑吡坦 suspect 暴露组共有 7,798 例，其中狭义跌倒事件 1,058 例，粗报告比例为 13.57%。这些结果提示，唑吡坦相关报告中跌倒事件具有较高的报告比例，但仍需通过不成比例分析和多因素校正分析进一步评价其信号强度和稳定性。
+2025 年度描述性分析显示，病例主要集中在 65-84 岁，女性略多于男性，严重病例占比较高，多重用药和中枢神经系统相关合并用药较为常见。
 总体而言，本章结果为后续唑吡坦相关跌倒事件信号挖掘、多因素校正分析和机器学习辅助识别模型构建提供了数据基础。
 第四章 唑吡坦相关跌倒事件信号挖掘结果
 4.1 主分析：唑吡坦 suspect 暴露与狭义跌倒事件
 本研究以 2004-2025 年全周期 FAERS 老年病例为基础，首先分析唑吡坦 suspect 暴露与狭义跌倒事件之间的不成比例报告信号。主分析采用 PS+SS 暴露口径，即唑吡坦被报告为 primary suspect 或 secondary suspect 时均定义为唑吡坦 suspect 暴露。为减少混合暴露对解释的影响，主分析排除同时包含唑吡坦和其他 Z-drugs suspect 暴露的病例。FAERS 属于自发报告系统，适合用于上市后安全信号发现，但结果需要解释为报告信号而非真实发生率或因果效应[44-53]。
-主分析结果显示，唑吡坦 suspect 暴露组共有 7,798 例，其中狭义跌倒事件 1,043 例，未发生狭义跌倒事件 6,755 例；参照组中狭义跌倒事件 131,211 例，非狭义跌倒事件 4,015,664 例。唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.38%，参照组为 3.16%。
-不成比例分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显报告信号。ROR 为 4.73，95%CI 为 4.43-5.05；PRR 为 4.23，95%CI 为 3.99-4.47；IC 为 2.07，IC025 为 1.98；EBGM 为 4.19，EB05 为 3.98。四种信号检测方法均达到阳性信号判定标准。ROR、PRR、IC 和 EBGM 是自发报告数据库中常用的信号检测指标，多指标联合观察有助于提高结果解释的稳健性[54-60]。
+主分析结果显示，唑吡坦 suspect 暴露组共有 7,798 例，其中狭义跌倒事件 1,058 例，未发生狭义跌倒事件 6,740 例；参照组中狭义跌倒事件 131,398 例，非狭义跌倒事件 4,015,477 例。唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.57%，参照组为 3.19%。
+不成比例分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显报告信号。ROR 为 4.80；PRR 为 4.28；IC 为 2.09；EBGM 为 4.24。四种信号检测方法均达到阳性信号判定标准。ROR、PRR、IC 和 EBGM 是自发报告数据库中常用的信号检测指标，多指标联合观察有助于提高结果解释的稳健性[54-60]。
 表 4-1 显示唑吡坦 suspect 暴露与狭义跌倒事件的主分析结果。
 表 4-1 唑吡坦 suspect 暴露与狭义跌倒事件的不成比例分析结果
 该结果提示，在 FAERS 老年病例报告中，唑吡坦 suspect 暴露病例中狭义跌倒事件的报告比例高于其他可疑药物病例。需要强调的是，这一结果表示报告信号增强，而不是直接证明唑吡坦导致跌倒。既往指南、FDA 安全警示和观察性研究已提示 Z-drugs 在老年人中存在跌倒、骨折、次日损害和复杂睡眠行为等安全问题，本研究结果与这些外部证据方向一致[1,9-22,69-70]。
-4.2 广义跌倒相关事件补充分析
-在广义跌倒相关事件分析中，仍采用 PS+SS 暴露口径。结果显示，唑吡坦 suspect 暴露组中发生广义跌倒相关事件 1,448 例，未发生广义跌倒相关事件 6,350 例；参照组中发生广义跌倒相关事件 297,438 例，未发生广义跌倒相关事件 3,849,437 例。唑吡坦 suspect 暴露组广义跌倒相关事件报告比例为 18.57%，参照组为 7.17%。
-不成比例分析显示，唑吡坦 suspect 暴露与广义跌倒相关事件之间同样存在阳性报告信号。ROR 为 2.95，95%CI 为 2.79-3.12；PRR 为 2.59，95%CI 为 2.47-2.71；IC 为 1.37，IC025 为 1.29；EBGM 为 2.58，EB05 为 2.47。四种方法均达到阳性信号标准。
-表 4-2 显示广义跌倒相关事件补充分析结果。
-表 4-2 唑吡坦 suspect 暴露与广义跌倒相关事件的不成比例分析结果
-与狭义跌倒结局相比，广义跌倒相关事件的信号强度较低，但方向一致。这可能与广义结局包含低血压、步态异常、视觉障碍、平衡障碍和眩晕等多类相关临床表现有关。这些事件与跌倒风险有关，但特异性低于直接跌倒事件，因此信号强度有所下降是可以理解的。
 4.3 PS only 敏感性分析
 为了验证主分析结果是否受到暴露定义影响，本研究进一步采用更严格的 PS only 暴露口径进行敏感性分析。PS only 口径下，仅当唑吡坦被报告为 primary suspect 时才定义为暴露。
 狭义跌倒结局分析显示，唑吡坦 primary suspect 暴露组共有 4,314 例，其中狭义跌倒事件 465 例，未发生狭义跌倒事件 3,849 例；参照组中狭义跌倒事件 131,798 例，非狭义跌倒事件 4,018,121 例。暴露组报告比例为 10.78%，参照组为 3.18%。
 不成比例分析显示，PS only 口径下仍存在阳性信号。ROR 为 3.68，95%CI 为 3.34-4.06；PRR 为 3.39，95%CI 为 3.11-3.70；IC 为 1.76，IC025 为 1.62；EBGM 为 3.36，EB05 为 3.12。四种方法均提示阳性信号。
-广义跌倒相关事件分析中，唑吡坦 primary suspect 暴露组发生广义跌倒相关事件 661 例，暴露组报告比例为 15.32%，参照组为 7.19%。ROR 为 2.34，95%CI 为 2.15-2.54；PRR 为 2.13，95%CI 为 1.99-2.29；IC 为 1.09，IC025 为 0.98；EBGM 为 2.12，EB05 为 1.99。该分析中 ROR、PRR 和 IC 均达到阳性标准，EBGM 下限略低于 2，但综合判定仍为检测到信号。
 表 4-3 显示 PS only 敏感性分析结果。
 表 4-3 PS only 口径下唑吡坦暴露与跌倒相关事件分析结果
 PS only 敏感性分析结果与 PS+SS 主分析方向一致，说明唑吡坦相关跌倒信号不完全依赖于较宽松的 suspect 暴露定义。即使仅保留 primary suspect 报告，唑吡坦与跌倒相关事件之间仍存在较稳定的不成比例报告信号。
 4.4 与其他 Z-drugs 的比较分析
-本研究进一步比较 zolpidem only 与 other zdrug only 病例中的跌倒事件报告比例。PS+SS 口径下，zolpidem only 组共有 7,798 例，狭义跌倒事件 1,043 例，报告比例为 13.38%；other zdrug only 组共有 6,799 例，狭义跌倒事件 628 例，报告比例为 9.24%。
+本研究进一步比较 zolpidem only 与 other zdrug only 病例中的跌倒事件报告比例。PS+SS 口径下，zolpidem only 组共有 7,798 例，狭义跌倒事件 1,058 例，报告比例为 13.57%；other zdrug only 组共有 6,799 例，狭义跌倒事件 628 例，报告比例为 9.24%。
 不成比例比较显示，zolpidem only 组相较于 other zdrug only 组的狭义跌倒报告比例更高。ROR 为 1.52，95%CI 为 1.37-1.68；PRR 为 1.45，95%CI 为 1.32-1.59；IC 为 0.22，IC025 为 0.14。ROR 与 IC 指标提示阳性信号，但 PRR 未达到 MHRA 标准，EBGM 也未达到 EB05 大于或等于 2 的标准。因此，该比较结果提示唑吡坦相较其他 Z-drugs 可能存在更高的跌倒报告比例，但信号强度弱于唑吡坦与所有其他可疑药物的主分析比较。
-广义跌倒相关事件中，zolpidem only 组发生事件 1,448 例，报告比例为 18.57%；other zdrug only 组发生事件 913 例，报告比例为 13.43%。ROR 为 1.47，95%CI 为 1.34-1.61；PRR 为 1.38，95%CI 为 1.28-1.49；IC 为 0.20，IC025 为 0.12。
 表 4-4 显示 zolpidem only 与 other zdrug only 的比较分析结果。
 表 4-4 唑吡坦与其他 Z-drugs 的比较分析结果
 PS only 口径下，zolpidem only 与 other zdrug only 的差异更明显。但该结果需要谨慎解释，因为 PS only 口径下 other zdrug only 病例数相对较少，且事件数较低，容易受到报告结构差异影响。因此，本文将该比较作为敏感性和补充分析，不作为核心结论。
 4.5 探索性分层分析
 本研究在唑吡坦 suspect 暴露病例内部进一步开展探索性分层分析，观察不同人口学特征、用药负担和合并用药情况下跌倒事件报告比例的差异。
-在年龄分层中，PS+SS 口径下，65-74 岁唑吡坦 suspect 病例狭义跌倒报告比例为 7.95%；75-84 岁为 15.53%；85 岁及以上为 24.09%。广义跌倒相关事件中，65-74 岁报告比例为 12.54%；75-84 岁为 21.29%；85 岁及以上为 29.24%。可以看到，随着年龄升高，跌倒相关事件报告比例明显增加。
-性别分层显示，PS+SS 口径下女性唑吡坦 suspect 病例狭义跌倒报告比例为 15.08%，男性为 9.89%；广义跌倒相关事件中女性为 20.46%，男性为 14.46%。女性病例中跌倒相关事件报告比例高于男性。
-用药负担方面，多重用药病例的狭义跌倒报告比例为 18.12%，广义跌倒相关事件报告比例为 23.86%，均高于唑吡坦 suspect 病例总体水平。合并用药方面，合并抗抑郁药病例狭义跌倒报告比例为 21.35%，合并阿片类药物病例为 20.44%，合并抗癫痫药病例为 18.56%，均显示较高的跌倒相关报告比例。
+在年龄分层中，PS+SS 口径下，65-74 岁唑吡坦 suspect 病例狭义跌倒报告比例为 7.95%；75-84 岁为 15.53%；85 岁及以上为 24.09%。可以看到，随着年龄升高，跌倒事件报告比例明显增加。
+性别分层显示，PS+SS 口径下女性唑吡坦 suspect 病例狭义跌倒报告比例为 15.08%，男性为 9.89%。女性病例中跌倒事件报告比例高于男性。
+用药负担方面，多重用药病例的狭义跌倒报告比例为 18.12%，高于唑吡坦 suspect 病例总体水平。合并用药方面，合并抗抑郁药病例狭义跌倒报告比例为 21.35%，合并阿片类药物病例为 20.44%，合并抗癫痫药病例为 18.56%，均显示较高的跌倒相关报告比例。
 表 4-5 显示 PS+SS 口径下唑吡坦 suspect 病例内部主要分层结果。
 表 4-5 唑吡坦 suspect 病例内部跌倒事件报告比例分层结果
 探索性分层结果提示，高龄、多重用药以及部分中枢神经系统相关合并用药可能与唑吡坦相关跌倒报告比例升高有关。这一发现符合老年药学中关于跌倒风险因素、药物相关跌倒和潜在不适当用药的基本认识[25-43]，但由于该分析仍基于自发报告数据，不能直接解释为风险因素的因果效应。
 4.6 多因素校正分析
-为了进一步控制可获得的病例特征，本研究构建多因素校正模型。基础模型纳入年龄组、性别、年份、季度、多重用药、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药等协变量。扩展模型在基础模型基础上进一步加入严重结局变量。
-主分析狭义跌倒结局中，基础模型显示唑吡坦 suspect 暴露的校正报告优势比为 3.24，95%CI 为 3.03-3.46，P 值小于 0.001。加入严重结局变量后，校正报告优势比为 2.91，95%CI 为 2.72-3.11，P 值小于 0.001。虽然加入严重结局后效应量有所下降，但方向和统计学显著性保持稳定。
-广义跌倒相关事件中，基础模型校正报告优势比为 2.23，95%CI 为 2.10-2.36；加入严重结局变量后为 2.07，95%CI 为 1.96-2.20。PS only 敏感性分析中，狭义跌倒结局的基础模型校正报告优势比为 3.07，95%CI 为 2.78-3.39；扩展模型为 2.77，95%CI 为 2.51-3.06。广义跌倒相关事件的基础模型校正报告优势比为 2.06，95%CI 为 1.89-2.24；扩展模型为 1.93，95%CI 为 1.77-2.10。
+为了进一步控制可获得的病例特征，本研究构建多因素校正模型。核心临床模型纳入年龄组、性别、年份、季度、多重用药、去重药物数、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药等协变量。扩展报告-适应证模型在核心临床模型基础上进一步加入报告国家、报告类型、电子提交标记和常见适应证相关变量。
+主分析狭义跌倒结局中，核心临床模型显示唑吡坦 suspect 暴露的校正报告优势比为 3.28，95%CI 为 3.07-3.51，P 值小于 0.001。扩展报告-适应证模型中，校正报告优势比为 2.74，95%CI 为 2.56-2.93，P 值小于 0.001。虽然进一步控制报告来源和适应证变量后效应量有所下降，但方向和统计学显著性保持稳定。
 表 4-6 显示多因素校正分析中唑吡坦暴露项的结果。
 表 4-6 唑吡坦暴露与跌倒相关事件的多因素校正分析结果
 校正模型结果与不成比例分析结果方向一致。也就是说，在控制年龄、性别、年份、季度、多重用药和常见中枢神经系统合并用药后，唑吡坦 suspect 暴露与跌倒相关事件之间仍存在较高的报告优势。该结果增强了主分析发现的稳定性。
 4.7 本章小结
-本章基于 2004-2025 年 FAERS 老年病例，对唑吡坦相关跌倒事件进行了信号挖掘和校正分析。主分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显不成比例报告信号，ROR 为 4.73，PRR 为 4.23，IC 为 2.07，EBGM 为 4.19，四种方法均达到阳性信号标准。
-广义跌倒相关事件补充分析和 PS only 敏感性分析均显示一致方向的阳性信号。与其他 Z-drugs 比较时，唑吡坦组跌倒相关事件报告比例也相对较高，但该部分信号强度低于主分析，且部分结果受病例数影响，解释时应更加谨慎。
-探索性分层分析显示，高龄、多重用药、合并抗抑郁药、合并阿片类药物和合并抗癫痫药等特征对应较高的跌倒事件报告比例。多因素校正分析进一步显示，在控制可获得协变量后，唑吡坦 suspect 暴露与狭义跌倒及广义跌倒相关事件之间仍存在稳定关联。
+本章基于 2004-2025 年 FAERS 老年病例，对唑吡坦相关跌倒事件进行了信号挖掘和校正分析。主分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显不成比例报告信号，ROR 为 4.80，PRR 为 4.28，IC 为 2.09，EBGM 为 4.24，四种方法均达到阳性信号标准。
+PS only 敏感性分析显示一致方向的阳性信号。与其他 Z-drugs 比较时，唑吡坦组狭义跌倒事件报告比例也相对较高，但该部分信号强度低于主分析，且部分结果受病例数影响，解释时应更加谨慎。
+探索性分层分析显示，高龄、多重用药、合并抗抑郁药、合并阿片类药物和合并抗癫痫药等特征对应较高的跌倒事件报告比例。多因素校正分析进一步显示，在控制可获得协变量后，唑吡坦 suspect 暴露与狭义跌倒事件之间仍存在稳定关联。
 总体而言，本章结果提示，FAERS 老年病例中唑吡坦相关报告存在跌倒相关不良事件信号，临床使用唑吡坦时应特别关注高龄、多重用药和合并中枢神经系统药物使用患者的跌倒风险。
 第五章 机器学习辅助识别模型探索
 5.1 建模目的与总体思路
@@ -426,14 +409,14 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 不过，由于 FAERS 数据库本身存在自发报告偏倚、缺少真实用药分母和临床随访信息等问题，本章模型不能解释为临床预测模型，也不能用于证明药物因果关系。其主要价值在于辅助理解 FAERS 报告中的多因素模式，并为后续更严格的真实世界研究提供线索。
 第六章 讨论
 6.1 主要研究发现
-本研究基于 2004-2025 年 FAERS 数据，对老年人群中唑吡坦相关跌倒事件进行了药物警戒分析，并进一步使用机器学习方法进行辅助识别探索。全周期去重后共纳入 4,155,023 例病例，其中狭义跌倒事件 132,266 例，广义跌倒相关事件 298,906 例。唑吡坦 suspect 暴露病例为 8,011 例，其中排除混合 Z-drug 暴露后，主分析暴露组为 7,798 例。
-主分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显不成比例报告信号。唑吡坦暴露组狭义跌倒报告比例为 13.38%，参照组为 3.16%；ROR 为 4.73，PRR 为 4.23，IC 为 2.07，EBGM 为 4.19。四种信号检测方法均提示阳性信号。广义跌倒相关事件分析和 PS only 敏感性分析也显示方向一致的阳性结果。多因素校正分析进一步显示，在控制年龄、性别、年份、季度、多重用药和常见中枢神经系统合并用药后，唑吡坦 suspect 暴露与跌倒相关事件之间仍保持较高的报告优势。
+本研究基于 2004-2025 年 FAERS 数据，对老年人群中唑吡坦相关跌倒事件进行了药物警戒分析，并进一步使用机器学习方法进行辅助识别探索。全周期去重后共纳入 4,155,023 例病例，其中狭义跌倒事件 132,456 例。唑吡坦 suspect 暴露病例为 8,011 例，其中排除混合 Z-drug 暴露后，主分析暴露组为 7,798 例。
+主分析显示，唑吡坦 suspect 暴露与狭义跌倒事件之间存在明显不成比例报告信号。唑吡坦暴露组狭义跌倒报告比例为 13.57%，参照组为 3.19%；ROR 为 4.80，PRR 为 4.28，IC 为 2.09，EBGM 为 4.24。四种信号检测方法均提示阳性信号。PS only 敏感性分析也显示方向一致的阳性结果。多因素校正分析进一步显示，在控制年龄、性别、年份、季度、多重用药、去重药物数、常见中枢神经系统合并用药以及报告来源和适应证变量后，唑吡坦 suspect 暴露与跌倒相关事件之间仍保持较高的报告优势。
 探索性分层分析显示，高龄、多重用药、合并抗抑郁药、合并阿片类药物和合并抗癫痫药等特征对应较高的跌倒事件报告比例。机器学习分析显示，XGBoost 在 2025 年测试集中的 ROC-AUC 为 0.772，前 5% 高风险病例中的狭义跌倒事件比例为 14.79%，约为总体阳性比例的 4.70 倍。模型特征重要性也提示年龄、报告类型、神经系统疾病相关变量、肌肉骨骼系统疾病相关变量、用药负担和合并用药等因素与跌倒事件报告相关。
 总体来看，本研究结果提示，在 FAERS 老年病例中，唑吡坦相关报告存在跌倒相关不良事件信号。该发现与老年药学中关于镇静催眠药增加跌倒、骨折和损伤风险的认识一致[1,9-17,69-70]，也提示临床药师在老年患者镇静催眠药管理中应更加重视跌倒风险评估。
 6.2 唑吡坦与老年跌倒相关性的药学解释
 唑吡坦属于非苯二氮卓类镇静催眠药，常被归入 Z-drugs。与传统苯二氮卓类药物相比，Z-drugs 在受体选择性和半衰期方面具有一定差异，因此曾被认为可能具有更好的安全性。然而，从老年患者用药角度看，唑吡坦仍作用于中枢神经系统。2023 年 AGS Beers Criteria 将 zolpidem、zaleplon 和 eszopiclone 等 Z-drugs 列为老年人潜在不适当用药，主要原因包括谵妄、跌倒、骨折、急诊就诊、住院和机动车事故等风险，而睡眠获益相对有限[1]。FDA 对唑吡坦次日损害和 Z-drugs 复杂睡眠行为的安全警示也提示，此类药物可能造成反应能力下降、异常行为和严重伤害[19-22]。因此，唑吡坦可能引起嗜睡、头晕、反应迟钝、注意力下降、运动协调能力下降和次日残余镇静等问题。这些效应与跌倒发生机制高度相关。
 老年患者对镇静催眠药更敏感，原因主要包括肝肾功能下降、体成分变化、血脑屏障和中枢神经系统敏感性改变、合并疾病较多以及多药并用常见等[35-38]。即使药物剂量不高，老年患者也可能出现比年轻人更明显的镇静、认知和运动功能影响。因此，在老年人群中，唑吡坦相关跌倒信号具有较强的药理学合理性。
-本研究中，狭义跌倒信号强度高于广义跌倒相关事件。狭义跌倒主要由 FALL、FALLING 等直接跌倒术语构成，特异性较高；广义跌倒相关事件还包括低血压、步态异常、视觉障碍、平衡障碍和眩晕等临床表现，覆盖面更广但特异性较低。因此，广义结局信号强度较低并不意外。两类结局方向一致，反而说明唑吡坦相关报告不仅集中于直接跌倒，也涉及多个可能与跌倒前状态或跌倒风险有关的临床表现。
+本研究的正式结局为狭义跌倒事件，主要由 FALL、FALLING 等直接跌倒术语构成，特异性较高，结果解释也更直接。
 6.3 与既往研究和指南认识的关系
 本研究结果与既往关于 Z-drugs 和老年跌倒、骨折风险的研究方向基本一致。既往系统评价和 Meta 分析显示，Z-drugs 使用与老年人骨折风险升高有关，并提示跌倒和损伤风险可能增加[9,16-17]。另一项聚焦 zolpidem 的 Meta 分析纳入超过 100 万名参与者，结果显示 zolpidem 使用与骨折风险升高相关，合并相对风险为 1.92，髋部骨折风险更高[10]。老年失眠患者、住院患者和护理院居民中的观察性研究也提示唑吡坦或非苯二氮卓类催眠药与跌倒或骨折风险有关[11-15,69]。虽然不同研究设计、研究人群和结局定义存在差异，但总体证据并不支持“Z-drugs 在老年人中完全安全”的观点。
 2023 年 AGS Beers Criteria 将非苯二氮卓类苯二氮卓受体激动剂类催眠药列为老年人潜在不适当用药，涉及 eszopiclone、zaleplon 和 zolpidem。该标准指出，这类药物在老年人中可产生与苯二氮卓类相似的不良反应，例如谵妄、跌倒、骨折、急诊就诊和住院等风险，而睡眠获益相对有限[1]。因此，Beers Criteria 通常建议老年人避免使用这类药物，尤其是存在跌倒风险或同时使用其他中枢神经系统活性药物时。
@@ -444,7 +427,7 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 多重用药也是本研究中非常重要的发现。唑吡坦 suspect 病例中，多重用药者狭义跌倒报告比例为 18.12%，高于总体唑吡坦 suspect 病例水平。多重用药可能通过多种机制增加跌倒风险，包括药物间相互作用、低血压、镇静、认知损害、眩晕、肌无力和依从性下降等。国内外老年合理用药文献均提示，多重用药和潜在不适当用药与不良结局有关，是老年药学管理的重要切入点[36-42]。
 合并用药方面，本研究显示合并抗抑郁药、阿片类药物、抗癫痫药、抗精神病药等病例的跌倒报告比例较高。这些药物本身就可能影响中枢神经系统功能，若与唑吡坦合用，可能出现镇静效应叠加。Beers Criteria、STOPPFall 和药物相关跌倒综述均强调，中枢神经系统活性药物是老年跌倒风险管理中的重点药物类别[1,31-33,38-39,43]。临床药学实践中，不能只看单个药物是否合理，还要看患者整体用药组合是否增加跌倒风险。
 6.5 与其他 Z-drugs 比较的解释
-本研究中，zolpidem only 与 other zdrug only 的比较显示，唑吡坦组跌倒相关事件报告比例相对较高。PS+SS 口径下，zolpidem only 组狭义跌倒报告比例为 13.38%，other zdrug only 组为 9.24%；广义跌倒相关事件中分别为 18.57% 和 13.43%。从 ROR 和 IC 指标看，唑吡坦相较其他 Z-drugs 也存在一定报告信号。
+本研究中，zolpidem only 与 other zdrug only 的比较显示，唑吡坦组狭义跌倒事件报告比例相对较高。PS+SS 口径下，zolpidem only 组狭义跌倒报告比例为 13.57%，other zdrug only 组为 9.29%。从 ROR 和 IC 指标看，唑吡坦相较其他 Z-drugs 也存在一定报告信号。
 不过，这一结果需要谨慎解释。首先，FAERS 中不同 Z-drugs 的使用规模、上市时间、国家分布和报告习惯可能不同。其次，唑吡坦在部分国家和地区使用更广，报告数量也可能更多。再次，PS only 口径下 other zdrug only 病例数较少，容易导致估计不稳定。因此，本研究不宜简单得出“唑吡坦一定比其他 Z-drugs 更危险”的结论。
 更稳妥的解释是：在 FAERS 老年病例报告中，唑吡坦相关跌倒报告比例高于其他 Z-drugs 参照组，这提示唑吡坦应作为老年镇静催眠药安全性管理中的重点关注对象。未来仍需使用处方数据库、医保数据库或电子病历数据进一步比较不同 Z-drugs 的真实风险差异。
 6.6 机器学习辅助分析的意义
@@ -461,7 +444,7 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 本研究具有以下优势。
 第一，数据时间跨度较长。本研究覆盖 2004-2025 年 FAERS 数据，能够较全面地反映唑吡坦上市后长期不良事件报告情况。
 第二，研究对象聚焦老年人群。老年患者是跌倒高风险人群，也是镇静催眠药安全性管理的重点人群。聚焦这一人群有较强的临床药学意义。
-第三，暴露和结局定义较完整。本研究同时设置 PS+SS 主分析和 PS only 敏感性分析，同时设置狭义跌倒和广义跌倒相关事件两类结局，有利于观察结果稳定性。
+第三，暴露定义较完整。本研究同时设置 PS+SS 主分析和 PS only 敏感性分析，并以狭义跌倒事件作为正式分析结局，有利于观察结果稳定性。
 第四，使用多种信号检测方法。本研究同时计算 ROR、PRR、IC 和 EBGM，避免单一算法造成结果片面。
 第五，结合多因素校正和机器学习辅助分析。多因素模型用于控制部分可获得协变量，机器学习用于探索多维报告特征组合，两者为主信号分析提供补充。
 6.9 本研究的局限
@@ -479,15 +462,15 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 第三，比较不同 Z-drugs 的安全性差异。FAERS 分析提示唑吡坦值得重点关注，但不同 Z-drugs 之间真实风险差异仍需更严格研究设计验证。
 第四，结合药师干预研究。可设计老年镇静催眠药用药审查、跌倒风险筛查和 deprescribing 干预研究，观察药师参与是否能降低高风险用药和跌倒事件。
 6.11 本章小结
-本研究在大规模 FAERS 老年病例中观察到唑吡坦相关跌倒事件报告信号。该信号在狭义跌倒、广义跌倒、PS+SS 主分析和 PS only 敏感性分析中方向一致，并在多因素校正后仍然存在。高龄、多重用药和合并中枢神经系统药物使用可能进一步增加跌倒相关报告比例。
+本研究在大规模 FAERS 老年病例中观察到唑吡坦相关狭义跌倒事件报告信号。该信号在 PS+SS 主分析和 PS only 敏感性分析中方向一致，并在多因素校正后仍然存在。高龄、多重用药和合并中枢神经系统药物使用可能进一步增加跌倒相关报告比例。
 从药学角度看，唑吡坦通过中枢镇静、反应能力下降、运动协调受损和次日残余效应等机制，可能与老年患者跌倒风险增加有关。本研究结果支持临床药师在老年患者中加强唑吡坦用药评估，尤其关注高龄、多重用药和合并中枢神经系统药物使用者。
 同时，本研究结论应限定在药物警戒信号层面。FAERS 分析不能证明因果关系，也不能替代临床研究。未来仍需结合更完整的真实世界数据库和前瞻性研究进一步验证。
 第七章 结论与展望
 7.1 研究结论
 本研究基于 2004-2025 年 FAERS 数据库，对老年人群中唑吡坦相关跌倒事件进行了药物警戒信号挖掘，并结合多因素校正分析和机器学习方法进行辅助探索。FAERS 可用于上市后安全信号发现，但自发报告数据不能直接计算真实发生率，也不能单独证明因果关系[44-53]。研究得到以下主要结论。
-第一，在 FAERS 老年病例中，唑吡坦相关报告与狭义跌倒事件之间存在明显不成比例报告信号。主分析采用 PS+SS 暴露定义，排除混合 Z-drug 暴露病例后，唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.38%，参照组为 3.16%。ROR、PRR、IC 和 EBGM 四种信号检测方法均提示阳性信号，这些方法均是自发报告系统中常用的药物警戒信号检测工具[54-60]。
-第二，广义跌倒相关事件分析和 PS only 敏感性分析结果与主分析方向一致。广义跌倒相关事件中，唑吡坦 suspect 暴露组报告比例高于参照组；PS only 口径下，唑吡坦 primary suspect 暴露与狭义跌倒及广义跌倒相关事件之间仍可观察到阳性报告信号。这说明本研究结果不完全依赖单一暴露定义或单一结局定义。
-第三，多因素校正分析显示，在控制年龄、性别、年份、季度、多重用药、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物和抗癫痫药等可获得协变量后，唑吡坦 suspect 暴露与跌倒相关事件之间仍保持较高的报告优势。加入严重结局变量后，结果方向仍然稳定。
+第一，在 FAERS 老年病例中，唑吡坦相关报告与狭义跌倒事件之间存在明显不成比例报告信号。主分析采用 PS+SS 暴露定义，排除混合 Z-drug 暴露病例后，唑吡坦 suspect 暴露组狭义跌倒事件报告比例为 13.57%，参照组为 3.19%。ROR、PRR、IC 和 EBGM 四种信号检测方法均提示阳性信号，这些方法均是自发报告系统中常用的药物警戒信号检测工具[54-60]。
+第二，PS only 敏感性分析结果与主分析方向一致。PS only 口径下，唑吡坦 primary suspect 暴露与狭义跌倒事件之间仍可观察到阳性报告信号。这说明本研究结果不完全依赖单一暴露定义。
+第三，多因素校正分析显示，在控制年龄、性别、年份、季度、多重用药、去重药物数、苯二氮卓类药物、抗抑郁药、抗精神病药、阿片类药物、抗癫痫药、报告来源和适应证相关变量后，唑吡坦 suspect 暴露与跌倒相关事件之间仍保持较高的报告优势。
 第四，探索性分层分析提示，高龄、多重用药以及合并部分中枢神经系统相关药物的病例中，跌倒相关事件报告比例较高。尤其是 85 岁及以上、多重用药、合并抗抑郁药、合并阿片类药物和合并抗癫痫药等情况，可能是临床药学实践中需要重点关注的风险背景。这一结果与老年跌倒风险因素、药物相关跌倒和老年潜在不适当用药文献认识基本一致[1,25-43]。
 第五，机器学习辅助分析显示，基于 FAERS 病例级结构化特征可以对狭义跌倒事件报告进行一定程度的风险排序。XGBoost 模型在 2025 年测试集中的 ROC-AUC 为 0.772，前 5% 高风险病例中的狭义跌倒事件比例约为总体的 4.70 倍。该结果提示机器学习模型可作为药物警戒研究中的辅助筛选工具，但不能替代传统信号挖掘方法，也不能直接用于临床个体预测[61-68]。
 总体而言，本研究提示，在 FAERS 老年病例中，唑吡坦相关报告存在跌倒相关不良事件信号。临床使用唑吡坦时，应特别关注高龄、多重用药以及合并中枢神经系统药物使用患者的跌倒风险。既往指南、FDA 安全警示和观察性研究也提示，老年人使用 Z-drugs 时应充分评估跌倒、骨折、次日损害和复杂睡眠行为等风险[1-5,9-22,69-70]。
@@ -495,7 +478,7 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 本研究的创新点主要体现在以下几个方面。
 第一，研究时间跨度较长。本研究整合 2004-2025 年 FAERS 数据，构建了全周期病例级数据集，能够较全面地反映唑吡坦上市后长期不良事件报告情况。
 第二，研究对象聚焦老年人群。相比全人群分析，老年人群更符合唑吡坦相关跌倒风险的临床药学关注重点，也更贴近老年潜在不适当用药管理问题。
-第三，结局定义兼顾特异性和敏感性。本研究同时设置狭义跌倒和广义跌倒相关事件。狭义结局用于主分析，保证结果解释清楚；广义结局用于补充分析，帮助观察与跌倒风险相关的临床表现。
+第三，结局定义强调特异性。本研究以狭义跌倒事件作为正式分析结局，保证结果解释清楚。
 第四，暴露定义设置主分析和敏感性分析。本研究以 PS+SS 作为主分析口径，以 PS only 作为敏感性分析口径，从不同可疑药物角色定义下验证结果稳定性。
 第五，方法上结合传统药物警戒和机器学习。研究不仅使用 ROR、PRR、IC 和 EBGM 进行信号挖掘，还进一步使用多因素校正模型和机器学习模型探索多维报告特征，为药物警戒研究提供了更丰富的分析视角。
 7.3 研究不足
@@ -597,18 +580,15 @@ XGBoost 模型的特征重要性显示，报告类型、合并中枢神经系统
 药物特征数据集	4,155,023
 指标	病例数
 全周期去重病例数	4,155,023
-狭义跌倒事件	132,266
-广义跌倒相关事件	298,906
+狭义跌倒事件	132,456
 唑吡坦任意暴露	38,709
 唑吡坦 suspect 暴露（PS+SS）	8,011
 唑吡坦 primary suspect 暴露（PS only）	4,314
 其他 Z-drugs suspect 暴露（PS+SS）	7,012
 其他 Z-drugs primary suspect 暴露（PS only）	2,925
 分析	结局	暴露且发生结局	暴露但未发生结局	暴露组病例数	暴露组报告比例
-PS+SS 主分析	狭义跌倒	1,043	6,755	7,798	13.38%
-PS+SS 补充分析	广义跌倒	1,448	6,350	7,798	18.57%
-PS only 敏感性分析	狭义跌倒	465	3,849	4,314	10.78%
-PS only 敏感性分析	广义跌倒	661	3,653	4,314	15.32%
+PS+SS 主分析	狭义跌倒	1,058	6,740	7,798	13.57%
+PS only 敏感性分析	狭义跌倒	474	3,840	4,314	10.99%
 变量	分组	例数	构成比
 年龄组	65-74 岁	192,299	53.52%
 年龄组	75-84 岁	131,985	36.73%
@@ -628,16 +608,6 @@ PS only 敏感性分析	广义跌倒	661	3,653	4,314	15.32%
 抗精神病药	6,331	1.76%
 阿片类药物	15,163	4.22%
 抗癫痫药	14,592	4.06%
-PT	涉及病例数	占总体百分比	占广义跌倒事件百分比
-FALL	10,377	2.89%	40.33%
-HYPOTENSION	4,352	1.21%	16.91%
-GAIT DISTURBANCE	3,636	1.01%	14.13%
-VISUAL IMPAIRMENT	2,762	0.77%	10.73%
-BALANCE DISORDER	1,816	0.51%	7.06%
-GAIT INABILITY	1,107	0.31%	4.30%
-VERTIGO	981	0.27%	3.81%
-ORTHOSTATIC HYPOTENSION	521	0.15%	2.02%
-VISUAL ACUITY REDUCED	279	0.08%	1.08%
 结局口径	报告国家	报告数	构成比
 狭义跌倒	US	32,941	60.76%
 狭义跌倒	CA	4,772	8.80%
@@ -646,68 +616,39 @@ VISUAL ACUITY REDUCED	279	0.08%	1.08%
 狭义跌倒	FR	1,679	3.10%
 狭义跌倒	GB	1,675	3.09%
 狭义跌倒	DE	1,588	2.93%
-广义跌倒	US	83,769	59.16%
-广义跌倒	CA	9,937	7.02%
-广义跌倒	UNKNOWN	7,024	4.96%
-广义跌倒	GB	5,804	4.10%
-广义跌倒	FR	5,679	4.01%
-广义跌倒	DE	4,037	2.85%
-广义跌倒	JP	3,634	2.57%
 指标	结果
-暴露且发生狭义跌倒事件（a）	1,043
-暴露但未发生狭义跌倒事件（b）	6,755
-未暴露但发生狭义跌倒事件（c）	131,211
-未暴露且未发生狭义跌倒事件（d）	4,015,664
+暴露且发生狭义跌倒事件（a）	1,058
+暴露但未发生狭义跌倒事件（b）	6,740
+未暴露但发生狭义跌倒事件（c）	131,398
+未暴露且未发生狭义跌倒事件（d）	4,015,477
 暴露组病例数	7,798
-暴露组报告比例	13.38%
-参照组报告比例	3.16%
-ROR（95%CI）	4.73（4.43-5.05）
-PRR（95%CI）	4.23（3.99-4.47）
-IC（IC025-IC975）	2.07（1.98-2.15）
-EBGM（EB05-EB95）	4.19（3.98-4.40）
-信号结论	检测到信号
-指标	结果
-暴露且发生广义跌倒相关事件（a）	1,448
-暴露但未发生广义跌倒相关事件（b）	6,350
-未暴露但发生广义跌倒相关事件（c）	297,438
-未暴露且未发生广义跌倒相关事件（d）	3,849,437
-暴露组病例数	7,798
-暴露组报告比例	18.57%
-参照组报告比例	7.17%
-ROR（95%CI）	2.95（2.79-3.12）
-PRR（95%CI）	2.59（2.47-2.71）
-IC（IC025-IC975）	1.37（1.29-1.44）
-EBGM（EB05-EB95）	2.58（2.47-2.69）
+暴露组报告比例	13.57%
+参照组报告比例	3.19%
+ROR	4.80
+PRR	4.28
+IC	2.09
+EBGM	4.24
 信号结论	检测到信号
 结局	暴露且发生结局	暴露组病例数	暴露组报告比例	ROR（95%CI）	PRR（95%CI）	IC（IC025）	EBGM（EB05）	结论
-狭义跌倒	465	4,314	10.78%	3.68（3.34-4.06）	3.39（3.11-3.70）	1.76（1.62）	3.36（3.12）	检测到信号
-广义跌倒	661	4,314	15.32%	2.34（2.15-2.54）	2.13（1.99-2.29）	1.09（0.98）	2.12（1.99）	检测到信号
+狭义跌倒	474	4,314	10.99%	3.76	3.45	1.78	3.42	检测到信号
 暴露口径	结局	zolpidem only 报告比例	other zdrug only 报告比例	ROR（95%CI）	PRR（95%CI）	IC（IC025）	结论
-PS+SS	狭义跌倒	13.38%	9.24%	1.52（1.37-1.68）	1.45（1.32-1.59）	0.22（0.14）	检测到信号
-PS+SS	广义跌倒	18.57%	13.43%	1.47（1.34-1.61）	1.38（1.28-1.49）	0.20（0.12）	检测到信号
-PS only	狭义跌倒	10.78%	1.40%	8.50（6.15-11.74）	7.69（5.61-10.55）	0.62（0.49）	检测到信号
-PS only	广义跌倒	15.32%	2.80%	6.27（4.96-7.93）	5.47（4.37-6.84）	0.58（0.47）	检测到信号
-分层变量	分层	暴露病例数	狭义跌倒报告比例	广义跌倒报告比例
-年龄	65-74 岁	3,986	7.95%	12.54%
-年龄	75-84 岁	2,705	15.53%	21.29%
-年龄	>=85 岁	1,320	24.09%	29.24%
-性别	女性	5,059	15.08%	20.46%
-性别	男性	2,952	9.89%	14.46%
-用药负担	多重用药	3,935	18.12%	23.86%
-合并用药	苯二氮卓类	1,517	13.71%	19.18%
-合并用药	抗抑郁药	1,892	21.35%	25.37%
-合并用药	抗精神病药	735	15.65%	22.18%
-合并用药	阿片类药物	1,458	20.44%	25.38%
-合并用药	抗癫痫药	803	18.56%	24.03%
+PS+SS	狭义跌倒	13.57%	9.29%	1.54	1.47	0.23	检测到信号
+PS only	狭义跌倒	10.99%	1.42%	8.68	7.84	0.63	检测到信号
+分层变量	分层	暴露病例数	狭义跌倒报告比例
+年龄	65-74 岁	3,986	7.95%
+年龄	75-84 岁	2,705	15.53%
+年龄	>=85 岁	1,320	24.09%
+性别	女性	5,059	15.08%
+性别	男性	2,952	9.89%
+用药负担	多重用药	3,935	18.12%
+合并用药	苯二氮卓类	1,517	13.71%
+合并用药	抗抑郁药	1,892	21.35%
+合并用药	抗精神病药	735	15.65%
+合并用药	阿片类药物	1,458	20.44%
+合并用药	抗癫痫药	803	18.56%
 暴露口径	结局	模型	校正报告优势比	95%CI	P 值
-PS+SS	狭义跌倒	基础模型	3.24	3.03-3.46	<0.001
-PS+SS	狭义跌倒	扩展模型	2.91	2.72-3.11	<0.001
-PS+SS	广义跌倒	基础模型	2.23	2.10-2.36	<0.001
-PS+SS	广义跌倒	扩展模型	2.07	1.96-2.20	<0.001
-PS only	狭义跌倒	基础模型	3.07	2.78-3.39	<0.001
-PS only	狭义跌倒	扩展模型	2.77	2.51-3.06	<0.001
-PS only	广义跌倒	基础模型	2.06	1.89-2.24	<0.001
-PS only	广义跌倒	扩展模型	1.93	1.77-2.10	<0.001
+PS+SS	狭义跌倒	核心临床模型	3.28	3.07-3.51	<0.001
+PS+SS	狭义跌倒	扩展报告-适应证模型	2.74	2.56-2.93	<0.001
 模型	验证集 ROC-AUC	验证集 AP	测试集 ROC-AUC	测试集 AP	测试集 Brier score
 逻辑回归	0.762	0.094	0.759	0.106	0.0303
 随机森林	0.776	0.104	0.771	0.113	0.0292

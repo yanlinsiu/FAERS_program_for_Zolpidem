@@ -346,7 +346,7 @@ def build_qc(
             "check_name": "full_period_primary_ror",
             "status": "pass" if 4.6 <= float(all_period_row["ror"]) <= 4.9 else "review",
             "value": float(all_period_row["ror"]),
-            "expected_or_rule": "Should reproduce current primary ROR near 4.73.",
+            "expected_or_rule": "Should reproduce current primary ROR near 4.80.",
         }
     )
     rows.append(
@@ -358,7 +358,7 @@ def build_qc(
                 else "review"
             ),
             "value": float(all_period_row["zolpidem_fall_reporting_rate"]),
-            "expected_or_rule": "Should reproduce current exposed fall reporting proportion near 13.38%.",
+            "expected_or_rule": "Should reproduce current exposed fall reporting proportion near 13.57%.",
         }
     )
 

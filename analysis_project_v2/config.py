@@ -202,7 +202,6 @@ NUMERIC_ADJUSTMENT_COLUMNS: tuple[str, ...] = (
 
 BOOL_COLUMNS: tuple[str, ...] = (
     "is_fall_narrow",
-    "is_fall_broad",
     "is_zolpidem_any",
     "is_zolpidem_suspect",
     "is_zolpidem_suspect_ps",
