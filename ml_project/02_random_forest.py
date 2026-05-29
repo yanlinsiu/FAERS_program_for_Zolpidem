@@ -27,9 +27,9 @@ SEARCH_SPEC = SearchSpec(
     param_space_by_mode={
         "fast": {
             "model__n_estimators": [200],
-            "model__max_depth": [8, 12, 16],
-            "model__min_samples_leaf": [20, 50],
-            "model__max_features": ["sqrt"],
+            "model__max_depth": [8, 12, 20],
+            "model__min_samples_leaf": [10, 30],
+            "model__max_features": ["sqrt", 0.5],
             "model__class_weight": ["balanced_subsample"],
         },
         "full": {

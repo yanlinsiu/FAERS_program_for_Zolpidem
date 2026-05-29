@@ -28,13 +28,15 @@ SEARCH_SPEC = SearchSpec(
     param_space_by_mode={
         "fast": [
             {
+                "model__penalty": ["elasticnet"],
                 "model__l1_ratio": [0.0],
-                "model__C": [0.03, 0.1, 0.3, 1.0, 3.0, 10.0],
-                "model__class_weight": [None],
+                "model__C": [0.03, 0.1, 0.3, 1.0, 3.0],
+                "model__class_weight": [None, "balanced"],
             },
         ],
         "full": [
             {
+                "model__penalty": ["elasticnet"],
                 "model__C": [0.03, 0.1, 0.3, 1.0, 3.0, 10.0],
                 "model__l1_ratio": [0.0, 0.15, 0.3, 0.5, 0.7, 1.0],
                 "model__class_weight": [None, "balanced"],
@@ -46,6 +48,7 @@ SEARCH_SPEC = SearchSpec(
 
 def build_estimator(_: pd.DataFrame, config: ExperimentConfig) -> LogisticRegression:
     return LogisticRegression(
+        penalty="elasticnet",
         solver="saga",
         l1_ratio=0.0,
         max_iter=10000,

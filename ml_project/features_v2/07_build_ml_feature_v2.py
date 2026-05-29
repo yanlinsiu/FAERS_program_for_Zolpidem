@@ -23,7 +23,15 @@ from feature_v2_common import (
 )
 
 
-LEAKAGE_COLUMNS = {"fall_pt_list", "fall_pt_count"}
+LEAKAGE_COLUMNS = {"fall_pt_list", "fall_pt_count", "fall_narrow_pt_count"}
+PHENOTYPE_FEATURE_COLUMNS = [
+    "pheno_sedation_somnolence",
+    "pheno_consciousness_cognition",
+    "pheno_dizziness_vertigo_syncope",
+    "pheno_gait_balance_motor",
+    "pheno_hypotension",
+    "pheno_visual_disturbance",
+]
 
 
 def _feature_paths(prefix: str, start_year: int, end_year: int) -> list[Path]:
@@ -41,6 +49,31 @@ def _load_feature(prefix: str, start_year: int, end_year: int) -> pd.DataFrame:
     return df.drop_duplicates(subset="caseid", keep="last")
 
 
+def _load_phenotype_features(token: str) -> pd.DataFrame | None:
+    phenotype_file = (
+        GLOBAL_DATASET_DIR.parent
+        / "phenotypes"
+        / f"phenotype_features_{token}_case.parquet"
+    )
+    if not phenotype_file.exists():
+        return None
+
+    phenotype_df = pd.read_parquet(phenotype_file)
+    phenotype_df["caseid"] = clean_caseid(phenotype_df["caseid"])
+    available_columns = [
+        column for column in PHENOTYPE_FEATURE_COLUMNS if column in phenotype_df.columns
+    ]
+    if not available_columns:
+        return None
+
+    phenotype_df = phenotype_df[["caseid", *available_columns]].copy()
+    phenotype_df = phenotype_df[phenotype_df["caseid"] != ""]
+    phenotype_df = phenotype_df.drop_duplicates(subset="caseid", keep="last")
+    for column in available_columns:
+        phenotype_df[column] = phenotype_df[column].fillna(False).astype(bool)
+    return phenotype_df
+
+
 def build_ml_feature_v2(start_year: int, end_year: int) -> pd.DataFrame:
     token = period_token(start_year, end_year)
     signal_file = GLOBAL_DATASET_DIR / f"signal_dataset_{token}.parquet"
@@ -52,6 +85,8 @@ def build_ml_feature_v2(start_year: int, end_year: int) -> pd.DataFrame:
 
     signal_df = pd.read_parquet(signal_file)
     signal_df["caseid"] = clean_caseid(signal_df["caseid"])
+    if "is_fall" not in signal_df.columns and "is_fall_narrow" in signal_df.columns:
+        signal_df["is_fall"] = signal_df["is_fall_narrow"]
     stale_fall_cols = {
         col
         for col in signal_df.columns
@@ -77,15 +112,24 @@ def build_ml_feature_v2(start_year: int, end_year: int) -> pd.DataFrame:
             feature_df = feature_df.drop(columns=overlap)
         merged = merged.merge(feature_df, on="caseid", how="left")
 
+    phenotype_df = _load_phenotype_features(token)
+    if phenotype_df is not None:
+        overlap = sorted((set(merged.columns) & set(phenotype_df.columns)) - {"caseid"})
+        if overlap:
+            phenotype_df = phenotype_df.drop(columns=overlap)
+        merged = merged.merge(phenotype_df, on="caseid", how="left")
+
     fill_false_cols = [
-        col for col in merged.columns if col.startswith(("has_", "indi_", "zolpidem_", "other_zdrug_"))
+        col
+        for col in merged.columns
+        if col.startswith(("has_", "indi_", "pheno_", "zolpidem_", "other_zdrug_"))
     ]
     fill_false_cols.extend(
         col for col in ["event_date_known", "duration_known"] if col in merged.columns
     )
     for column in fill_false_cols:
         if merged[column].dtype == "bool" or merged[column].dropna().isin([True, False]).all():
-            merged[column] = merged[column].fillna(False).astype(bool)
+            merged[column] = merged[column].astype("boolean").fillna(False).astype(bool)
 
     numeric_fill_zero = [
         "ps_drug_n",

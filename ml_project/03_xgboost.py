@@ -25,9 +25,9 @@ SEARCH_SPEC = SearchSpec(
     strategy="random",
     param_space_by_mode={
         "fast": {
-            "model__n_estimators": [200, 400],
+            "model__n_estimators": [200, 400, 600],
             "model__max_depth": [3, 5],
-            "model__learning_rate": [0.05, 0.1],
+            "model__learning_rate": [0.03, 0.05, 0.1],
             "model__subsample": [0.8, 1.0],
             "model__colsample_bytree": [0.8, 1.0],
             "model__min_child_weight": [1, 5],
@@ -44,7 +44,7 @@ SEARCH_SPEC = SearchSpec(
         },
     },
     n_iter_by_mode={
-        "fast": 8,
+        "fast": 12,
         "full": 18,
     },
 )
