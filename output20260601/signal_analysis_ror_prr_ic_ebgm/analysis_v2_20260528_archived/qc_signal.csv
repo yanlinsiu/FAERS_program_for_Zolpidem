@@ -1,0 +1,5 @@
+﻿section,analysis_tier,analysis,outcome_name,n_cases,n_outcome,n_exposed
+signal,primary,primary_ps_ss,strict_fall,4154673,132456,7798
+signal,sensitivity,sensitivity_ps_only,strict_fall,4154233,132465,4314
+signal,sensitivity,comparative_ps_ss,strict_fall,14597,1686,7798
+signal,sensitivity,comparative_ps_only,strict_fall,7239,515,4314

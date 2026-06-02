@@ -1,0 +1,33 @@
+{
+  "model": "logistic_regression",
+  "display_name": "Logistic Regression",
+  "search_mode": "fast",
+  "search_strategy": "grid",
+  "refit_metric": "average_precision",
+  "cv_folds_used": 3,
+  "candidate_count": 10,
+  "best_score": 0.10274721232324957,
+  "best_params": {
+    "model__C": 0.3,
+    "model__class_weight": null,
+    "model__l1_ratio": 0.0,
+    "model__penalty": "elasticnet"
+  },
+  "selected_model_params": {
+    "C": 0.3,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 10000,
+    "multi_class": "deprecated",
+    "n_jobs": null,
+    "penalty": "elasticnet",
+    "random_state": 42,
+    "solver": "saga",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  }
+}

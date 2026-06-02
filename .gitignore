@@ -110,7 +110,7 @@ OUTPUT_COUNTRY/
 OUTPUT_GLOBAL/
 OUTPUT_GLOBAL_COUNTRY/
 OUTPUT_ML/
-
+references/
 analysis_reports/
 docs_or_reports/
 presentation_output/
@@ -130,3 +130,6 @@ runs/*/analysis_reports/
 test_*.py
 demo.py
 drug_name_cleaner.py
+
+
+archive_old_outputs/

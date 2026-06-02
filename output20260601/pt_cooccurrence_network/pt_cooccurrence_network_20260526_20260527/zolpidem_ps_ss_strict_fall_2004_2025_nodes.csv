@@ -1,0 +1,51 @@
+﻿pt,case_count,case_percent,community_id,phenotype_column,phenotype_layer,phenotype_label,community_name,degree,co_count_strength,jaccard_strength
+FALL,1043,100.0,1,pheno_fall_event,fall_event,Fall event,Dizziness / vertigo / syncope,49,4111,3.941515
+CONFUSIONAL STATE,216,20.7095,1,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Dizziness / vertigo / syncope,48,3361,14.238989
+NAUSEA,128,12.2723,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,48,3415,24.198831
+DIZZINESS,122,11.697,1,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,21,437,1.758714
+PAIN,116,11.1218,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,49,3222,25.090794
+ANXIETY,115,11.0259,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,47,3284,25.809914
+MALAISE,108,10.3547,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,47,3197,26.612161
+DYSARTHRIA,95,9.1083,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,46,3149,29.478995
+HEADACHE,95,9.1083,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,46,3189,30.037806
+MOTOR DYSFUNCTION,95,9.1083,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,48,3220,29.975769
+MUSCULAR WEAKNESS,94,9.0125,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,48,3150,29.596093
+HYPOTENSION,90,8.629,1,pheno_hypotension,prodrome,Hypotension / orthostatic hypotension,Dizziness / vertigo / syncope,18,317,1.503135
+FATIGUE,88,8.4372,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,46,3142,31.738878
+VOMITING,86,8.2454,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,47,3164,32.657376
+PYREXIA,85,8.1496,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,47,3155,32.866803
+GASTROINTESTINAL DISORDER,84,8.0537,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,48,2951,29.054668
+AFFECT LABILITY,82,7.8619,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,46,3139,33.54866
+PNEUMONIA,81,7.7661,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,44,3092,33.564577
+COORDINATION ABNORMAL,78,7.4784,1,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Dizziness / vertigo / syncope,43,3091,34.812604
+SYNCOPE,78,7.4784,1,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,10,266,1.377896
+APHASIA,76,7.2867,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3078,35.417186
+CEREBROVASCULAR ACCIDENT,75,7.1908,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3087,36.059653
+DYSPHAGIA,75,7.1908,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3086,36.036144
+EATING DISORDER,75,7.1908,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3083,35.968866
+CYSTITIS,74,7.0949,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3081,36.394478
+NASOPHARYNGITIS,74,7.0949,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3079,36.343977
+MUSCLE SPASTICITY,73,6.999,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3074,36.706494
+PSORIASIS,73,6.999,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3072,36.665153
+SKIN EXFOLIATION,73,6.999,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3072,36.665153
+SNEEZING,73,6.999,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3076,36.74777
+ADJUSTMENT DISORDER,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+CAROTID ARTERY THROMBOSIS,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+HEMIPARESIS,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+HEMIPLEGIA,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+HYPONATRAEMIA,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,19,346,1.901274
+INFLUENZA,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+INFLUENZA LIKE ILLNESS,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+NEUROLOGIC NEGLECT SYNDROME,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+PALPITATIONS,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,46,2905,32.975436
+PERSONALITY DISORDER,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+RESPIRATORY TRACT CONGESTION,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+RHINORRHOEA,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+SENSORY LOSS,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+SINUS CONGESTION,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+SINUS DISORDER,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+SKIN HAEMORRHAGE,72,6.9032,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,3071,37.115396
+BLOOD PRESSURE INCREASED,71,6.8073,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,2848,32.587524
+HEAD INJURY,71,6.8073,1,pheno_fracture_injury,consequence,Fracture / injury consequence,Dizziness / vertigo / syncope,10,103,0.255883
+COUGH,70,6.7114,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,43,2854,33.124586
+DRUG INTERACTION,70,6.7114,1,,,Unmapped / other PT,Dizziness / vertigo / syncope,17,302,1.665446

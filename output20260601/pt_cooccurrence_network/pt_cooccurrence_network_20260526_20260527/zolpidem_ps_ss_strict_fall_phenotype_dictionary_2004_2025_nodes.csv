@@ -1,0 +1,33 @@
+﻿pt,case_count,case_percent,community_id,phenotype_column,phenotype_layer,phenotype_label,community_name,degree,co_count_strength,jaccard_strength
+DIZZINESS,123,11.6257,1,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,23,320,2.081388
+HYPOTENSION,90,8.5066,1,pheno_hypotension,prodrome,Hypotension / orthostatic hypotension,Dizziness / vertigo / syncope,16,202,1.649023
+SYNCOPE,79,7.4669,1,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,9,172,1.444632
+COGNITIVE DISORDER,70,6.6163,1,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Dizziness / vertigo / syncope,19,300,2.891297
+MOBILITY DECREASED,48,4.5369,1,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Dizziness / vertigo / syncope,16,248,2.9774
+SEDATION,30,2.8355,1,pheno_sedation_somnolence,prodrome,Sedation / somnolence,Dizziness / vertigo / syncope,8,116,1.60387
+BLOOD PRESSURE DECREASED,19,1.7958,1,pheno_hypotension,prodrome,Hypotension / orthostatic hypotension,Dizziness / vertigo / syncope,7,86,1.300556
+CONFUSIONAL STATE,221,20.8885,2,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,21,279,1.118975
+COORDINATION ABNORMAL,78,7.3724,2,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Consciousness / cognition change,1,74,0.328889
+CONTUSION,64,6.0491,3,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,13,122,1.095185
+GAIT DISTURBANCE,41,3.8752,3,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Fracture / injury consequence,8,48,0.464567
+DELIRIUM,44,4.1588,4,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,9,109,1.134887
+VERTIGO,31,2.9301,4,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Consciousness / cognition change,11,105,1.336741
+FRACTURE,26,2.4575,4,pheno_fracture_injury,consequence,Fracture / injury consequence,Consciousness / cognition change,7,71,0.890406
+HEAD INJURY,76,7.1834,5,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,11,68,0.524839
+SOMNOLENCE,69,6.5217,6,pheno_sedation_somnolence,prodrome,Sedation / somnolence,Sedation / somnolence,9,51,0.344554
+LOSS OF CONSCIOUSNESS,68,6.4272,7,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,13,73,0.635841
+DISORIENTATION,41,3.8752,8,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,6,41,0.297301
+MEMORY IMPAIRMENT,30,2.8355,9,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,9,47,0.622134
+ORTHOSTATIC HYPOTENSION,30,2.8355,10,pheno_hypotension,prodrome,Hypotension / orthostatic hypotension,Hypotension / orthostatic hypotension,12,56,0.718184
+BALANCE DISORDER,29,2.741,11,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Gait / balance / motor control abnormality,7,23,0.248283
+SKIN LACERATION,27,2.552,12,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,5,27,0.237202
+FEMUR FRACTURE,25,2.3629,13,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,6,38,0.453699
+DISTURBANCE IN ATTENTION,11,1.0397,14,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,7,38,0.769342
+VISUAL IMPAIRMENT,10,0.9452,14,pheno_visual_disturbance,secondary_prodrome,Visual disturbance,Consciousness / cognition change,7,33,0.787005
+INJURY,20,1.8904,15,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,2,7,0.082503
+MENTAL STATUS CHANGES,12,1.1342,16,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,2,9,0.288596
+LETHARGY,7,0.6616,16,pheno_sedation_somnolence,prodrome,Sedation / somnolence,Consciousness / cognition change,2,7,0.298582
+WOUND,16,1.5123,17,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,2,9,0.078821
+HIP FRACTURE,15,1.4178,18,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,1,3,0.012876
+DEPRESSED LEVEL OF CONSCIOUSNESS,13,1.2287,19,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,1,4,0.040404
+CRANIOCEREBRAL INJURY,9,0.8507,20,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,2,8,0.16908

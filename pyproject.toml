@@ -15,4 +15,6 @@ dependencies = [
     "xgboost>=3.1.0",
     "networkx>=3.6.1",
     "matplotlib>=3.10.9",
+    "python-docx>=1.2.0",
+    "python-pptx>=1.0.2",
 ]

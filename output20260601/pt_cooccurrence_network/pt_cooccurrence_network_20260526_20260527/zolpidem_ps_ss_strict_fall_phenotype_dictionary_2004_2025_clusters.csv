@@ -1,0 +1,21 @@
+﻿community_id,community_name,node_count,top_terms,total_node_case_count
+1,Dizziness / vertigo / syncope,7,DIZZINESS|HYPOTENSION|SYNCOPE|COGNITIVE DISORDER|MOBILITY DECREASED|SEDATION|BLOOD PRESSURE DECREASED,459
+4,Consciousness / cognition change,3,DELIRIUM|VERTIGO|FRACTURE,101
+2,Consciousness / cognition change,2,CONFUSIONAL STATE|COORDINATION ABNORMAL,299
+3,Fracture / injury consequence,2,CONTUSION|GAIT DISTURBANCE,105
+14,Consciousness / cognition change,2,DISTURBANCE IN ATTENTION|VISUAL IMPAIRMENT,21
+16,Consciousness / cognition change,2,MENTAL STATUS CHANGES|LETHARGY,19
+5,Fracture / injury consequence,1,HEAD INJURY,76
+6,Sedation / somnolence,1,SOMNOLENCE,69
+7,Consciousness / cognition change,1,LOSS OF CONSCIOUSNESS,68
+8,Consciousness / cognition change,1,DISORIENTATION,41
+9,Consciousness / cognition change,1,MEMORY IMPAIRMENT,30
+10,Hypotension / orthostatic hypotension,1,ORTHOSTATIC HYPOTENSION,30
+11,Gait / balance / motor control abnormality,1,BALANCE DISORDER,29
+12,Fracture / injury consequence,1,SKIN LACERATION,27
+13,Fracture / injury consequence,1,FEMUR FRACTURE,25
+15,Fracture / injury consequence,1,INJURY,20
+17,Fracture / injury consequence,1,WOUND,16
+18,Fracture / injury consequence,1,HIP FRACTURE,15
+19,Consciousness / cognition change,1,DEPRESSED LEVEL OF CONSCIOUSNESS,13
+20,Fracture / injury consequence,1,CRANIOCEREBRAL INJURY,9
