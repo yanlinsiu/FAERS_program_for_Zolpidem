@@ -12,6 +12,7 @@ from typing import Any, Callable, Literal
 
 import numpy as np
 import pandas as pd
+from joblib import parallel_backend
 from sklearn.base import BaseEstimator, clone
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
@@ -21,6 +22,7 @@ from sklearn.metrics import (
     brier_score_loss,
     confusion_matrix,
     f1_score,
+    matthews_corrcoef,
     precision_score,
     recall_score,
     roc_auc_score,
@@ -160,6 +162,8 @@ SEARCH_SCORING = {
     "neg_brier_score": "neg_brier_score",
 }
 REFIT_METRIC = "average_precision"
+SEARCH_N_JOBS = int(os.environ.get("FAERS_SEARCH_N_JOBS", "1"))
+SEARCH_BACKEND = os.environ.get("FAERS_SEARCH_BACKEND", "loky").strip()
 EVALUATION_METRICS = [
     "roc_auc",
     "average_precision",
@@ -169,6 +173,7 @@ EVALUATION_METRICS = [
     "recall",
     "f1",
     "specificity",
+    "mcc",
 ]
 
 
@@ -866,6 +871,7 @@ def evaluate_predictions(
         "recall": float(recall_score(y_true_arr, y_pred, zero_division=0)),
         "f1": float(f1_score(y_true_arr, y_pred, zero_division=0)),
         "specificity": float(specificity),
+        "mcc": float(matthews_corrcoef(y_true_arr, y_pred)),
         "tn": int(tn),
         "fp": int(fp),
         "fn": int(fn),
@@ -1115,7 +1121,7 @@ def _fit_search(
             scoring=SEARCH_SCORING,
             refit=REFIT_METRIC,
             cv=cv,
-            n_jobs=1,
+            n_jobs=SEARCH_N_JOBS,
             return_train_score=False,
             error_score="raise",
             verbose=2,
@@ -1130,14 +1136,18 @@ def _fit_search(
             scoring=SEARCH_SCORING,
             refit=REFIT_METRIC,
             cv=cv,
-            n_jobs=1,
+            n_jobs=SEARCH_N_JOBS,
             return_train_score=False,
             error_score="raise",
             random_state=random_state,
             verbose=2,
         )
 
-    search.fit(X_train, y_train)
+    if SEARCH_BACKEND:
+        with parallel_backend(SEARCH_BACKEND):
+            search.fit(X_train, y_train)
+    else:
+        search.fit(X_train, y_train)
     log_step(
         f"Search finished, best {REFIT_METRIC}={search.best_score_:.6f}"
     )
@@ -1627,7 +1637,8 @@ def _compact_metrics(metrics: dict[str, Any]) -> str:
         f"ROC-AUC={format_metric(metrics.get('roc_auc'))}, "
         f"Brier={format_metric(metrics.get('brier_score'))}, "
         f"Recall={format_metric(metrics.get('recall'))}, "
-        f"Precision={format_metric(metrics.get('precision'))}"
+        f"Precision={format_metric(metrics.get('precision'))}, "
+        f"MCC={format_metric(metrics.get('mcc'))}"
     )
 
 

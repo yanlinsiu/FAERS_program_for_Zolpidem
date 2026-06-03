@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 
 import pandas as pd
 
@@ -34,18 +35,21 @@ SEARCH_SPEC = SearchSpec(
             "model__reg_lambda": [1.0, 5.0],
         },
         "full": {
-            "model__n_estimators": [200, 400],
-            "model__max_depth": [3, 5, 7],
-            "model__learning_rate": [0.03, 0.05, 0.1],
-            "model__subsample": [0.8, 1.0],
-            "model__colsample_bytree": [0.8, 1.0],
-            "model__min_child_weight": [1, 5],
-            "model__reg_lambda": [1.0, 5.0],
+            "model__n_estimators": [300, 600, 900, 1200],
+            "model__max_depth": [3, 4, 5, 6],
+            "model__learning_rate": [0.01, 0.03, 0.05, 0.08],
+            "model__subsample": [0.7, 0.8, 0.9, 1.0],
+            "model__colsample_bytree": [0.7, 0.8, 0.9, 1.0],
+            "model__min_child_weight": [1, 3, 5, 10, 20],
+            "model__reg_lambda": [1.0, 3.0, 5.0, 10.0],
+            "model__reg_alpha": [0.0, 0.1, 0.5, 1.0],
+            "model__gamma": [0.0, 0.5, 1.0, 2.0],
+            "model__scale_pos_weight": [5.0, 10.0, 20.0, 30.0, 40.0],
         },
     },
     n_iter_by_mode={
         "fast": 12,
-        "full": 18,
+        "full": 60,
     },
 )
 
@@ -72,7 +76,7 @@ def build_estimator(train_df: pd.DataFrame, config: ExperimentConfig):
         tree_method="hist",
         scale_pos_weight=_positive_class_weight(train_df[config.target_col]),
         random_state=config.random_state,
-        n_jobs=-1,
+        n_jobs=int(os.environ.get("FAERS_ESTIMATOR_N_JOBS", "-1")),
     )
 
 

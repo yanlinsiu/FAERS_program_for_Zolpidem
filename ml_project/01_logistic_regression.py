@@ -4,6 +4,7 @@ import argparse
 
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 from sklearn.linear_model import LogisticRegression
 
 from ml_common import (
@@ -56,6 +57,69 @@ def build_estimator(_: pd.DataFrame, config: ExperimentConfig) -> LogisticRegres
     )
 
 
+def save_logistic_inference(
+    *,
+    result,
+    coefficients_df: pd.DataFrame,
+    top_n: int,
+) -> pd.DataFrame:
+    if top_n <= 0:
+        return pd.DataFrame()
+
+    top_features = (
+        coefficients_df.assign(abs_coefficient=lambda df: df["coefficient"].abs())
+        .sort_values("abs_coefficient", ascending=False)
+        .head(top_n)
+        ["feature"]
+        .tolist()
+    )
+    feature_names = get_feature_names(result.pipeline)
+    feature_index = {feature: idx for idx, feature in enumerate(feature_names)}
+    selected_indices = [feature_index[feature] for feature in top_features]
+
+    preprocessor = result.pipeline.named_steps["preprocessor"]
+    x_sparse = preprocessor.transform(result.train_df[preprocessor.feature_names_in_])
+    x_selected = x_sparse[:, selected_indices].toarray()
+    x_selected = sm.add_constant(x_selected, has_constant="add")
+    y = result.train_df[result.config.target_col].astype(int).to_numpy()
+
+    model = sm.GLM(y, x_selected, family=sm.families.Binomial())
+    fitted = model.fit(maxiter=100, disp=0, cov_type="HC0")
+
+    params = np.asarray(fitted.params)
+    pvalues = np.asarray(fitted.pvalues)
+    conf_int = np.asarray(fitted.conf_int(alpha=0.05))
+
+    rows = []
+    for offset, feature in enumerate(top_features, start=1):
+        coef = float(params[offset])
+        ci_low = float(conf_int[offset, 0])
+        ci_high = float(conf_int[offset, 1])
+        rows.append(
+            {
+                "feature": feature,
+                "inference_model_coefficient": coef,
+                "odds_ratio": float(np.exp(coef)),
+                "or_95ci_low": float(np.exp(ci_low)),
+                "or_95ci_high": float(np.exp(ci_high)),
+                "p_value": float(pvalues[offset]),
+                "selected_by": "top_abs_regularized_coefficient",
+                "inference_note": (
+                    "Post-hoc unpenalized GLM on selected top features; "
+                    "use as explanatory support, not as the tuned ML model."
+                ),
+            }
+        )
+
+    inference_df = pd.DataFrame(rows).sort_values("p_value", ascending=True)
+    inference_df.to_csv(
+        result.run_dir / "logistic_inference_top_features.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    return inference_df
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Train a tuned logistic regression model on FAERS global datasets."
@@ -64,6 +128,15 @@ def main() -> None:
         parser,
         default_train_sample_n=0,
         default_search_mode="fast",
+    )
+    parser.add_argument(
+        "--inference-top-n",
+        type=int,
+        default=30,
+        help=(
+            "Fit a post-hoc unpenalized GLM for the top N absolute regularized "
+            "coefficients and save OR, 95% CI, and P values. Use 0 to skip."
+        ),
     )
     args = parser.parse_args()
     config = config_from_args(args)
@@ -91,6 +164,13 @@ def main() -> None:
     coefficients_df[["feature", "odds_ratio"]].sort_values(
         "odds_ratio", ascending=False
     ).to_csv(result.run_dir / "odds_ratios.csv", index=False, encoding="utf-8-sig")
+
+    if args.inference_top_n > 0:
+        save_logistic_inference(
+            result=result,
+            coefficients_df=coefficients_df,
+            top_n=args.inference_top_n,
+        )
 
     feature_highlights = summarize_logistic_highlights(coefficients_df)
     save_model_card(

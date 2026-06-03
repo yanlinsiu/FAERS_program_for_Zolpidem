@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -50,7 +51,7 @@ def build_estimator(_: pd.DataFrame, config: ExperimentConfig) -> RandomForestCl
         min_samples_leaf=20,
         max_features="sqrt",
         class_weight="balanced_subsample",
-        n_jobs=-1,
+        n_jobs=int(os.environ.get("FAERS_ESTIMATOR_N_JOBS", "-1")),
         random_state=config.random_state,
     )
 

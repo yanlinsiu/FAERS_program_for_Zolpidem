@@ -1,0 +1,26 @@
+﻿pt,case_count,case_percent,community_id,phenotype_column,phenotype_layer,phenotype_label,community_name,degree,co_count_strength,jaccard_strength,plot_community_id
+CONFUSIONAL STATE,221,20.8885,2,pheno_consciousness_cognition,prodrome,Consciousness / cognition change,Consciousness / cognition change,48,3173,13.827677,1
+NAUSEA,128,12.0983,2,,,Unmapped / other PT,Consciousness / cognition change,48,3326,24.313251,2
+DIZZINESS,123,11.6257,3,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,21,360,1.934296,2
+PAIN,116,10.9641,2,,,Unmapped / other PT,Consciousness / cognition change,49,3112,25.006507,4
+ANXIETY,115,10.8696,2,,,Unmapped / other PT,Consciousness / cognition change,47,3189,25.813073,4
+MALAISE,108,10.2079,2,,,Unmapped / other PT,Consciousness / cognition change,47,3094,26.530618,3
+DYSARTHRIA,95,8.9792,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,45,3054,29.380354,1
+HEADACHE,95,8.9792,2,,,Unmapped / other PT,Consciousness / cognition change,46,3099,29.970977,3
+MOTOR DYSFUNCTION,95,8.9792,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,48,3145,30.015123,2
+MUSCULAR WEAKNESS,94,8.8847,2,,,Unmapped / other PT,Consciousness / cognition change,48,3062,29.536569,3
+HYPOTENSION,90,8.5066,3,pheno_hypotension,prodrome,Hypotension / orthostatic hypotension,Dizziness / vertigo / syncope,18,259,1.663546,2
+FATIGUE,88,8.3176,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,45,3054,31.64632,1
+VOMITING,86,8.1285,2,,,Unmapped / other PT,Consciousness / cognition change,47,3083,32.601102,3
+PYREXIA,85,8.034,2,,,Unmapped / other PT,Consciousness / cognition change,47,3075,32.810338,3
+GASTROINTESTINAL DISORDER,84,7.9395,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,48,2883,29.083103,2
+AFFECT LABILITY,82,7.7505,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,46,3067,33.531639,1
+PNEUMONIA,81,7.656,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,43,3011,33.479801,1
+SYNCOPE,79,7.4669,3,pheno_dizziness_vertigo_syncope,prodrome,Dizziness / vertigo / syncope,Dizziness / vertigo / syncope,10,212,1.484713,2
+COORDINATION ABNORMAL,78,7.3724,1,pheno_gait_balance_motor,prodrome,Gait / balance / motor control abnormality,Gait / balance / motor control abnormality,42,3013,34.730345,1
+APHASIA,76,7.1834,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,42,3002,35.336879,1
+HEAD INJURY,76,7.1834,4,pheno_fracture_injury,consequence,Fracture / injury consequence,Fracture / injury consequence,9,37,0.199519,1
+CEREBROVASCULAR ACCIDENT,75,7.0888,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,42,3012,35.980237,1
+DYSPHAGIA,75,7.0888,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,42,3011,35.956728,1
+EATING DISORDER,75,7.0888,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,42,3008,35.889278,1
+CYSTITIS,74,6.9943,1,,,Unmapped / other PT,Gait / balance / motor control abnormality,42,3007,36.315952,2

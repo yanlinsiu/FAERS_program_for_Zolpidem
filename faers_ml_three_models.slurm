@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
+#SBATCH --mem=10G
 #SBATCH --partition=cpu
 #SBATCH --job-name=FAERS_ML
 #SBATCH -o /share/home/ycg_luanjingjie/baoan/logs/faers-ml-%j.out
