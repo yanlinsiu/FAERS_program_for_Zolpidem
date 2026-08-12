@@ -1,0 +1,31 @@
+﻿target_key,target_label,omitted_domain,omitted_domain_status,original_score,original_available_score,original_support_class,loo_score,loo_available_score,loo_support_class,class_changed
+zolpidem,Zolpidem,traditional_signal_strength,supportive,8,9,high support,6,7,moderate support,True
+zolpidem,Zolpidem,active_comparator_consistency,supportive,8,9,high support,6,7,moderate support,True
+zolpidem,Zolpidem,adjusted_model_stability,supportive,8,9,high support,6,7,moderate support,True
+zolpidem,Zolpidem,exposure_definition_sensitivity,supportive,8,9,high support,6,7,moderate support,True
+zolpidem,Zolpidem,reporting_structure_stability,neutral,8,9,high support,8,8,high support,False
+z_drug,Z-drugs,traditional_signal_strength,supportive,7,9,moderate support,5,7,moderate support,False
+z_drug,Z-drugs,active_comparator_consistency,supportive,7,9,moderate support,5,7,moderate support,False
+z_drug,Z-drugs,adjusted_model_stability,supportive,7,9,moderate support,5,7,moderate support,False
+z_drug,Z-drugs,exposure_definition_sensitivity,contradictory,7,9,moderate support,6,7,moderate support,False
+z_drug,Z-drugs,reporting_structure_stability,contradictory,7,9,moderate support,7,8,moderate support,False
+benzodiazepine,Benzodiazepines,traditional_signal_strength,supportive,6,6,moderate support,4,4,insufficient evidence,True
+benzodiazepine,Benzodiazepines,active_comparator_consistency,supportive,6,6,moderate support,4,4,insufficient evidence,True
+benzodiazepine,Benzodiazepines,adjusted_model_stability,supportive,6,6,moderate support,4,4,insufficient evidence,True
+benzodiazepine,Benzodiazepines,exposure_definition_sensitivity,not_available,6,6,moderate support,6,6,moderate support,False
+benzodiazepine,Benzodiazepines,reporting_structure_stability,not_available,6,6,moderate support,6,6,moderate support,False
+other_insomnia_related,Other insomnia-related drugs,traditional_signal_strength,supportive,5,6,moderate support,3,4,insufficient evidence,True
+other_insomnia_related,Other insomnia-related drugs,active_comparator_consistency,supportive,5,6,moderate support,3,4,insufficient evidence,True
+other_insomnia_related,Other insomnia-related drugs,adjusted_model_stability,supportive,5,6,moderate support,4,4,insufficient evidence,True
+other_insomnia_related,Other insomnia-related drugs,exposure_definition_sensitivity,not_available,5,6,moderate support,5,6,moderate support,False
+other_insomnia_related,Other insomnia-related drugs,reporting_structure_stability,not_available,5,6,moderate support,5,6,moderate support,False
+other_z_drug,Other Z-drugs,traditional_signal_strength,supportive,2,2,insufficient evidence,0,0,insufficient evidence,False
+other_z_drug,Other Z-drugs,active_comparator_consistency,not_available,2,2,insufficient evidence,2,2,insufficient evidence,False
+other_z_drug,Other Z-drugs,adjusted_model_stability,not_available,2,2,insufficient evidence,2,2,insufficient evidence,False
+other_z_drug,Other Z-drugs,exposure_definition_sensitivity,not_available,2,2,insufficient evidence,2,2,insufficient evidence,False
+other_z_drug,Other Z-drugs,reporting_structure_stability,not_available,2,2,insufficient evidence,2,2,insufficient evidence,False
+orexin_antagonist,Orexin receptor antagonists,traditional_signal_strength,contradictory,0,2,insufficient evidence,0,0,insufficient evidence,False
+orexin_antagonist,Orexin receptor antagonists,active_comparator_consistency,not_available,0,2,insufficient evidence,0,2,insufficient evidence,False
+orexin_antagonist,Orexin receptor antagonists,adjusted_model_stability,not_available,0,2,insufficient evidence,0,2,insufficient evidence,False
+orexin_antagonist,Orexin receptor antagonists,exposure_definition_sensitivity,not_available,0,2,insufficient evidence,0,2,insufficient evidence,False
+orexin_antagonist,Orexin receptor antagonists,reporting_structure_stability,not_available,0,2,insufficient evidence,0,2,insufficient evidence,False

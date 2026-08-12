@@ -1,0 +1,29 @@
+{
+  "raw_root": "D:/program_FAERS/data",
+  "corrected_output_dir": "outputs_v3",
+  "first_year": 2004,
+  "train_end_year": 2018,
+  "test_start_year": 2019,
+  "test_end_year": 2025,
+  "chunksize": 250000,
+  "suspect_roles": ["PS", "SS"],
+  "events": [
+    "strict_fall",
+    "broad_fall",
+    "pheno_sedation",
+    "pheno_neurocognitive",
+    "pheno_dizziness_syncope",
+    "pheno_gait_balance",
+    "pheno_hypotension"
+  ],
+  "alias_min_rows": 5,
+  "alias_min_top_share": 0.8,
+  "positive_min_cases": 5,
+  "positive_min_ror_lower": 1.0,
+  "evaluable_min_exposures": 100,
+  "evaluable_min_expected_cases": 5.0,
+  "cold_start_max_train_exposures": 25,
+  "cold_start_min_test_exposures": 100,
+  "bootstrap_replicates": 500,
+  "random_seed": 20260813
+}

@@ -1,0 +1,25 @@
+﻿scenario,target_key,target_label,strong_case_threshold,weak_case_threshold,ci_rule,obtained_score,available_score,support_class,baseline_support_class,class_changed_from_baseline,note
+baseline,zolpidem,Zolpidem,10,5,lower_bound,8,9,high support,high support,False,Prespecified primary rules.
+baseline,z_drug,Z-drugs,10,5,lower_bound,7,9,moderate support,moderate support,False,Prespecified primary rules.
+baseline,benzodiazepine,Benzodiazepines,10,5,lower_bound,6,6,moderate support,moderate support,False,Prespecified primary rules.
+baseline,other_insomnia_related,Other insomnia-related drugs,10,5,lower_bound,5,6,moderate support,moderate support,False,Prespecified primary rules.
+baseline,other_z_drug,Other Z-drugs,10,5,lower_bound,2,2,insufficient evidence,insufficient evidence,False,Prespecified primary rules.
+baseline,orexin_antagonist,Orexin receptor antagonists,10,5,lower_bound,0,2,insufficient evidence,insufficient evidence,False,Prespecified primary rules.
+lenient_case_count,zolpidem,Zolpidem,5,3,lower_bound,8,9,high support,high support,False,Lower fall-report count thresholds.
+lenient_case_count,z_drug,Z-drugs,5,3,lower_bound,7,9,moderate support,moderate support,False,Lower fall-report count thresholds.
+lenient_case_count,benzodiazepine,Benzodiazepines,5,3,lower_bound,6,6,moderate support,moderate support,False,Lower fall-report count thresholds.
+lenient_case_count,other_insomnia_related,Other insomnia-related drugs,5,3,lower_bound,5,6,moderate support,moderate support,False,Lower fall-report count thresholds.
+lenient_case_count,other_z_drug,Other Z-drugs,5,3,lower_bound,2,2,insufficient evidence,insufficient evidence,False,Lower fall-report count thresholds.
+lenient_case_count,orexin_antagonist,Orexin receptor antagonists,5,3,lower_bound,0,2,insufficient evidence,insufficient evidence,False,Lower fall-report count thresholds.
+conservative_case_count,zolpidem,Zolpidem,20,10,lower_bound,8,9,high support,high support,False,Higher fall-report count thresholds.
+conservative_case_count,z_drug,Z-drugs,20,10,lower_bound,7,9,moderate support,moderate support,False,Higher fall-report count thresholds.
+conservative_case_count,benzodiazepine,Benzodiazepines,20,10,lower_bound,6,6,moderate support,moderate support,False,Higher fall-report count thresholds.
+conservative_case_count,other_insomnia_related,Other insomnia-related drugs,20,10,lower_bound,5,6,moderate support,moderate support,False,Higher fall-report count thresholds.
+conservative_case_count,other_z_drug,Other Z-drugs,20,10,lower_bound,2,2,insufficient evidence,insufficient evidence,False,Higher fall-report count thresholds.
+conservative_case_count,orexin_antagonist,Orexin receptor antagonists,20,10,lower_bound,0,2,insufficient evidence,insufficient evidence,False,Higher fall-report count thresholds.
+point_estimate_consistency,zolpidem,Zolpidem,10,5,point_estimate,8,9,high support,high support,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.
+point_estimate_consistency,z_drug,Z-drugs,10,5,point_estimate,7,9,moderate support,moderate support,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.
+point_estimate_consistency,benzodiazepine,Benzodiazepines,10,5,point_estimate,6,6,moderate support,moderate support,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.
+point_estimate_consistency,other_insomnia_related,Other insomnia-related drugs,10,5,point_estimate,6,6,moderate support,moderate support,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.
+point_estimate_consistency,other_z_drug,Other Z-drugs,10,5,point_estimate,2,2,insufficient evidence,insufficient evidence,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.
+point_estimate_consistency,orexin_antagonist,Orexin receptor antagonists,10,5,point_estimate,0,2,insufficient evidence,insufficient evidence,False,Point-estimate direction used for consistency points; precise reverse results remain contradictions.

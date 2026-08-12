@@ -1,0 +1,7 @@
+module_key,module_label,analysis_role,meddra_pt_terms,use_in_main_outcome,use_in_phenotype_fingerprint,interpretation_note
+strict_fall,Narrow fall endpoint,main_outcome,"FALL; DROP ATTACKS",1,0,Strict fall endpoint for signal analyses.
+sedation,Sedation phenotype,co_reported_phenotype,"SOMNOLENCE; SEDATION",0,1,Co-reported phenotype among strict fall reports only; do not interpret as causal.
+neurocognitive,Neurocognitive phenotype,co_reported_phenotype,"CONFUSIONAL STATE; DELIRIUM; COGNITIVE DISORDER",0,1,Co-reported phenotype among strict fall reports only; do not interpret as causal.
+dizziness_syncope,Dizziness or syncope phenotype,co_reported_phenotype,"DIZZINESS; SYNCOPE",0,1,Co-reported phenotype among strict fall reports only; do not interpret as causal.
+gait_balance,Gait or balance phenotype,co_reported_phenotype,"GAIT DISTURBANCE; ATAXIA; COORDINATION ABNORMAL",0,1,Co-reported phenotype among strict fall reports only; do not interpret as causal.
+hypotension,Hypotension phenotype,co_reported_phenotype,"HYPOTENSION; ORTHOSTATIC HYPOTENSION",0,1,Co-reported phenotype among strict fall reports only; do not interpret as causal.

@@ -1,0 +1,29 @@
+{
+  "main_dataset": "../outputs/intermediate/05_main_analysis_dataset.parquet",
+  "drug_master": "../configs/sedative_hypnotic_drug_master.csv",
+  "raw_faers_root": "D:/program_FAERS/data",
+  "exposure_suffix": "ps_ss",
+  "train_end_year": 2018,
+  "test_start_year": 2019,
+  "test_end_year": 2025,
+  "events": [
+    "strict_fall",
+    "broad_fall",
+    "pheno_sedation",
+    "pheno_neurocognitive",
+    "pheno_dizziness_syncope",
+    "pheno_gait_balance",
+    "pheno_hypotension"
+  ],
+  "positive_min_cases": 5,
+  "positive_min_ror_lower": 1.0,
+  "target_mapping_min_fraction": 0.9,
+  "target_drug_min_test_exposures": 50,
+  "target_drug_min_count": 15,
+  "cold_start_max_train_exposures": 25,
+  "cold_start_min_test_exposures": 50,
+  "minimum_future_positive_pairs": 20,
+  "minimum_future_negative_pairs": 20,
+  "minimum_groups_for_cv": 8,
+  "minimum_auprc_gain_over_volume": 0.02
+}

@@ -1,0 +1,19 @@
+drug_key,drug_group,generic_name,example_brand_names,analysis_priority,notes
+zolpidem,z_drug,zolpidem,"Ambien; Ambien CR; Edluar; Intermezzo; Zolpimist",primary_case_study,Core case study drug.
+eszopiclone,z_drug,eszopiclone,Lunesta,primary_comparator,Other Z-drug comparator.
+zaleplon,z_drug,zaleplon,Sonata,primary_comparator,Other Z-drug comparator.
+zopiclone,z_drug,zopiclone,Imovane,exploratory,May be less visible in US FAERS; verify count before main analysis.
+temazepam,benzodiazepine,temazepam,Restoril,primary_comparator,Benzodiazepine hypnotic comparator.
+triazolam,benzodiazepine,triazolam,Halcion,primary_comparator,Benzodiazepine hypnotic comparator.
+lorazepam,benzodiazepine,lorazepam,Ativan,secondary_comparator,Benzodiazepine anxiolytic/sedative comparator.
+diazepam,benzodiazepine,diazepam,Valium,secondary_comparator,Benzodiazepine comparator.
+alprazolam,benzodiazepine,alprazolam,Xanax,secondary_comparator,Benzodiazepine comparator.
+clonazepam,benzodiazepine,clonazepam,Klonopin,secondary_comparator,Benzodiazepine comparator.
+suvorexant,orexin_antagonist,suvorexant,Belsomra,primary_comparator,Orexin receptor antagonist comparator.
+lemborexant,orexin_antagonist,lemborexant,Dayvigo,primary_comparator,Orexin receptor antagonist comparator.
+daridorexant,orexin_antagonist,daridorexant,Quviviq,primary_comparator,Orexin receptor antagonist comparator.
+trazodone,other_insomnia_related,trazodone,Desyrel,secondary_comparator,Common off-label insomnia medication; indication confounding likely.
+mirtazapine,other_insomnia_related,mirtazapine,Remeron,secondary_comparator,Common sedating antidepressant; indication confounding likely.
+doxepin,other_insomnia_related,doxepin,Silenor,secondary_comparator,Low-dose insomnia use should be distinguished where possible.
+ramelteon,other_insomnia_related,ramelteon,Rozerem,secondary_comparator,Melatonin receptor agonist comparator.
+melatonin,other_insomnia_related,melatonin,,exploratory,May include supplement reports; verify data quality.

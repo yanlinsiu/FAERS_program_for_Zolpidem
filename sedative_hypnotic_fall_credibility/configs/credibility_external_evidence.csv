@@ -1,0 +1,7 @@
+target_key,classification,detail,source_basis
+zolpidem,established,"Regulatory and geriatric prescribing guidance identifies fall-related or serious-injury concern for zolpidem in older adults.","FDA boxed warning (2019); AGS Beers Criteria (2023)"
+z_drug,established,"Regulatory and geriatric prescribing guidance identifies fall-related or serious-injury concern for prescription Z-drugs in older adults.","FDA boxed warning (2019); AGS Beers Criteria (2023)"
+other_z_drug,established,"Regulatory and geriatric prescribing guidance includes eszopiclone and zaleplon among Z-drugs of concern.","FDA boxed warning (2019); AGS Beers Criteria (2023)"
+benzodiazepine,established,"Geriatric prescribing guidance identifies fall and fracture concern for benzodiazepines in older adults.","AGS Beers Criteria (2023)"
+orexin_antagonist,absent,"No external evidence classification was prespecified as supporting an elevated fall-reporting signal in this framework.","Prespecified local evidence review"
+other_insomnia_related,absent,"No group-level external evidence classification was prespecified because this is a heterogeneous comparator group.","Prespecified local evidence review"

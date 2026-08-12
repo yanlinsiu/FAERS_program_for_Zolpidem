@@ -1,0 +1,7 @@
+﻿qc_domain,metric,value,note
+evidence_summary,summary_rows,6,
+evidence_summary,detail_rows,42,
+evidence_summary,core_score_max,9,Five-domain internal-support score.
+evidence_summary,class_count__moderate support,3,
+evidence_summary,class_count__insufficient evidence,2,
+evidence_summary,class_count__high support,1,

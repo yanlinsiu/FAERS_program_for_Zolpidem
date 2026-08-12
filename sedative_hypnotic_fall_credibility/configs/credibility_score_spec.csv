@@ -1,0 +1,8 @@
+domain,domain_type,max_points,availability_source,rule_summary,threshold
+traditional_signal_strength,core,2,signal_landscape,"2: fall_n>=10 and ROR lower CI>1 and IC025>0 and OE05>1; 1: fall_n>=5 and ROR lower CI>1; otherwise 0.","strong_n=10;weak_n=5"
+active_comparator_consistency,core,2,active_comparator,"2: all prespecified comparisons have point estimate>1 and at least half have lower CI>1; 1: all point estimates>1 without a precise reverse result; otherwise 0.","supported_fraction=0.5"
+adjusted_model_stability,core,2,adjusted_model,"2: all prespecified full-model estimates>1 and at least half have lower CI>1; 1: all estimates>1 without a precise reverse result; otherwise 0.","supported_fraction=0.5;model_id=model_3_full"
+exposure_definition_sensitivity,core,2,ps_only_and_clean_exposure,"One point for each supportive sensitivity analysis; retain a contradiction flag when either analysis is precisely reversed.","subdomains=ps_only|clean_exposure"
+reporting_structure_stability,core,1,reporting_source_stratified,"1: at least two strata are available, no precise reverse result, and at least 75% of estimates are >1; otherwise 0.","directional_fraction=0.75;minimum_strata=2"
+phenotype_coherence,modifier,0,phenotype_fingerprint,"Supportive when at least 40% of fall reports have a mechanistically coherent co-phenotype; otherwise neutral; never added to the core score.","supportive_percent=40"
+external_evidence,modifier,0,external_evidence_config,"Report the prespecified classification from credibility_external_evidence.csv; never add it to the core score.","allowed=established|suggestive|absent|conflicting"

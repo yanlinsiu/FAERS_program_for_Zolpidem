@@ -1,0 +1,33 @@
+{
+  "case_dataset": "../outputs/intermediate/05_main_analysis_dataset.parquet",
+  "drug_root": "D:/program_FAERS/archive_old_outputs/results_before_20260525/OUTPUT_COUNTRY",
+  "train_end_year": 2018,
+  "test_start_year": 2019,
+  "test_end_year": 2025,
+  "suspect_roles": ["PS", "SS"],
+  "events": [
+    "strict_fall",
+    "broad_fall",
+    "pheno_sedation",
+    "pheno_neurocognitive",
+    "pheno_dizziness_syncope",
+    "pheno_gait_balance",
+    "pheno_hypotension"
+  ],
+  "alias_min_rows": 5,
+  "alias_min_top_share": 0.8,
+  "positive_min_cases": 5,
+  "positive_min_ror_lower": 1.0,
+  "evaluable_min_exposures": 100,
+  "evaluable_min_expected_cases": 5.0,
+  "cold_start_max_train_exposures": 25,
+  "cold_start_min_test_exposures": 100,
+  "quality_gates": {
+    "minimum_case_drug_coverage": 0.95,
+    "maximum_name_only_exposure_fraction": 0.35,
+    "minimum_drugs_observed_both_periods": 500,
+    "minimum_evaluable_pairs": 1000,
+    "minimum_positive_pairs": 100,
+    "minimum_operational_negative_pairs": 100
+  }
+}

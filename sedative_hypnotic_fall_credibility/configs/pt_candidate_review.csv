@@ -1,0 +1,14 @@
+pt_code,pt_english,pt_chinese,suggested_module,include_in_primary_map,possible_use,reason
+10036653,Presyncope,晕厥前期,dizziness_syncope,0,sensitivity_or_exploratory,Close to syncope but less specific; consider in sensitivity analysis only.
+10013578,Dizziness postural,体位性头晕,dizziness_syncope,0,sensitivity_or_exploratory,More specific dizziness subtype; may increase sensitivity but narrows interpretation.
+10017581,Gait inability,步态无力,gait_balance,0,sensitivity_or_exploratory,Related to gait impairment but may indicate baseline disability.
+10054197,Gait deviation,步态偏差,gait_balance,0,sensitivity_or_exploratory,Related to gait impairment but less standard than Gait disturbance.
+10082636,Decreased gait velocity,步速减慢,gait_balance,0,sensitivity_or_exploratory,Related to frailty or baseline mobility; not primary.
+10047385,Vestibular ataxia,前庭性共济失调,gait_balance,0,usually_exclude,Specific vestibular disorder rather than general sedative-hypnotic phenotype.
+10008025,Cerebellar ataxia,小脑共济失调,gait_balance,0,usually_exclude,Specific neurologic disorder; likely baseline disease or differential diagnosis.
+10050389,Cerebral ataxia,大脑性共济失调,gait_balance,0,usually_exclude,Specific neurologic disorder; likely baseline disease or differential diagnosis.
+10067494,Confusional arousal,觉醒混淆,neurocognitive,0,sensitivity_or_exploratory,Potentially relevant to hypnotics but more sleep-specific; not primary.
+10078610,Postoperative delirium,术后谵妄,neurocognitive,0,usually_exclude,Procedure-related context; not a clean sedative-hypnotic phenotype.
+10079741,Sedation complication,镇静并发症,sedation,0,usually_exclude,Procedure or anesthesia context; not a clean spontaneous phenotype.
+10050395,Neonatal oversedation,新生儿镇静过度,sedation,0,exclude,Not relevant to elderly fall analysis.
+10048744,Fear of falling,跌倒恐惧,strict_fall,0,exclude,Not an actual fall event; do not use as strict fall outcome.

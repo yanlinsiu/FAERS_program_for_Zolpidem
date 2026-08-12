@@ -47,6 +47,10 @@ var/
 venv/
 env/
 ENV/
+.python_packages/
+.analysis_packages/
+.runtime_packages/
+.local_packages/
 .Python
 .uv/
 
@@ -70,13 +74,56 @@ node_modules/
 # Codex and other temporary scratch work
 # ------------------------------------------------------------
 .codex_scratch/
+.codex-remote-attachments/
 
 # ------------------------------------------------------------
 # FAERS raw data, downloaded data, and generated package data
 # ------------------------------------------------------------
 data/
+raw/
+raw_data/
+faers_raw/
+faers_ascii/
+faers_xml/
 package/
 references/literature/
+
+# FDA quarterly archives and their unpacked ASCII tables. Keep curated
+# configuration/result CSV files trackable; ignore only FAERS source tables.
+[Ff][Aa][Ee][Rr][Ss]_[Aa][Ss][Cc][Ii][Ii]_*.zip
+[Ff][Aa][Ee][Rr][Ss]_[Xx][Mm][Ll]_*.zip
+[Aa][Ss][Cc][Ii][Ii][0-9][0-9][Qq][1-4].zip
+[Dd][Ee][Mm][Oo][0-9][0-9][Qq][1-4].txt
+[Dd][Rr][Uu][Gg][0-9][0-9][Qq][1-4].txt
+[Rr][Ee][Aa][Cc][0-9][0-9][Qq][1-4].txt
+[Oo][Uu][Tt][Cc][0-9][0-9][Qq][1-4].txt
+[Rr][Pp][Ss][Rr][0-9][0-9][Qq][1-4].txt
+[Tt][Hh][Ee][Rr][0-9][0-9][Qq][1-4].txt
+[Ii][Nn][Dd][Ii][0-9][0-9][Qq][1-4].txt
+
+# Large local datasets and serialized model artifacts.
+*.parquet
+*.feather
+*.arrow
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.rds
+*.RData
+*.sas7bdat
+*.sqlite
+*.sqlite3
+*.db
+*.npy
+*.npz
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
 
 # FDA FAERS yearly folders if raw quarterly archives are unpacked here.
 2004/
@@ -106,6 +153,8 @@ references/literature/
 # Generated analysis outputs and reports
 # ------------------------------------------------------------
 OUTPUT/
+output*/
+outputs/
 OUTPUT_COUNTRY/
 OUTPUT_GLOBAL/
 OUTPUT_GLOBAL_COUNTRY/
@@ -114,6 +163,11 @@ references/
 analysis_reports/
 docs_or_reports/
 presentation_output/
+docx_render_check/
+_paper_fig_preview/
+*.tif
+*.tiff
+~$*
 tools/*
 !tools/audit_analysis_fields.py
 # Run folders are reproducible output snapshots.
@@ -131,5 +185,19 @@ test_*.py
 demo.py
 drug_name_cleaner.py
 
-
 archive_old_outputs/
+
+# ------------------------------------------------------------
+# Local reference material and presentation drafts
+# ------------------------------------------------------------
+*.md
+*.ppt
+*.pptx
+*.pps
+*.ppsx
+*.key
+*.pdf
+*.ris
+*.nbib
+*.enw
+*.bib

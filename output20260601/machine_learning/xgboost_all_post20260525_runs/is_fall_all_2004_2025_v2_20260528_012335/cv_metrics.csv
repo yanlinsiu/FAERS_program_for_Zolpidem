@@ -1,3 +1,0 @@
-﻿n_rows,positive_cases,positive_rate,threshold,roc_auc,average_precision,brier_score,accuracy,precision,recall,f1,specificity,tn,fp,fn,tp,top_5pct_n,top_5pct_positive_cases,top_5pct_positive_rate,top_5pct_lift,top_10pct_n,top_10pct_positive_cases,top_10pct_positive_rate,top_10pct_lift,fold,train_rows,valid_rows,train_positive_rate,valid_positive_rate
-500,16,0.032,0.5,0.6677427685950412,0.07034081584880153,0.03925800018502103,0.958,0.0,0.0,0.0,0.9896694214876033,479,5,16,0,25,2,0.08,2.5,50,4,0.08,2.5,1,500,500,0.032,0.032
-500,16,0.032,0.5,0.6043388429752066,0.05904768318048979,0.04715621479385757,0.946,0.07692307692307693,0.0625,0.06896551724137931,0.9752066115702479,472,12,15,1,25,2,0.08,2.5,50,3,0.06,1.875,2,500,500,0.032,0.032

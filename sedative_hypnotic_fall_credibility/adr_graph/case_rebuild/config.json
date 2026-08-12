@@ -1,0 +1,23 @@
+{
+  "raw_root": "D:/program_FAERS/data",
+  "first_year": 2004,
+  "last_year": 2025,
+  "chunksize": 250000,
+  "drug_dictionary": "../../configs/drug_name_dictionary.csv",
+  "drug_master": "../../configs/sedative_hypnotic_drug_master.csv",
+  "old_case_dataset": "../../outputs/intermediate/05_main_analysis_dataset.parquet",
+  "strict_fall_terms": ["FALL", "DROP ATTACKS"],
+  "broad_fall_terms": [
+    "FALL", "DROP ATTACKS", "BALANCE DISORDER", "GAIT DISTURBANCE", "GAIT INABILITY",
+    "HYPOTENSION", "ORTHOSTATIC HYPOTENSION", "VERTIGO", "VERTIGO CNS ORIGIN",
+    "VERTIGO POSITIONAL", "VESTIBULAR DISORDER", "VISUAL ACUITY REDUCED", "VISUAL IMPAIRMENT"
+  ],
+  "phenotype_terms": {
+    "pheno_sedation": ["SOMNOLENCE", "SEDATION"],
+    "pheno_neurocognitive": ["CONFUSIONAL STATE", "DELIRIUM", "COGNITIVE DISORDER"],
+    "pheno_dizziness_syncope": ["DIZZINESS", "SYNCOPE"],
+    "pheno_gait_balance": ["GAIT DISTURBANCE", "ATAXIA", "COORDINATION ABNORMAL"],
+    "pheno_hypotension": ["HYPOTENSION", "ORTHOSTATIC HYPOTENSION"],
+    "pheno_visual_disturbance": ["VISUAL IMPAIRMENT", "VISUAL ACUITY REDUCED"]
+  }
+}

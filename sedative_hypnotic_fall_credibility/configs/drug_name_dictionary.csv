@@ -1,0 +1,61 @@
+drug_key,drug_group,term,term_type,match_action,manual_review_note
+zolpidem,z_drug,zolpidem,generic,include,base generic
+zolpidem,z_drug,zolpidem tartrate,salt_or_active,include,official active ingredient in US labels
+zolpidem,z_drug,ambien,brand,include,brand
+zolpidem,z_drug,ambien cr,brand,include,extended-release brand
+zolpidem,z_drug,edluar,brand,include,sublingual brand
+zolpidem,z_drug,intermezzo,brand,include,sublingual middle-of-night brand
+zolpidem,z_drug,zolpimist,brand,include,oral spray brand
+eszopiclone,z_drug,eszopiclone,generic,include,base generic
+eszopiclone,z_drug,lunesta,brand,include,brand
+zaleplon,z_drug,zaleplon,generic,include,base generic
+zaleplon,z_drug,sonata,brand,include,brand
+zopiclone,z_drug,zopiclone,generic,include,base generic
+zopiclone,z_drug,imovane,brand,include,Health Canada brand
+temazepam,benzodiazepine,temazepam,generic,include,base generic
+temazepam,benzodiazepine,restoril,brand,include,brand
+triazolam,benzodiazepine,triazolam,generic,include,base generic
+triazolam,benzodiazepine,halcion,brand,include,brand
+lorazepam,benzodiazepine,lorazepam,generic,include,base generic
+lorazepam,benzodiazepine,ativan,brand,include,brand
+lorazepam,benzodiazepine,loreev,brand,include,extended-release brand
+lorazepam,benzodiazepine,loreev xr,brand,include,extended-release brand
+diazepam,benzodiazepine,diazepam,generic,include,base generic
+diazepam,benzodiazepine,valium,brand,include,brand
+diazepam,benzodiazepine,diastat,brand,include,rectal gel brand; indication confounding later
+diazepam,benzodiazepine,valtoco,brand,include,nasal spray brand; indication confounding later
+diazepam,benzodiazepine,libervant,brand,include,buccal film brand; indication confounding later
+diazepam,benzodiazepine,diazepam intensol,brand,include,oral concentrate brand
+alprazolam,benzodiazepine,alprazolam,generic,include,base generic
+alprazolam,benzodiazepine,xanax,brand,include,brand
+alprazolam,benzodiazepine,xanax xr,brand,include,extended-release brand
+alprazolam,benzodiazepine,niravam,brand,include,orally disintegrating brand
+clonazepam,benzodiazepine,clonazepam,generic,include,base generic
+clonazepam,benzodiazepine,klonopin,brand,include,brand
+suvorexant,orexin_antagonist,suvorexant,generic,include,base generic
+suvorexant,orexin_antagonist,belsomra,brand,include,brand
+lemborexant,orexin_antagonist,lemborexant,generic,include,base generic
+lemborexant,orexin_antagonist,dayvigo,brand,include,brand
+daridorexant,orexin_antagonist,daridorexant,generic,include,base generic
+daridorexant,orexin_antagonist,daridorexant hydrochloride,salt_or_active,include,official active ingredient in US label
+daridorexant,orexin_antagonist,quviviq,brand,include,brand
+trazodone,other_insomnia_related,trazodone,generic,include,base generic
+trazodone,other_insomnia_related,trazodone hydrochloride,salt_or_active,include,official active ingredient in US labels
+trazodone,other_insomnia_related,desyrel,brand,include,brand
+trazodone,other_insomnia_related,desyrel dividose,brand,include,brand
+trazodone,other_insomnia_related,oleptro,brand,include,extended-release brand
+trazodone,other_insomnia_related,raldesy,brand,include,oral solution brand
+mirtazapine,other_insomnia_related,mirtazapine,generic,include,base generic
+mirtazapine,other_insomnia_related,remeron,brand,include,brand
+mirtazapine,other_insomnia_related,remeron soltab,brand,include,orally disintegrating brand
+mirtazapine,other_insomnia_related,remeronsoltab,brand,include,no-space brand spelling
+mirtazapine,other_insomnia_related,mirataz,brand,exclude,topical/veterinary-style product name; not insomnia exposure
+doxepin,other_insomnia_related,doxepin,generic,include,base generic
+doxepin,other_insomnia_related,doxepin hydrochloride,salt_or_active,include,official active ingredient in US labels
+doxepin,other_insomnia_related,silenor,brand,include,low-dose insomnia brand
+doxepin,other_insomnia_related,sinequan,brand,include,older oral antidepressant brand; keep but flag indication confounding
+doxepin,other_insomnia_related,prudoxin,brand,exclude,topical doxepin cream
+doxepin,other_insomnia_related,zonalon,brand,exclude,topical doxepin cream
+ramelteon,other_insomnia_related,ramelteon,generic,include,base generic
+ramelteon,other_insomnia_related,rozerem,brand,include,brand
+melatonin,other_insomnia_related,melatonin,generic,include,exploratory supplement term
